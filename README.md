@@ -4,6 +4,8 @@
 金融千问机器人是一个 基于 `LLM` + `Agent` + `RAG` 的智能问答系统，该项目源于阿里天池的挑战赛。
 **赛事内容地址**：https://tianchi.aliyun.com/competition/entrance/532172
 **开源参考代码**：https://github.com/Tongyi-EconML/FinQwen
+**项目计划地址**：https://docs.qq.com/sheet/DTGVMSWtkendacmRl?tab=3qh6in
+
 
 ## 项目架构
 根据之前参赛项目的经验，该项目预计的项目架构图如下：
@@ -19,7 +21,7 @@ smart-finance-bot \
     |- rag \   # 该目录用于保存rag相关代码
     |- web \   # 该目录用于保存前端页面代码以及langserve相关代码
     |- conf \  # 该目录用于保存配置文件
-        |- .qwen # 该文件保存QWen的配置文件
+        |- .qwen # 该文件保存QWen的配置文件(请自行添加对应的API KEY)
 ```
 
 ## 使用说明

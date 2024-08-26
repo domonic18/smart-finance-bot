@@ -29,18 +29,23 @@ export default {
       this.userInput = ''; // 清空输入框
     },
     async fetchResponse(message) {
-      // 假设后端接口为 /api/chat
+      // 构建请求数据
+      const data = {
+        ad_words: message, // 从编辑框获取
+      };
+
+      // 后端接口为 /gen
       try {
-        const response = await fetch('http://localhost:3000/api/chat', {
+        const response = await fetch('http://localhost:8082/gen/invoke', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ message }),
+          body: JSON.stringify({ input: data }),
         });
-        const data = await response.json();
+        const dataResponse = await response.json(); // 修改为 dataResponse
         // 添加后端返回的消息
-        this.messages.push({ sender: '机器人', text: data.reply });
+        this.messages.push({ sender: '机器人', text: dataResponse.output });
       } catch (error) {
         console.error('Error:', error);
       }

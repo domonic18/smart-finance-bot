@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from langserve import add_routes
-from util import get_qwen_models
+from utils.util import get_qwen_models
+from utils.util import get_ernie_models
 
 from langchain_core.prompts import SystemMessagePromptTemplate
 from langchain_core.prompts import HumanMessagePromptTemplate
@@ -10,7 +11,8 @@ from langchain_core.output_parsers import StrOutputParser
 
 from fastapi.middleware.cors import CORSMiddleware
 
-llm, chat, embed = get_qwen_models()
+# llm, chat, embed = get_qwen_models()
+llm, chat, embed = get_ernie_models()
 
 # 创建 FastAPI 应用
 app = FastAPI(
@@ -27,11 +29,6 @@ app.add_middleware(
     allow_methods=["*"],  # 允许的HTTP方法
     allow_headers=["*"],  # 允许的请求头
 )
-
-# 如果访问根目录，重定向到/docs
-@app.get("/")
-async def redirect_root_to_docs():
-    return RedirectResponse("/docs")
 
 # 构建Prompt模板
 sys_msg = SystemMessagePromptTemplate.from_template(template="这是一个创意文案生成专家。")
@@ -53,4 +50,4 @@ add_routes(
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8082)

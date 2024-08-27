@@ -385,7 +385,7 @@ async function dom2img() {
         <div class="hidden sm:flex sm:flex-col sm:h-screen sm:border">
           <!-- 新建按钮 -->
           <div class="basis-1/12 flex justify-center items-center">
-            <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">新的会话</n-button>
+            <n-button class="w-4/5" @click="addLeftListEle">新的会话</n-button>
           </div>
           <!-- 列表 -->
           <div class="basis-10/12 overflow-auto border">

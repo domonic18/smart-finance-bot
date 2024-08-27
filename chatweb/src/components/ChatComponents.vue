@@ -398,7 +398,7 @@ async function startStream(index, body) {
           console.error('Error parsing JSON:', e, 'Complete Data:', completeData);
         }
       } else {
-        console.error('No valid JSON found in:', completeData);
+        console.log('No valid JSON found in:', completeData);
       }
     }
 

@@ -116,7 +116,7 @@ function addLeftListEle() {
     const uuid = randomUuid()
     left_data.left_list.push({
         uuid: uuid,
-        title: `New Chat${uuid}`,
+        title: `新的对话${uuid}`,
         enable_edit: false
     })
     left_data.chat.push({

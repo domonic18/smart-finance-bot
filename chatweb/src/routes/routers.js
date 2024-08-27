@@ -1,4 +1,4 @@
-import ContainerTemplate from '../components/ContainerTemplate.vue'
+import ContainerTemplate from '../components/ChatComponents.vue'
 import NotFound from '../components/NotFound.vue'
 import Home from '../components/Home.vue'
 

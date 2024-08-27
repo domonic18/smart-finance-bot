@@ -29,7 +29,9 @@ var controlSidebarHidden = ref(true)
 // 移动端下侧边栏显影
 
 const showSetting = ref(false)
-var LLM_URL = ref("https://uu.ci/v1/chat/completions")
+// var LLM_URL = ref("https://uu.ci/v1/chat/completions")
+var LLM_URL = ref("http://localhost:8082/gen/stream_log")
+
 var LLM_APIKEY = ref("sk-cwtdeSy4Ownmy6Uh5e9b6a67Fe4c4454A3Dc524876348eB1")
 
 var setting = reactive({
@@ -201,9 +203,25 @@ function addMessageListItem(uuid) {
         reversion: true,
         msgload: false
     })
+
+    // 构建发送的数据格式
+    const data = {
+      ad_words: input_area_value.value // 编辑框内容
+      // ad_words: "助听器" // 编辑框内容
+    };
+
+    const body = {
+      config: {},
+      input: data// 按要求的格式拼接
+
+    };
+
+    // 清空编辑框
     input_area_value.value = ''
     var ele = document.getElementById("msgArea")
     ele.scrollTop = ele.scrollHeight + ele.offsetHeight
+
+    // 添加一个占位消息，表示正在加载
     left_data.chat[index].msg_list.push({
         content: '',
         create_time: now_t,
@@ -211,7 +229,11 @@ function addMessageListItem(uuid) {
         msgload: true
     })
     console.info("开始发送消息...")
-    startStream(index)
+
+
+    // 调用 startStream 函数，并传递构建的请求体
+    startStream(index, body);
+    // startStream(index)
 }
 
 function buildMessagePromt(index) {
@@ -227,85 +249,167 @@ function buildMessagePromt(index) {
     return res
 }
 
-async function startStream(index) {
-    const url = LLM_URL.value;
-    const key = LLM_APIKEY.value
-    debugger
-    const body = {
-        model: setting.model,
-        messages: buildMessagePromt(index),
-        temperature: setting.Temperatures,
-        top_p: setting.Top_p,
-        stream: true,
+// async function startStream(index, body) {
+//     const url = LLM_URL.value;
+//     const key = LLM_APIKEY.value
+//     debugger
+//     // const body = {
+//     //     model: setting.model,
+//     //     messages: buildMessagePromt(index),
+//     //     temperature: setting.Temperatures,
+//     //     top_p: setting.Top_p,
+//     //     stream: true,
+//     // }
+//     var response = null
+//     try {
+//         response = await fetch(url, {
+//             "method": "POST",
+//             "headers": {
+//                 // Authorization: `Bearer ${key}`,
+//                 "Content-Type": "application/json",
+//                 "Accept": "text/event-stream", // 添加 Accept 头
+//                 "Accept-Encoding": "gzip, deflate, br, zstd", // 添加 Accept-Encoding 头
+//                 "Accept-Language": "zh-CN,zh;q=0.9" // 添加 Accept-Language 头
+//             },
+//             "mode": "cors",
+//             "body": JSON.stringify(body),
+//             "timeout": 60000,
+//         });
+//         left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].msgload = false
+//     } catch (error) {
+//         left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`
+//         return false
+//     }
+//
+//     if (response.status !== 200) {
+//         left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`
+//         return false
+//     }
+//
+//     const reader = response.body.getReader();
+//     let buffer = ''; // 用于缓存数据块
+//
+//     const readStream = async () => {
+//
+//         const { done, value } = await reader.read();
+//
+//         if (done) {
+//             console.log('Stream reading complete');
+//             return;
+//         }
+//
+//         const chunk = new TextDecoder('utf-8').decode(value);
+//         buffer += chunk; // 将数据块追加到缓冲区中
+//
+//         // 检查缓冲区中是否有完整的数据
+//         let completeData = '';
+//         let separatorIndex;
+//         while ((separatorIndex = buffer.indexOf('\n')) !== -1) {
+//             completeData = buffer.slice(0, separatorIndex); // 提取完整的数据
+//             buffer = buffer.slice(separatorIndex + 1); // 更新缓冲区，去掉已处理的数据
+//
+//             // 解析JSON数据
+//             const res = completeData.split(": ")[1]
+//             let data;
+//             try {
+//                 data = JSON.parse(res);
+//                 // 这里处理业务逻辑
+//                 const delta_content = data.choices[0].delta.content
+//                 console.log(delta_content)
+//
+//                 left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += delta_content
+//             } catch (e) {
+//                 continue
+//             }
+//         }
+//
+//         return readStream();
+//     }
+//
+//     // 开始处理流数据
+//     return readStream();
+// }
+
+async function startStream(index, body) {
+  const url = LLM_URL.value;
+  const key = LLM_APIKEY.value;
+  let response = null;
+
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "text/event-stream",
+        "Accept-Encoding": "gzip, deflate, br, zstd",
+        "Accept-Language": "zh-CN,zh;q=0.9"
+      },
+      mode: "cors",
+      body: JSON.stringify(body),
+    });
+
+    left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].msgload = false;
+  } catch (error) {
+    left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${error.message}`;
+    return false;
+  }
+
+  if (response.status !== 200) {
+    left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`;
+    return false;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder('utf-8');
+  let buffer = '';
+
+  const readStream = async () => {
+    const { done, value } = await reader.read();
+
+    if (done) {
+      console.log('Stream reading complete');
+      return;
     }
-    var response = null
-    try {
-        response = await fetch(url, {
-            "method": "POST",
-            "headers": {
-                Authorization: `Bearer ${key}`,
-                "Content-Type": "application/json"
-            },
-            "mode": "cors",
-            "body": JSON.stringify(body),
-            "timeout": 60000,
-        });
-        left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].msgload = false
-    } catch (error) {
-        left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`
-        return false
-    }
 
+    buffer += decoder.decode(value, { stream: true });
 
+    let completeData = '';
+    let separatorIndex;
+    while ((separatorIndex = buffer.indexOf('\n')) !== -1) {
+      completeData = buffer.slice(0, separatorIndex).trim();
+      buffer = buffer.slice(separatorIndex + 1);
 
-    if (response.status !== 200) {
-        left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`
-        return false
-    }
-
-    const reader = response.body.getReader();
-    let buffer = ''; // 用于缓存数据块
-
-    const readStream = async () => {
-
-        const { done, value } = await reader.read();
-
-        if (done) {
-            console.log('Stream reading complete');
-            return;
-        }
-
-        const chunk = new TextDecoder('utf-8').decode(value);
-        buffer += chunk; // 将数据块追加到缓冲区中
-
-        // 检查缓冲区中是否有完整的数据
-        let completeData = '';
-        let separatorIndex;
-        while ((separatorIndex = buffer.indexOf('\n')) !== -1) {
-            completeData = buffer.slice(0, separatorIndex); // 提取完整的数据
-            buffer = buffer.slice(separatorIndex + 1); // 更新缓冲区，去掉已处理的数据
-
-            // 解析JSON数据
-            const res = completeData.split(": ")[1]
-            let data;
-            try {
-                data = JSON.parse(res);
-                // 这里处理业务逻辑
-                const delta_content = data.choices[0].delta.content
-                console.log(delta_content)
-
-                left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += delta_content
-            } catch (e) {
-                continue
+      if (completeData.startsWith('data: ')) {
+        const jsonString = completeData.slice(6); // 去掉 'data: '
+        try {
+          const data = JSON.parse(jsonString);
+          data.ops.forEach(op => {
+            if (op.op === 'add' && op.path.includes('/streamed_output')) {
+              const outputText = op.value;
+              if (outputText) {
+                const currentContent = left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content;
+                if (!currentContent.includes(outputText)) {
+                  left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += outputText;
+                }
+              }
             }
+          });
+        } catch (e) {
+          console.error('Error parsing JSON:', e, 'Complete Data:', completeData);
         }
-
-        return readStream();
+      } else {
+        console.error('No valid JSON found in:', completeData);
+      }
     }
 
-    // 开始处理流数据
     return readStream();
+  };
+
+  return readStream();
 }
+
+
+
 
 function hasLogin(compomentName = 'Login') {
     if (compomentName == 'login') return instaceV.proxy.hasLogin ? 'hidden' : '';
@@ -429,7 +533,7 @@ async function dom2img() {
       <div class="sm:hidden absolute top-1 left-1 h-full w-full flex flex-col">
         <div>
           <n-button text style="font-size:32px" @click="controlSidebarHidden = !controlSidebarHidden">
-            <n-icon class="text-black dark:text-white">
+            <n-icon class="text-black">
               <Menu />
             </n-icon>
           </n-button>
@@ -437,7 +541,7 @@ async function dom2img() {
         <div v-if="!controlSidebarHidden" class="mobile-sidebar">
           <div class="w-full flex flex-col h-screen border">
             <div class="basis-1/12 flex justify-center items-center">
-              <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">新的对话</n-button>
+              <n-button class="w-4/5" @click="addLeftListEle">新的对话</n-button>
             </div>
             <div class="basis-10/12 overflow-auto border">
               <div v-for="item in left_data.left_list" :key="item.uuid">
@@ -501,7 +605,7 @@ async function dom2img() {
                 <n-tooltip trigger="hover">
                   <template #trigger>
                     <n-button text size="large" class="px-2" @click="deleteChatItemHistory(route.params.uuid)">
-                      <n-icon class="text-black dark:text-white">
+                      <n-icon class="text-black">
                         <Delete />
                       </n-icon>
                     </n-button>
@@ -511,7 +615,7 @@ async function dom2img() {
                 <n-tooltip trigger="hover">
                   <template #trigger>
                     <n-button text size="large" class="pr-4" @click="dom2img()">
-                      <n-icon class="text-black dark:text-white">
+                      <n-icon class="text-black">
                         <Download />
                       </n-icon>
                     </n-button>
@@ -520,7 +624,7 @@ async function dom2img() {
                 </n-tooltip>
                 <a href="" id="link" class="hidden"></a>
                 <n-input show-count @keyup.ctrl.enter="addMessageListItem(route.params.uuid)" placeholder="Ctrl+Enter 发送消息" v-model:value="input_area_value" type="textarea" size="tiny" :autosize="{ minRows: 2, maxRows: 5 }" />
-                <n-button ghost class="h-auto dark:text-white" @click="addMessageListItem(route.params.uuid)">
+                <n-button ghost class="h-auto" @click="addMessageListItem(route.params.uuid)">
                   发送
                 </n-button>
               </n-input-group>
@@ -529,6 +633,35 @@ async function dom2img() {
         </div>
       </div>
     </div>
+
+    <!-- 设置模态框 -->
+    <n-modal v-model:show="showSetting" style="width: 600px" class="custom-card" preset="card" title="设置">
+      <n-tabs type="line" animated>
+        <n-tab-pane name="about" tab="关于">
+          <div>这是一个demo项目，仅用于学习。</div>
+          <div class="my-4">技术栈：Vue3 + Vite + tailwindCss3 + NaiveUi</div>
+        </n-tab-pane>
+        <n-tab-pane name="settings" tab="设置">
+          <div class="grid grid-rows-3 gap-4">
+            <div>
+              <span class="mr-4">Model: </span>
+              <n-select :style="{ width: '80%' }" :options="selectOptions" v-model:value="setting.model" />
+            </div>
+            <div>
+              <span class="mr-4">Temperatures: </span>
+              <n-input-number :style="{ width: '80%' }" :default-value="0.8" :step="0.1" :max="1" :min="0.1" v-model:value="setting.Temperatures" />
+            </div>
+            <div>
+              <span class="mr-4">Top_p: </span>
+              <n-input-number :style="{ width: '80%' }" :default-value="1" :step="1" :max="1" :min="1" v-model:value="setting.Top_p" />
+            </div>
+          </div>
+        </n-tab-pane>
+        <n-tab-pane name="other" tab="其他">
+          其他
+        </n-tab-pane>
+      </n-tabs>
+    </n-modal>
   </div>
 </template>
 

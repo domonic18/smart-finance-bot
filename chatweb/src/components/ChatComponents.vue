@@ -385,7 +385,7 @@ async function dom2img() {
         <div class="hidden sm:flex sm:flex-col sm:h-screen sm:border">
           <!-- 新建按钮 -->
           <div class="basis-1/12 flex justify-center items-center">
-            <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">New Chat</n-button>
+            <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">新的会话</n-button>
           </div>
           <!-- 列表 -->
           <div class="basis-10/12 overflow-auto border">
@@ -395,7 +395,7 @@ async function dom2img() {
                   <n-icon size="medium">
                     <game-controller-outline />
                   </n-icon>
-                  <div class="truncate mx-2">
+                  <div class="truncate mx-2" style="color: #000;">
                     <p v-if="!item.enable_edit" class="truncate h-full">{{ item.title }}</p>
                     <n-input v-else type="text" size="small" class="h-full" v-model:value="item.title" @keyup.enter="submit(item.uuid)" />
                   </div>
@@ -414,14 +414,8 @@ async function dom2img() {
             </div>
           </div>
           <!-- 设置页面 -->
-          <div class="settings-container">
-            <div class="avatar-container">
-              <img class="rounded-full h-10 w-10" src="../assets/icon.jpg" alt="" />
-            </div>
-            <div class="user-info">
-              <div class="font-bold">DaShuaiqi Li</div>
-              <div class="text-xs">Start On <a class="text-blue-400" href="https://github.com">Github</a></div>
-            </div>
+          <div class="footer flex items-center justify-between p-4 h-15">
+            <div class="user-info font-bold">金融千问机器人</div>
             <div class="settings-icon">
               <n-icon @click="showSettingFunc()">
                 <SettingsOutline />
@@ -443,7 +437,7 @@ async function dom2img() {
         <div v-if="!controlSidebarHidden" class="mobile-sidebar">
           <div class="w-full flex flex-col h-screen border">
             <div class="basis-1/12 flex justify-center items-center">
-              <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">New Chat</n-button>
+              <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">新的对话</n-button>
             </div>
             <div class="basis-10/12 overflow-auto border">
               <div v-for="item in left_data.left_list" :key="item.uuid">
@@ -470,14 +464,8 @@ async function dom2img() {
                 </router-link>
               </div>
             </div>
-            <div class="settings-container">
-              <div class="avatar-container">
-                <img class="rounded-full h-10 w-10" src="../assets/icon.jpg" alt="" />
-              </div>
-              <div class="user-info">
-                <div class="font-bold">DaShuaiqi Li</div>
-                <div class="text-xs">Start On <a class="text-blue-400" href="https://github.com">Github</a></div>
-              </div>
+            <div class="footer flex items-center justify-between p-4 h-15">
+              <div class="user-info font-bold">金融千问机器人</div>
               <div class="settings-icon">
                 <n-icon @click="showSettingFunc()">
                   <SettingsOutline />
@@ -582,14 +570,7 @@ async function dom2img() {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  height: 100%;
-}
-
-.avatar-container {
-  width: 25%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height: 50%;
 }
 
 .user-info {

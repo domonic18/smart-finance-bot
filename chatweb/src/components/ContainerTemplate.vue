@@ -38,7 +38,7 @@ var setting = reactive({
     Top_p: 1,
 })
 
-const left_list_is_empty = ref(false)
+let left_list_is_empty = ref(false)
 
 var is404 = ref(false)
 
@@ -374,351 +374,280 @@ async function dom2img() {
 </script>
 
 <template>
-
-
-    <div>
-        <div v-if="centerLodding"
-            class=" absolute top-1/3 left-1/3 bg-gray w-1/3 h1/3 flex justify-center items-center ">
-            <n-spin size="large" />
-        </div>
-        <Login class=" border border-red-400"></Login>
-        <div class=" flex flex-row h-min " :class="hasLogin('main')">
-            <!-- 非移动端模式下侧边栏的样式 -->
-            <div class=" sm:w-1/5 h-full  " :class="controlSidebarHidden ? 'w-0' : ''">
-                <div class="hidden sm:flex sm:flex-col sm:h-screen sm:border ">
-                    <!-- 新建按钮 -->
-                    <div class=" basis-1/12   flex justify-center items-center">
-                        <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">New Chat</n-button>
-                    </div>
-                    <!-- 列表 -->
-
-                    <div class="basis-10/12  overflow-auto border  ">
-
-                        <div v-for=" item in left_data.left_list" :key="item.uuid">
-                            <!-- 侧边栏输入框 -->
-                            <router-link :to="`/chat/${item.uuid}`" class="m-2 flex flex-row justify-between items-center 
-                        border border-gray-400  rounded-md p-2  dark:text-white">
-
-                                <div class=" w-4/5 flex items-center">
-                                    <n-icon size="medium">
-                                        <game-controller-outline />
-                                    </n-icon>
-                                    <div class=" truncate mx-2">
-                                        <p v-if="!item.enable_edit" class=" truncate h-full">{{ item.title }}</p>
-                                        <n-input v-else type="text" size="small" class=" h-full " :hidden="false"
-                                            v-model:value="item.title" @keyup.enter="submit(item.uuid)"></n-input>
-                                    </div>
-                                </div>
-                                <div class="w-1/5 flex justify-center items-center "
-                                    :class="route.params.uuid != item.uuid ? 'hidden' : ''">
-                                    <n-button-group size="small" :vertical="false" :hidden="false">
-                                        <n-button text size="" @click="editLeftListEle(item.uuid)">
-                                            <n-icon>
-                                                <Edit />
-                                            </n-icon>
-                                        </n-button>
-                                        <n-button text @click="delLeftListEle(item.uuid)">
-                                            <n-icon>
-                                                <Delete />
-                                            </n-icon>
-                                        </n-button>
-
-                                    </n-button-group>
-                                </div>
-                            </router-link>
-                        </div>
-
-
-                    </div>
-                    <!-- 设置页面 -->
-                    <div class="basis-1/12 flex justify-start items-center h-full  ">
-                        <!-- 头像 -->
-                        <div class=" w-1/4  flex justify-center items-center">
-                            <img class=" rounded-full h-10 w-10" src="../assets/icon.jpg" alt="">
-                        </div>
-                        <!-- 简介 -->
-                        <div class=" w-2/4  h-full grid grid-rows-2">
-                            <div class=" flex justify-start items-end font-bold">
-                                DaShuaiqi Li
-                            </div>
-                            <div class=" text-xs">
-                                Start On <a class=" text-blue-400" href="https://github.com">Github</a>
-                            </div>
-                        </div>
-                        <!-- 设置 -->
-                        <div class=" w-1/4  h-full flex justify-center items-center">
-                            <n-icon @click="showSettingFunc()">
-                                <SettingsOutline></SettingsOutline>
-                            </n-icon>
-                            <!-- 设置 modal -->
-                            <div
-                                class="hidden absolute top-0 left-0 bg-transparent  w-screen h-screen border border-red-200">
-                                <div class=" flex justify-center items-center">
-                                    <n-modal v-model:show="showSetting" style="width: 600px" class="custom-card"
-                                        preset="card" title="" size="huge">
-
-                                        <template #header-extra>
-                                        </template>
-                                        <n-tabs type="line" animated>
-                                            <n-tab-pane name="about" tab="关于">
-                                                <div>这是一个demo项目，仅用于学习。</div>
-                                                <div class="my-4">技术栈：Vue3 + Vite + tailwindCss3 + NaiveUi</div>
-                                            </n-tab-pane>
-                                            <n-tab-pane name="settings" tab="设置">
-                                                <div class=" grid grid-rows-3 gap-4">
-
-                                                    <div>
-                                                        <span class=" mr-4">LLM_URL: </span>
-                                                        <br>
-                                                        <n-input :style="{ width: '80%' }" v-model:value="LLM_URL"
-                                                            type="text" placeholder="LLM_URL" />
-                                                    </div>
-                                                    <div>
-                                                        <span class=" mr-4">LLM_APIKEY: </span>
-                                                        <br>
-                                                        <n-input :style="{ width: '80%' }" v-model:value="LLM_APIKEY"
-                                                            type="text" placeholder="LLM_APIKEY" />
-                                                    </div>
-                                                    <div>
-                                                        <span class=" mr-4">Model: </span>
-                                                        <n-select :style="{ width: '80%' }" :options="selectOptions"
-                                                            v-model:value="setting.model" />
-                                                    </div>
-                                                    <div>
-                                                        <span class=" mr-4">Temperatures: </span>
-                                                        <n-input-number :style="{ width: '80%' }" :default-value="0.8"
-                                                            :step="0.1" :max="1" :min="0.1"
-                                                            v-model:value="setting.Temperatures" />
-                                                    </div>
-                                                    <div>
-                                                        <span class=" mr-4">Top_p: </span>
-                                                        <n-input-number :style="{ width: '80%' }" :default-value="1"
-                                                            :step="1" :max="1" :min="1" v-model:value="setting.Top_p" />
-                                                    </div>
-                                                </div>
-                                            </n-tab-pane>
-                                            <n-tab-pane name="other" tab="其他">
-                                                其他
-                                            </n-tab-pane>
-                                        </n-tabs>
-
-                                    </n-modal>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <!-- 移动端模式下侧边栏的样式 -->
-
-            <div class=" sm:hidden absolute top-1 left-1  h-full w-full flex flex-col ">
-                <div>
-                    <n-button text style="font-size:32px" key="" @click="controlSidebarHidden = !controlSidebarHidden">
-                        <n-icon class=" text-black dark:text-white">
-                            <Menu></Menu>
-                        </n-icon>
-                    </n-button>
-                </div>
-                <div v-if="!controlSidebarHidden" class=" w-4/5 sm:hidden bg-white dark:bg-black">
-                    <div class=" w-full flex  flex-col  h-screen border ">
-                        <!-- 新建按钮 -->
-                        <div class=" basis-1/12   flex justify-center items-center  ">
-                            <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">New Chat</n-button>
-                        </div>
-                        <!-- 列表 -->
-
-                        <div class="basis-10/12  overflow-auto border  ">
-
-                            <div v-for=" item in left_data.left_list" :key="item.uuid">
-                                <!-- 侧边栏输入框 -->
-                                <router-link :to="`/chat/${item.uuid}`" class="m-2 flex flex-row justify-between items-center 
-                        border border-gray-400  rounded-md p-2  dark:text-white ">
-
-                                    <div class=" w-4/5 flex items-center ">
-                                        <n-icon size="medium">
-                                            <game-controller-outline />
-                                        </n-icon>
-                                        <div class=" truncate mx-2">
-                                            <p v-if="!item.enable_edit" class=" truncate h-full">{{ item.title }}</p>
-                                            <n-input v-else type="text" size="small" class=" h-full " :hidden="false"
-                                                v-model:value="item.title" @keyup.enter="submit(item.uuid)"></n-input>
-                                        </div>
-                                    </div>
-                                    <div class="w-1/5 flex justify-center items-center "
-                                        :class="route.params.uuid != item.uuid ? 'hidden' : ''">
-                                        <n-button-group size="small" :vertical="false" :hidden="false">
-                                            <n-button text size="" @click="editLeftListEle(item.uuid)">
-                                                <n-icon>
-                                                    <Edit />
-                                                </n-icon>
-                                            </n-button>
-                                            <n-button text @click="delLeftListEle(item.uuid)">
-                                                <n-icon>
-                                                    <Delete />
-                                                </n-icon>
-                                            </n-button>
-
-                                        </n-button-group>
-                                    </div>
-                                </router-link>
-                            </div>
-
-
-                        </div>
-                        <!-- 设置页面 -->
-                        <div class="basis-1/12 flex justify-start items-center h-full  ">
-                            <!-- 头像 -->
-                            <div class=" w-1/4  flex justify-center items-center">
-                                <img class=" rounded-full h-10 w-10" src="../assets/icon.jpg" alt="">
-                            </div>
-                            <!-- 简介 -->
-                            <div class=" w-2/4  h-full grid grid-rows-2">
-                                <div class=" flex justify-start items-end font-bold">
-                                    DaShuaiqi Li
-                                </div>
-                                <div class=" text-xs">
-                                    Start On <a class=" text-blue-400" href="https://github.com">Github</a>
-                                </div>
-                            </div>
-                            <!-- 设置 -->
-                            <div class=" w-1/4  h-full flex justify-center items-center">
-                                <n-icon @click="showSettingFunc()">
-                                    <SettingsOutline></SettingsOutline>
-                                </n-icon>
-                                <!-- 设置 modal -->
-                                <div
-                                    class="hidden absolute top-0 left-0 bg-transparent  w-screen h-screen border border-red-200">
-                                    <div class=" flex justify-center items-center">
-                                        <n-modal v-model:show="showSetting" style="width: 600px" class="custom-card"
-                                            preset="card" title="" size="huge">
-
-                                            <template #header-extra>
-                                            </template>
-                                            <n-tabs type="line" animated>
-                                                <n-tab-pane name="about" tab="关于">
-                                                    <div>这是一个demo项目，仅用于学习。</div>
-                                                    <div class="my-4">技术栈：Vue3 + Vite + tailwindCss3 + NaiveUi</div>
-                                                </n-tab-pane>
-                                                <n-tab-pane name="settings" tab="设置">
-                                                    <div class=" grid grid-rows-3 gap-4">
-                                                        <div>
-                                                            <span class=" mr-4">Model: </span>
-                                                            <n-select :style="{ width: '80%' }" :options="selectOptions"
-                                                                v-model:value="setting.model" />
-                                                        </div>
-                                                        <div>
-                                                            <span class=" mr-4">Temperatures: </span>
-                                                            <n-input-number :style="{ width: '80%' }"
-                                                                :default-value="0.8" :step="0.1" :max="1" :min="0.1"
-                                                                v-model:value="setting.Temperatures" />
-                                                        </div>
-                                                        <div>
-                                                            <span class=" mr-4">Top_p: </span>
-                                                            <n-input-number :style="{ width: '80%' }" :default-value="1"
-                                                                :step="1" :max="1" :min="1"
-                                                                v-model:value="setting.Top_p" />
-                                                        </div>
-                                                    </div>
-                                                </n-tab-pane>
-                                                <n-tab-pane name="other" tab="其他">
-                                                    其他
-                                                </n-tab-pane>
-                                            </n-tabs>
-
-                                        </n-modal>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="w-full  sm:w-4/5 h-full ">
-                <div class="flex flex-col h-screen">
-                    <div v-if="left_list_is_empty"
-                        class=" basis-11/12 w-full p-12 overflow-auto flex justify-center items-start text-gray-400 italic  ">
-                        Hi
-                    </div>
-                    <!-- 这里是IM区域 -->
-                    <div v-else class=" basis-11/12 w-full p-12 overflow-auto" id="msgArea">
-                        <div v-for="(msglist, index) in getMsgList(route.params.uuid)" :key="index"
-                            class=" flex flex-col mt-1  msgItem ">
-                            <div :class="msglist.reversion ? 'flex-row-reverse' : 'flex-row'"
-                                class=" flex justify-start items-center h-10">
-                                <img class=" rounded-full h-10 w-10" src="../assets/icon.jpg" alt="">
-                                <span class="ml-4 text-sm">{{ msglist.create_time }}</span>
-                            </div>
-                            <div class="flex  " :class="msglist.reversion ? 'flex-row-reverse' : 'flex-row'">
-                                <div
-                                    class="bg-blue-200 dark:bg-white dark:text-black w-auto max-w-[80%] min-w-[1%] break-words overflow-ellipsis rounded-sm p-2 my-1">
-                                    <n-spin v-if="msglist.msgload" size="small" stroke="red" />
-                                    <Markdown v-else :source="msglist.content"></Markdown>
-                                </div>
-
-                            </div>
-                        </div>
-
-
-                    </div>
-
-                    <div v-if="!left_list_is_empty" class=" basis-1/12   w-full">
-                        <!-- 这里是输入框 -->
-                        <div class="  p-2">
-                            <n-input-group>
-                                <n-tooltip trigger="hover">
-                                    <template #trigger>
-                                        <n-button text size="large" class="px-2"
-                                            @click="deleteChatItemHistory(route.params.uuid)">
-                                            <n-icon class=" text-black dark:text-white">
-                                                <Delete></Delete>
-                                            </n-icon>
-                                        </n-button>
-                                    </template>
-                                    删除当前会话记录
-                                </n-tooltip>
-                                <n-tooltip trigger="hover">
-                                    <template #trigger>
-                                        <n-button text size="large" class=" pr-4" @click="dom2img()">
-                                            <n-icon class=" text-black dark:text-white">
-                                                <Download></Download>
-                                            </n-icon>
-                                        </n-button>
-                                    </template>
-                                    下载当前会话为图片
-                                </n-tooltip>
-                                <a href="" id="link" class="hidden"></a>
-
-
-                                <n-input show-count @keyup.ctrl.enter="addMessageListItem(route.params.uuid)"
-                                    placeholder="Ctrl+Enter 发送消息" v-model:value="input_area_value" type="textarea" size="tiny"
-                                    :autosize="{
-            minRows: 2,
-            maxRows: 5
-        }" />
-                                <n-button ghost class=" h-auto dark:text-white "
-                                    @click="addMessageListItem(route.params.uuid)">
-                                    发送
-                                </n-button>
-                            </n-input-group>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div>
+    <div v-if="centerLodding" class="loading-container">
+      <n-spin size="large" />
     </div>
-</template>
+    <Login class="border border-red-400" />
+    <div class="flex flex-row h-min" :class="hasLogin('main')">
+      <!-- 非移动端模式下侧边栏的样式 -->
+      <div class="sidebar" :class="controlSidebarHidden ? 'w-0' : ''">
+        <div class="hidden sm:flex sm:flex-col sm:h-screen sm:border">
+          <!-- 新建按钮 -->
+          <div class="basis-1/12 flex justify-center items-center">
+            <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">New Chat</n-button>
+          </div>
+          <!-- 列表 -->
+          <div class="basis-10/12 overflow-auto border">
+            <div v-for="item in left_data.left_list" :key="item.uuid">
+              <router-link :to="`/chat/${item.uuid}`" class="sidebar-item">
+                <div class="w-4/5 flex items-center">
+                  <n-icon size="medium">
+                    <game-controller-outline />
+                  </n-icon>
+                  <div class="truncate mx-2">
+                    <p v-if="!item.enable_edit" class="truncate h-full">{{ item.title }}</p>
+                    <n-input v-else type="text" size="small" class="h-full" v-model:value="item.title" @keyup.enter="submit(item.uuid)" />
+                  </div>
+                </div>
+                <div class="w-1/5 flex justify-center items-center" :class="route.params.uuid != item.uuid ? 'hidden' : ''">
+                  <n-button-group size="small">
+                    <n-button text @click="editLeftListEle(item.uuid)">
+                      <n-icon><Edit /></n-icon>
+                    </n-button>
+                    <n-button text @click="delLeftListEle(item.uuid)">
+                      <n-icon><Delete /></n-icon>
+                    </n-button>
+                  </n-button-group>
+                </div>
+              </router-link>
+            </div>
+          </div>
+          <!-- 设置页面 -->
+          <div class="settings-container">
+            <div class="avatar-container">
+              <img class="rounded-full h-10 w-10" src="../assets/icon.jpg" alt="" />
+            </div>
+            <div class="user-info">
+              <div class="font-bold">DaShuaiqi Li</div>
+              <div class="text-xs">Start On <a class="text-blue-400" href="https://github.com">Github</a></div>
+            </div>
+            <div class="settings-icon">
+              <n-icon @click="showSettingFunc()">
+                <SettingsOutline />
+              </n-icon>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      <!-- 移动端模式下侧边栏的样式 -->
+      <div class="sm:hidden absolute top-1 left-1 h-full w-full flex flex-col">
+        <div>
+          <n-button text style="font-size:32px" @click="controlSidebarHidden = !controlSidebarHidden">
+            <n-icon class="text-black dark:text-white">
+              <Menu />
+            </n-icon>
+          </n-button>
+        </div>
+        <div v-if="!controlSidebarHidden" class="mobile-sidebar">
+          <div class="w-full flex flex-col h-screen border">
+            <div class="basis-1/12 flex justify-center items-center">
+              <n-button class="w-4/5 dark:text-white" @click="addLeftListEle">New Chat</n-button>
+            </div>
+            <div class="basis-10/12 overflow-auto border">
+              <div v-for="item in left_data.left_list" :key="item.uuid">
+                <router-link :to="`/chat/${item.uuid}`" class="sidebar-item">
+                  <div class="w-4/5 flex items-center">
+                    <n-icon size="medium">
+                      <game-controller-outline />
+                    </n-icon>
+                    <div class="truncate mx-2">
+                      <p v-if="!item.enable_edit" class="truncate h-full">{{ item.title }}</p>
+                      <n-input v-else type="text" size="small" class="h-full" v-model:value="item.title" @keyup.enter="submit(item.uuid)" />
+                    </div>
+                  </div>
+                  <div class="w-1/5 flex justify-center items-center" :class="route.params.uuid != item.uuid ? 'hidden' : ''">
+                    <n-button-group size="small">
+                      <n-button text @click="editLeftListEle(item.uuid)">
+                        <n-icon><Edit /></n-icon>
+                      </n-button>
+                      <n-button text @click="delLeftListEle(item.uuid)">
+                        <n-icon><Delete /></n-icon>
+                      </n-button>
+                    </n-button-group>
+                  </div>
+                </router-link>
+              </div>
+            </div>
+            <div class="settings-container">
+              <div class="avatar-container">
+                <img class="rounded-full h-10 w-10" src="../assets/icon.jpg" alt="" />
+              </div>
+              <div class="user-info">
+                <div class="font-bold">DaShuaiqi Li</div>
+                <div class="text-xs">Start On <a class="text-blue-400" href="https://github.com">Github</a></div>
+              </div>
+              <div class="settings-icon">
+                <n-icon @click="showSettingFunc()">
+                  <SettingsOutline />
+                </n-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full sm:w-4/5 h-full">
+        <div class="flex flex-col h-screen">
+          <div v-if="left_list_is_empty" class="empty-chat-message">
+            Hi
+          </div>
+          <div v-else class="chat-area" id="msgArea">
+            <div v-for="(msglist, index) in getMsgList(route.params.uuid)" :key="index" class="flex flex-col mt-1 msgItem">
+              <div :class="msglist.reversion ? 'flex-row-reverse' : 'flex-row'" class="flex justify-start items-center h-10">
+                <img class="rounded-full h-10 w-10" src="../assets/icon.jpg" alt="" />
+                <span class="ml-4 text-sm">{{ msglist.create_time }}</span>
+              </div>
+              <div class="flex" :class="msglist.reversion ? 'flex-row-reverse' : 'flex-row'">
+                <div class="message-container">
+                  <n-spin v-if="msglist.msgload" size="small" stroke="red" />
+                  <Markdown v-else :source="msglist.content"></Markdown>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-if="!left_list_is_empty" class="input-area">
+            <div class="p-2">
+              <n-input-group>
+                <n-tooltip trigger="hover">
+                  <template #trigger>
+                    <n-button text size="large" class="px-2" @click="deleteChatItemHistory(route.params.uuid)">
+                      <n-icon class="text-black dark:text-white">
+                        <Delete />
+                      </n-icon>
+                    </n-button>
+                  </template>
+                  删除当前会话记录
+                </n-tooltip>
+                <n-tooltip trigger="hover">
+                  <template #trigger>
+                    <n-button text size="large" class="pr-4" @click="dom2img()">
+                      <n-icon class="text-black dark:text-white">
+                        <Download />
+                      </n-icon>
+                    </n-button>
+                  </template>
+                  下载当前会话为图片
+                </n-tooltip>
+                <a href="" id="link" class="hidden"></a>
+                <n-input show-count @keyup.ctrl.enter="addMessageListItem(route.params.uuid)" placeholder="Ctrl+Enter 发送消息" v-model:value="input_area_value" type="textarea" size="tiny" :autosize="{ minRows: 2, maxRows: 5 }" />
+                <n-button ghost class="h-auto dark:text-white" @click="addMessageListItem(route.params.uuid)">
+                  发送
+                </n-button>
+              </n-input-group>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .router-link-active {
-    border-color: #18a058;
-    color: #18a058;
+  border-color: #18a058;
+  color: #18a058;
+}
+
+.loading-container {
+  position: absolute;
+  top: 33%;
+  left: 33%;
+  background-color: gray;
+  width: 33%;
+  height: 33%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar {
+  width: 20%;
+  height: 100%;
+}
+
+.sidebar-item {
+  margin: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid gray;
+  border-radius: 0.375rem; /* rounded-md */
+  padding: 0.5rem;
+  color: white;
+}
+
+.settings-container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+}
+
+.avatar-container {
+  width: 25%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-info {
+  width: 50%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.settings-icon {
+  width: 25%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mobile-sidebar {
+  width: 80%;
+  background-color: white;
+  dark:bg-black;
+}
+
+.empty-chat-message {
+  flex-basis: 91%;
+  width: 100%;
+  padding: 3rem;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  color: gray;
+  font-style: italic;
+}
+
+.chat-area {
+  flex-basis: 91%;
+  width: 100%;
+  padding: 3rem;
+  overflow: auto;
+}
+
+.message-container {
+  background-color: #bfdbfe; /* bg-blue-200 */
+  color: black; /* dark:text-black */
+  width: auto;
+  max-width: 80%;
+  min-width: 1%;
+  break-words: break-word;
+  overflow: hidden;
+  border-radius: 0.375rem; /* rounded-sm */
+  padding: 0.5rem;
+  margin: 0.25rem 0;
+}
+
+.input-area {
+  flex-basis: 8%;
+  width: 100%;
 }
 </style>
+

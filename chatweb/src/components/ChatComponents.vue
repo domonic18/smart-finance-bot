@@ -442,7 +442,10 @@ async function dom2img() {
           <!-- 设置页面 -->
           <div class="footer flex flex-col items-center justify-between p-4 h-15">
             <div class="user-info font-bold text-lg">金融千问机器人</div>
-            <img src="../assets/logo.png" alt="Logo" class="logo" />
+            <div class="logo-container relative"> <!-- 添加一个容器 -->
+              <img src="../assets/background.png" alt="Background" class="background-logo" /> <!-- 新增背景图片 -->
+              <img src="../assets/logo.png" alt="Logo" class="logo" />
+            </div>
             <div class="robot-description text-sm text-gray-600 mt-2">
               金融千问机器人，通过RAG对既有的PDF招股书建立了知识库，同时借助大模型+Agent对金融SQL数据库进行动态查询，旨在为用户提供快速、准确的金融信息和咨询服务。
             </div>
@@ -696,18 +699,12 @@ async function dom2img() {
 }
 
 .avatar {
-  width: 50px;  /* 修改这里的值 */
-  height: 50px; /* 修改这里的值 */
+  width: 50px;
+  height: 50px;
 }
 
 .footer {
   text-align: center; /* 居中显示 */
-}
-
-.logo {
-  width: 200px; /* 根据需要调整 Logo 大小 */
-  height: auto; /* 保持比例 */
-  margin-top: 8px; /* Logo 与文本之间的间距 */
 }
 
 .robot-description {
@@ -715,6 +712,29 @@ async function dom2img() {
   text-align: left; /* 左对齐 */
   width: 100%; /* 使描述占满可用宽度 */
   padding-left: 16px; /* 可选：增加左侧内边距 */
+}
+
+.logo-container {
+  position: relative; /* 设置容器为相对定位 */
+}
+
+.background-logo {
+  position: absolute; /* 设置背景图为绝对定位 */
+  top: 0; /* 顶部对齐 */
+  left: 0; /* 左侧对齐 */
+  width: 240px; /* 设置背景图宽度为240px */
+  height: auto; /* 保持比例 */
+  z-index: 1; /* 确保背景图在logo下方 */
+}
+
+.logo {
+  position: relative; /* 设置logo为相对定位 */
+  z-index: 2; /* 确保logo在背景图上方 */
+  width: 200px; /* 根据需要调整 Logo 大小 */
+  height: auto; /* 保持比例 */
+  top: 30%; /* 垂直居中 */
+  left: 50%; /* 水平居中 */
+  transform: translate(-50%, -50%); /* 使 logo 在背景图中心 */
 }
 
 </style>

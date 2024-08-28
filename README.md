@@ -20,52 +20,56 @@
 ```bash
 smart-finance-bot \
     |- doc \  # 该目录用于保存文档类文件，例如：需求文档、说明文档、数据文档
-    |- agent \ # 该目录用于保存agent相关代码
-    |- rag \   # 该目录用于保存rag相关代码
-    |- ir \   # 该目录用于保存意图识别(Intent Recognition)相关代码
-    |- web \   # 该目录用于保存前端页面代码以及langserve相关代码
-    |- conf \  # 该目录用于保存配置文件
-        |- .qwen # 该文件保存QWen的配置文件(请自行添加对应的API KEY)
+    |- app \   # 该目录用于服务端代码
+        |- agent \ # 该目录用于保存agent相关代码
+        |- rag \   # 该目录用于保存rag相关代码
+        |- ir \   # 该目录用于保存意图识别(Intent Recognition)相关代码
+        |- conf \  # 该目录用于保存配置文件
+            |- .qwen # 该文件保存QWen的配置文件(请自行添加对应的API KEY)
+            |- .ernie # 该文件保存百度千帆的配置文件(请自行添加对应的API KEY)
+    |- chatweb \   # 该目录用于保存前端页面代码
 ```
 
 ## 使用说明
+### 后端服务启动方法
 
-### 代码拉取
-
-#### 第一步：安装git客户端
-
-安装相关说明请见[gitee使用教程](https://blog.csdn.net/weixin_50470247/article/details/133585369)
-
-#### 第二步：拉取代码
-
-在命令行输入
-
+**第一步**：拉取代码到本地
 ```shell
 git clone https://gitee.com/deadwalk/smart-finance-bot.git
 ```
 
-#### 第三步：切换代码分支为develop分支
+> Git客户端[gitee使用教程](https://blog.csdn.net/weixin_50470247/article/details/133585369)
 
-在命令行输入如下命令切换至develop开发分支
-
-```shell
-git checkout develop
-```
-
-#### 更新代码
-
-在拉取代码之后，如果涉及到代码的二次更新，请在命令行输入如下命令更新最新的代码
-
-```shell
-git pull
-```
-
-
-### 组件安装
+**第二步**：安装相关组件
 
 在当前目录下启动命令行，在命令行中运行如下命令
 
-```shell script
+```bash
 pip install -r requirements.txt
+```
+
+**第三步**：启动langserve服务
+```bash
+# 进入项目目录
+cd smart-finance-bot
+
+# 启动服务
+python app/server.py
+
+```
+
+### 前端服务运行方法
+**第一步**：安装Node.js
+访问https://nodejs.org，按照页面提示下载Node.js到本地后进行安装
+
+**第二步**：安装依赖包
+```bash
+    cd chatweb
+    npm install
+```
+
+**第三步**：启动服务
+```bash
+npm run dev
 ```
 

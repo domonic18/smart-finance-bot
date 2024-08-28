@@ -252,87 +252,6 @@ function buildMessagePromt(index) {
     return res
 }
 
-// async function startStream(index, body) {
-//     const url = LLM_URL.value;
-//     const key = LLM_APIKEY.value
-//     debugger
-//     // const body = {
-//     //     model: setting.model,
-//     //     messages: buildMessagePromt(index),
-//     //     temperature: setting.Temperatures,
-//     //     top_p: setting.Top_p,
-//     //     stream: true,
-//     // }
-//     var response = null
-//     try {
-//         response = await fetch(url, {
-//             "method": "POST",
-//             "headers": {
-//                 // Authorization: `Bearer ${key}`,
-//                 "Content-Type": "application/json",
-//                 "Accept": "text/event-stream", // 添加 Accept 头
-//                 "Accept-Encoding": "gzip, deflate, br, zstd", // 添加 Accept-Encoding 头
-//                 "Accept-Language": "zh-CN,zh;q=0.9" // 添加 Accept-Language 头
-//             },
-//             "mode": "cors",
-//             "body": JSON.stringify(body),
-//             "timeout": 60000,
-//         });
-//         left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].msgload = false
-//     } catch (error) {
-//         left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`
-//         return false
-//     }
-//
-//     if (response.status !== 200) {
-//         left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`
-//         return false
-//     }
-//
-//     const reader = response.body.getReader();
-//     let buffer = ''; // 用于缓存数据块
-//
-//     const readStream = async () => {
-//
-//         const { done, value } = await reader.read();
-//
-//         if (done) {
-//             console.log('Stream reading complete');
-//             return;
-//         }
-//
-//         const chunk = new TextDecoder('utf-8').decode(value);
-//         buffer += chunk; // 将数据块追加到缓冲区中
-//
-//         // 检查缓冲区中是否有完整的数据
-//         let completeData = '';
-//         let separatorIndex;
-//         while ((separatorIndex = buffer.indexOf('\n')) !== -1) {
-//             completeData = buffer.slice(0, separatorIndex); // 提取完整的数据
-//             buffer = buffer.slice(separatorIndex + 1); // 更新缓冲区，去掉已处理的数据
-//
-//             // 解析JSON数据
-//             const res = completeData.split(": ")[1]
-//             let data;
-//             try {
-//                 data = JSON.parse(res);
-//                 // 这里处理业务逻辑
-//                 const delta_content = data.choices[0].delta.content
-//                 console.log(delta_content)
-//
-//                 left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += delta_content
-//             } catch (e) {
-//                 continue
-//             }
-//         }
-//
-//         return readStream();
-//     }
-//
-//     // 开始处理流数据
-//     return readStream();
-// }
-
 async function startStream(index, body) {
   const url = LLM_URL.value;
   const key = LLM_APIKEY.value;
@@ -521,13 +440,17 @@ async function dom2img() {
             </div>
           </div>
           <!-- 设置页面 -->
-          <div class="footer flex items-center justify-between p-4 h-15">
-            <div class="user-info font-bold">金融千问机器人</div>
-            <div class="settings-icon">
-              <n-icon @click="showSettingFunc()">
-                <SettingsOutline />
-              </n-icon>
+          <div class="footer flex flex-col items-center justify-between p-4 h-15">
+            <div class="user-info font-bold text-lg">金融千问机器人</div>
+            <img src="../assets/logo.png" alt="Logo" class="logo" />
+            <div class="robot-description text-sm text-gray-600 mt-2">
+              金融千问机器人，通过RAG对既有的PDF招股书建立了知识库，同时借助大模型+Agent对金融SQL数据库进行动态查询，旨在为用户提供快速、准确的金融信息和咨询服务。
             </div>
+<!--            <div class="settings-icon">-->
+<!--              <n-icon @click="showSettingFunc()">-->
+<!--                <SettingsOutline />-->
+<!--              </n-icon>-->
+<!--            </div>-->
           </div>
         </div>
       </div>
@@ -775,6 +698,23 @@ async function dom2img() {
 .avatar {
   width: 50px;  /* 修改这里的值 */
   height: 50px; /* 修改这里的值 */
+}
+
+.footer {
+  text-align: center; /* 居中显示 */
+}
+
+.logo {
+  width: 200px; /* 根据需要调整 Logo 大小 */
+  height: auto; /* 保持比例 */
+  margin-top: 8px; /* Logo 与文本之间的间距 */
+}
+
+.robot-description {
+  margin-top: 8px; /* 描述与 Logo 之间的间距 */
+  text-align: left; /* 左对齐 */
+  width: 100%; /* 使描述占满可用宽度 */
+  padding-left: 16px; /* 可选：增加左侧内边距 */
 }
 
 </style>

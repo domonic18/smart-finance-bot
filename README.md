@@ -60,7 +60,8 @@ python app/server.py
 
 ### 前端服务运行方法
 **第一步**：安装Node.js
-访问https://nodejs.org，按照页面提示下载Node.js到本地后进行安装
+- 访问https://nodejs.cn/download/
+- 按照页面提示下载Node.js到本地后进行安装
 
 **第二步**：安装依赖包
 ```bash

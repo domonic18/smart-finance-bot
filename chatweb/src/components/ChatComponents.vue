@@ -734,7 +734,7 @@ async function dom2img() {
   overflow: auto;
   display: flex;
   justify-content: center;
-  align-items: start;
+  align-items: flex-start;
   color: gray;
   font-style: italic;
 }

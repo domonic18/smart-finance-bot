@@ -7,6 +7,9 @@ import {
 } from 'naive-ui'
 import { GameControllerOutline, GameController } from '@vicons/ionicons5'
 import { LogInOutline as LogInIcon, SettingsOutline, Menu } from '@vicons/ionicons5'
+import userAvatar from '@/assets/user-avatar.png';
+import robotAvatar from '@/assets/robot-avatar.png';
+
 import { Edit, Delete, Download } from '@vicons/carbon'
 import Markdown from 'vue3-markdown-it';
 
@@ -588,7 +591,12 @@ async function dom2img() {
           <div v-else class="chat-area" id="msgArea">
             <div v-for="(msglist, index) in getMsgList(route.params.uuid)" :key="index" class="flex flex-col mt-1 msgItem">
               <div :class="msglist.reversion ? 'flex-row-reverse' : 'flex-row'" class="flex justify-start items-center h-10">
-                <img class="rounded-full h-10 w-10" src="../assets/icon.jpg" alt="" />
+
+                <img
+                    class="rounded-full avatar"
+                    :src="msglist.reversion ? userAvatar : robotAvatar"
+                    alt="头像"
+                />
                 <span class="ml-4 text-sm">{{ msglist.create_time }}</span>
               </div>
               <div class="flex" :class="msglist.reversion ? 'flex-row-reverse' : 'flex-row'">
@@ -763,5 +771,11 @@ async function dom2img() {
   flex-basis: 8%;
   width: 100%;
 }
+
+.avatar {
+  width: 50px;  /* 修改这里的值 */
+  height: 50px; /* 修改这里的值 */
+}
+
 </style>
 

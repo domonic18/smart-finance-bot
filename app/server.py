@@ -1,8 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from langserve import add_routes
 from pydantic import BaseModel
-# from rag import My_Chroma_RAG
-# from agent import Agent_sql
 from fastapi.middleware.cors import CORSMiddleware
 from utils import recognition
 from utils import classify
@@ -43,15 +41,6 @@ async def query(query: Query):  # 使用模型类名Query而不是变量名query
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# rag = My_Chroma_RAG(data_path = "my_chroma")
-# agent = Agent_sql(path="data/博金杯比赛数据.db")
-
-# 添加路由
-# add_routes(
-#     app, 
-#     rag.get_chain(),
-#     path="/chat",
-# )
 
 
 # 运行Uvicorn服务器

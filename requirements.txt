@@ -2,6 +2,7 @@ pydantic==2.7.4
 python-dotenv
 langserve
 langchain-community
+langchain_openai
 dashscope
 uvicorn
 sse_starlette

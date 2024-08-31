@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python 调试程序: server.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/app/server.py",
+            "args": [
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8000",
+                "--reload"
+            ],
+            "jinja": true
+        }
+    ]
+}

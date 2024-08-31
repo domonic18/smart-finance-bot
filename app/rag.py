@@ -10,17 +10,8 @@ from langchain_core.output_parsers import StrOutputParser
 #可运行对象（占位符）
 from langchain_core.runnables import RunnablePassthrough
 # 文档切分器
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-import pylibmagic
-import magic
 
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.prompts import SystemMessagePromptTemplate #系统消息模板
-from langchain_core.prompts import HumanMessagePromptTemplate #用户消息模板
-from langchain_core.prompts import AIMessagePromptTemplate #挖空模板，一般不用
-from langchain_core.prompts import ChatMessagePromptTemplate #通用消息模板
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage #三个消息
-
 from langchain_core.runnables.base import RunnableLambda
 from langchain_core.runnables.base import RunnableMap
 
@@ -35,11 +26,7 @@ chat = ChatTongyi(model = "qwen-max",temperature=0.1,top_p=0.7,max_tokens=1024,a
 # embedding大模型
 embed = DashScopeEmbeddings(model="text-embedding-v3",dashscope_api_key="sk-2be00aba82564503af9ca25d22cda9cd")
 
-from langchain_community.utilities import SQLDatabase
-from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from langchain_core.messages import SystemMessage
-# 智能体Agent初始化（使用预构建的LangGraph Agent来构建）
-from langgraph.prebuilt import create_react_agent
+
 
 #rag
 class My_Chroma_RAG():
@@ -51,14 +38,7 @@ class My_Chroma_RAG():
                        embedding_function=embed,
                        client=self.client)
 
-
-        # self.data_path = data_path
-        # client = chromadb.PersistentClient(path=self.data_path)
-        # self.store = Chroma(collection_name="langchain", 
-        #                embedding_function=embed,
-        #                client=client)
-
-    def get_result(self,input,k=4,mutuality=0.5):
+    def get_result(self, input, k=4, mutuality=0.5):
         """获取RAG查询结果"""
         # 第三个级别
         retriever = self.store.as_retriever(search_type="similarity_score_threshold",
@@ -83,7 +63,7 @@ class My_Chroma_RAG():
             | chat
             | StrOutputParser()
         )
-        
+
         return rag_chain.invoke(input=input)
 
     def get_chain(self):

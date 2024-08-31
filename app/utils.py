@@ -86,20 +86,20 @@ def recognition(input):
         return result
     except Exception as e:
         print(e)
-        return "agent_question***"
+        return f"rag_question***{input}"
 
-    # return chain.invoke(input=input).content
 
 # 分类
 def classify(input):
     if input.split("***")[0] == 'agent_question':
-        agent = Agent_sql(path="data/博金杯比赛数据.db")
+        agent = Agent_sql(path="/Users/deadwalk/Code/smart-finance-bot/data/dataset/博金杯比赛数据.db")
         print("是agent_question")
         result,result_list = agent.get_result(input = input.split("***")[1])
         return result
         
     if input.split("***")[0] == 'rag_question':
-        rag = My_Chroma_RAG(data_path = "my_chroma")
+        # rag = My_Chroma_RAG(data_path = "data/my_chroma")
+        rag = My_Chroma_RAG(host="localhost", port=8000)
         print("是rag_question")
         result =  rag.get_result(input = input.split("***")[1])
         return result
@@ -110,9 +110,18 @@ def classify(input):
         return result
 
 
+def get_chain(input):
+    """获取链"""
+    rag_chain = My_Chroma_RAG(data_path = "data/my_chroma")
+    # agent = Agent_sql(path="data/dataset/博金杯比赛数据.db")
+    # recognition_result = recognition(input)
+    # classify_result = classify(recognition_result)
+    # result = get_fresult(input,rag,classify_result)
+    return rag_chain
+
 
 
 if __name__ == "__main__":
-    data_chroma = My_Chroma_RAG(data_path = "my_chroma")
+    data_chroma = My_Chroma_RAG(data_path = "data/my_chroma")
     result = data_chroma.get_result(input = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？")
     print(result)

@@ -1,7 +1,7 @@
 import requests
 
 # 注意请求路径：常规路径后面添加一个 invoke
-url = " http://localhost:8082/gen/invoke"
+url = " http://localhost:8082/gen/stream"
 
 data = {"ad_words": "助听器"}
 

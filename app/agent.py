@@ -54,7 +54,8 @@ class Agent_SQL():
             Then you should query the schema of the most relevant tables.
             特别注意：
             如果所有表中都没有查询到相关的信息，就停止查询，返回没有查询到结果即可。
-            如果查询过程中SQL语句有语法错误，减少查询量。"""
+            如果生成的SQL语句中，字段带有英文括号()，请使用双引号包裹起来，例如：收盘价(元) 双引号包裹为 "收盘价(元)"。
+            如果查询过程中SQL语句有语法错误，减少查询量,总体查询次数应控制在15次以内。"""
         
         self.system_message = SystemMessage(content=self.SQL_PREFIX)
         self.agent_executor = create_react_agent(chat, self.tools, state_modifier =self.system_message)

@@ -6,3 +6,4 @@ langchain_openai
 dashscope
 uvicorn
 sse_starlette
+tqdm

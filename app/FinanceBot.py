@@ -175,9 +175,8 @@ class FinanceBot:
         
         elif intent == "agent_question":
             # 如果是Agent相关的问题
-            agent = Agent_SQL(path="data/dataset/博金杯比赛数据.db")
+            result, result_list = self.agent.get_result(input=question)
 
-            result, result_list = agent.get_result(input=question)
             return result
         else:
             # 其他类问题

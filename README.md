@@ -31,6 +31,24 @@ smart-finance-bot \
 ```
 
 ## 使用说明
+### 启动Chroma数据库
+```shell
+# 进入根目录 smart-finance-bot
+cd smart-finance-bot
+
+# 给shell脚本赋予运行权限
+chmod +x ./start_chroma.sh
+
+# 启动Chroma数据库
+./start_chroma.sh
+```
+
+### 批量导入数据到向量数据库
+```shell
+# 给shell脚本赋予运行权限
+chmod +x ./import_data.sh
+```
+
 ### 后端服务启动方法
 
 **第一步**：拉取代码到本地
@@ -65,12 +83,16 @@ python app/server.py
 
 **第二步**：安装依赖包
 ```bash
-    cd chatweb
-    npm install
+# 进入chatweb目录
+cd chatweb
+
+# 安装依赖包
+npm install
 ```
 
 **第三步**：启动服务
 ```bash
+# 启动服务
 npm run dev
 ```
 

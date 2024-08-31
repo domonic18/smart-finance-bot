@@ -80,18 +80,26 @@ def recognition(input):
                 ]
             )
     chain = final_prompt | llm
-    return chain.invoke(input=input).content
+
+    try:
+        result = chain.invoke(input=input).content
+        return result
+    except Exception as e:
+        print(e)
+        return "agent_question***"
+
+    # return chain.invoke(input=input).content
 
 # 分类
 def classify(input):
     if input.split("***")[0] == 'agent_question':
-        agent = Agent_sql(path="/gemini/code/smart-finance-bot/app/data/博金杯比赛数据.db")
+        agent = Agent_sql(path="data/博金杯比赛数据.db")
         print("是agent_question")
         result,result_list = agent.get_result(input = input.split("***")[1])
         return result
         
     if input.split("***")[0] == 'rag_question':
-        rag = My_Chroma_RAG(data_path = "/gemini/code/my_chroma")
+        rag = My_Chroma_RAG(data_path = "my_chroma")
         print("是rag_question")
         result =  rag.get_result(input = input.split("***")[1])
         return result
@@ -105,6 +113,6 @@ def classify(input):
 
 
 if __name__ == "__main__":
-    data_chroma = My_Chroma(data_path = "/gemini/code/my_chroma")
+    data_chroma = My_Chroma_RAG(data_path = "my_chroma")
     result = data_chroma.get_result(input = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？")
     print(result)

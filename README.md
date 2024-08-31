@@ -37,16 +37,19 @@ smart-finance-bot \
 cd smart-finance-bot
 
 # 给shell脚本赋予运行权限
-chmod +x ./start_chroma.sh
+chmod +x ./scripts/start_chroma.sh
 
 # 启动Chroma数据库
-./start_chroma.sh
+./scripts/start_chroma.sh
 ```
 
 ### 批量导入数据到向量数据库
 ```shell
 # 给shell脚本赋予运行权限
-chmod +x ./import_data.sh
+chmod +x ./scripts/import_data.sh
+
+# 启动批量导入脚本
+./scripts/import_data.sh
 ```
 
 ### 后端服务启动方法

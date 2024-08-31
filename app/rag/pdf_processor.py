@@ -12,6 +12,7 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
+from langchain_chroma import Chroma
 
 
 class HuggingFaceEmbeddingsFunction(EmbeddingFunction):
@@ -29,15 +30,16 @@ class ChromaDB:
         self.port = port
         self.path = "chroma_db"
         self.collection_name = "langchain"
-        self.client = self.__connect__()
         self.embedding_function = HuggingFaceEmbeddings(model_name="bert-base-chinese")
+        self.chroma_db = self.__connect_with_langchain__()
 
+        # self.client = self.__connect__()
 
         # 将 embedding_function 传递给 HuggingFaceEmbeddingsFunction
-        self.collect = self.client.create_collection(
-            name=self.collection_name,
-            embedding_function=HuggingFaceEmbeddingsFunction(self.embedding_function)
-        )
+        # self.collect = self.client.create_collection(
+        #     name=self.collection_name,
+        #     embedding_function=HuggingFaceEmbeddingsFunction(self.embedding_function)
+        # )
 
     def __connect__(self):
         """
@@ -75,6 +77,28 @@ class ChromaDB:
             # 生成ids
             ids=[f"{uuid.uuid4()}" for _ in range(len(docs))]
         )
+
+    def __connect_with_langchain__(self):
+        """
+        连接到 Chroma 数据库
+        """
+        setting = Settings(chroma_server_host=self.host, chroma_server_http_port=self.port)
+
+        
+        chroma_db = Chroma(
+                embedding_function=self.embedding_function,
+                client_settings=setting
+            )
+
+        return chroma_db
+
+
+    def add_with_langchain(self, docs):
+        """
+        将文档添加到数据库
+        """
+        self.chroma_db.add_documents(documents=docs)
+            
 
 class PDFProcessor:
     def __init__(self, directory, host, port):
@@ -115,7 +139,7 @@ class PDFProcessor:
         logging.info("Split text into smaller chunks with RecursiveCharacterTextSplitter.")
         return docs
     
-    def insert_docs_chromadb(self, docs, batch_size=6):
+    def insert_docs_chromadb(self, docs, batch_size=20):
         """
         将文档插入到ChromaDB
         """
@@ -135,7 +159,11 @@ class PDFProcessor:
                 batch = docs[i:i + batch_size]  
 
                 # 将样本入库
-                self.chroma_db.add(batch)
+                # 方式一：使用chromadb 的add方法
+                # self.chroma_db.add(batch)
+
+                # 方式二：使用chromadb 的add_with_langchain方法
+                self.chroma_db.add_with_langchain(batch)
 
                 # 更新已插入的文档数量
                 total_docs_inserted += len(batch)  

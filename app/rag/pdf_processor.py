@@ -3,6 +3,9 @@ import chromadb
 import datetime
 import logging
 import uuid
+import time
+import argparse
+from tqdm import tqdm 
 from chromadb import Client
 from chromadb import Settings
 from langchain_community.document_loaders import PyMuPDFLoader
@@ -119,18 +122,38 @@ class PDFProcessor:
         # 分批入库
         logging.info(f"Inserting {len(docs)} documents into ChromaDB.")
 
-        for i in range(0, len(docs), batch_size):
-            batch = docs[i:i + batch_size]  # 获取当前批次的样本
-            logging.info(f"Inserting batch {i+1} of {len(docs)} into ChromaDB.")
-            # 将样本入库
-            self.chroma_db.add(batch)
-        
+        # 记录开始时间
+        start_time = time.time()  
+        total_docs_inserted = 0
+
+        # 计算总批次
+        total_batches = (len(docs) + batch_size - 1) // batch_size  
+
+        with tqdm(total=total_batches, desc="Inserting batches", unit="batch") as pbar:
+            for i in range(0, len(docs), batch_size):
+                # 获取当前批次的样本
+                batch = docs[i:i + batch_size]  
+
+                # 将样本入库
+                self.chroma_db.add(batch)
+
+                # 更新已插入的文档数量
+                total_docs_inserted += len(batch)  
+            
+                # 计算并显示当前的TPM
+                elapsed_time = time.time() - start_time  # 计算已用时间（秒）
+                if elapsed_time > 0:  # 防止除以零
+                    tpm = (total_docs_inserted / elapsed_time) * 60  # 转换为每分钟插入的文档数
+                    pbar.set_postfix({"TPM": f"{tpm:.2f}"})  # 更新进度条的后缀信息
+                
+                # 更新进度条
+                pbar.update(1)  
 
     def process_pdfs(self):
         # 获取目录下所有的PDF文件
         pdf_files = self.load_pdf_files()
 
-        for pdf_path in pdf_files:
+        for pdf_path in tqdm(pdf_files, desc="Processing PDFs"):
             # 读取PDF文件内容
             documents = self.load_pdf_content(pdf_path)
 
@@ -143,9 +166,24 @@ class PDFProcessor:
         print("PDFs processed successfully!")
 
 
-if __name__ == "__main__":
 
-    pdf_processor = PDFProcessor(directory="./app/data/pdf", host="localhost", port=8000)
+if __name__ == "__main__":
+    # 创建解析器
+    parser = argparse.ArgumentParser(description="Process PDFs and interact with ChromaDB.")
+    
+    # 添加参数
+    parser.add_argument('--directory', type=str, default="./app/data/pdf", help='Directory containing PDF files.')
+    parser.add_argument('--host', type=str, default="localhost", help='ChromaDB host address.')
+    parser.add_argument('--port', type=int, default=8000, help='ChromaDB port.')
+
+    # 解析参数
+    args = parser.parse_args()
+
+    # 创建 PDFProcessor 实例
+    pdf_processor = PDFProcessor(directory=args.directory, host=args.host, port=args.port)
+    
+    # 处理 PDF 文件
     pdf_processor.process_pdfs()
+    
     # 如果需要清空数据库，可以调用下面的方法
     # pdf_processor.clear_database()

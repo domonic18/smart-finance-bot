@@ -1,6 +1,7 @@
 import logging
+import os
 from rag import My_Chroma_RAG
-from agent import Agent_sql
+from agent import Agent_SQL
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import SystemMessagePromptTemplate #系统消息模板
 from langchain_core.prompts import HumanMessagePromptTemplate #用户消息模板
@@ -30,6 +31,9 @@ MODEL = "Qwen2_7B-chat-sft2"
 CHROMA_HOST = "localhost"
 CHROMA_PORT = 8000
 
+current_directory = os.getcwd()
+SQLDATABASE_URI = os.path.join(current_directory, "app/data/dataset/博金杯比赛数据.db")
+
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -45,8 +49,10 @@ class FinanceBot:
                                                  api_key=API_KEY, 
                                                  model=MODEL)                 
         
+        self.rag = My_Chroma_RAG(host=CHROMA_HOST, port=CHROMA_PORT)
+
         # 单独创建一个agent的大模型连接
-        self.agent = None                       
+        self.agent = Agent_SQL(path=SQLDATABASE_URI)                       
 
 
     def init_recognition(self, base_url, api_key, model):
@@ -163,14 +169,13 @@ class FinanceBot:
 
         if intent == "rag_question":
             # 如果是RAG相关的问题
-            rag = My_Chroma_RAG(host=CHROMA_HOST, port=CHROMA_PORT)
+            result = self.rag.get_result(input=question)
 
-            result = rag.get_result(input=question)
             return result
         
         elif intent == "agent_question":
             # 如果是Agent相关的问题
-            agent = Agent_sql(path="data/dataset/博金杯比赛数据.db")
+            agent = Agent_SQL(path="data/dataset/博金杯比赛数据.db")
 
             result, result_list = agent.get_result(input=question)
             return result

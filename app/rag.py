@@ -43,13 +43,20 @@ from langgraph.prebuilt import create_react_agent
 
 #rag
 class My_Chroma_RAG():
-    def __init__(self,data_path):
+    def __init__(self, host, port):
         """连接本地数据库"""
-        self.data_path = data_path
-        client = chromadb.PersistentClient(path=self.data_path)
+        settings = Settings(chroma_server_host=host, chroma_server_http_port=port)
+        self.client = chromadb.Client(settings)
         self.store = Chroma(collection_name="langchain", 
                        embedding_function=embed,
-                       client=client)
+                       client=self.client)
+
+
+        # self.data_path = data_path
+        # client = chromadb.PersistentClient(path=self.data_path)
+        # self.store = Chroma(collection_name="langchain", 
+        #                embedding_function=embed,
+        #                client=client)
 
     def get_result(self,input,k=4,mutuality=0.5):
         """获取RAG查询结果"""
@@ -76,7 +83,36 @@ class My_Chroma_RAG():
             | chat
             | StrOutputParser()
         )
+        
         return rag_chain.invoke(input=input)
+
+    def get_chain(self):
+        """获取RAG查询链"""
+
+        retriever = self.store.as_retriever(search_type="similarity_score_threshold",
+                                      search_kwargs={"k": 4, "score_threshold": 0.5})
+        # RAG系统经典的 Prompt (A 增强的过程)
+        prompt = ChatPromptTemplate.from_messages([
+          ("human", """You are an assistant for question-answering tasks. Use the following pieces 
+          of retrieved context to answer the question. 
+          If you don't know the answer, just say that you don't know. 
+          Use three sentences maximum and keep the answer concise.
+          Question: {question} 
+          Context: {context} 
+          Answer:""")
+        ])
+        # 将 format_docs 方法包装为 Runnable
+        format_docs_runnable = RunnableLambda(self.format_docs)
+        # RAG 链
+        rag_chain = (
+            {"context": retriever | format_docs_runnable, 
+             "question": RunnablePassthrough()}
+            | prompt
+            | chat
+            | StrOutputParser()
+        )
+
+        return rag_chain
 
     # 把检索到的多条上下文的文本使用 \n\n 练成一个大的字符串
     def format_docs(self,docs):

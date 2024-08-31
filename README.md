@@ -46,10 +46,10 @@ chmod +x ./scripts/start_chroma.sh
 ### 批量导入数据到向量数据库
 ```shell
 # 给shell脚本赋予运行权限
-chmod +x ./scripts/import_data.sh
+chmod +x ./scripts/import_pdf.sh
 
 # 启动批量导入脚本
-./scripts/import_data.sh
+./scripts/import_pdf.sh
 ```
 
 ### 后端服务启动方法

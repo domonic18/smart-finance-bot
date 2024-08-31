@@ -32,15 +32,12 @@ var controlSidebarHidden = ref(true)
 // 移动端下侧边栏显影
 
 const showSetting = ref(false)
-// var LLM_URL = ref("https://uu.ci/v1/chat/completions")
-var LLM_URL = ref("http://localhost:8082/gen/stream_log")
 
 var LLM_APIKEY = ref("sk-cwtdeSy4Ownmy6Uh5e9b6a67Fe4c4454A3Dc524876348eB1")
 
 var setting = reactive({
-    model: 'gpt-4',
-    Temperatures: 0.8,
-    Top_p: 1,
+    server_url: 'http://localhost:8082/query', // 默认值
+    type: 'query',
 })
 
 let left_list_is_empty = ref(false)
@@ -54,16 +51,12 @@ var segmented = {
 
 var selectOptions = ref([
     {
-        label: 'claude-3.5-sonnet',
-        value: 'claude-3.5-sonnet'
+        label: 'Query式访问',
+        value: 'query'
     },
     {
-        label: 'gpt-4',
-        value: 'gpt-4'
-    },
-    {
-        label: 'gpt-4-turbo',
-        value: 'gpt-4-turbo'
+        label: '流式访问',
+        value: 'stream_log'
     }
 ])
 
@@ -207,15 +200,9 @@ function addMessageListItem(uuid) {
         msgload: false
     })
 
-    // 构建发送的数据格式
-    const data = {
-      ad_words: input_area_value.value // 编辑框内容
-      // ad_words: "助听器" // 编辑框内容
-    };
-
     const body = {
       config: {},
-      input: data// 按要求的格式拼接
+      input: input_area_value.value// 按要求的格式拼接
 
     };
 
@@ -234,9 +221,14 @@ function addMessageListItem(uuid) {
     console.info("开始发送消息...")
 
 
-    // 调用 startStream 函数，并传递构建的请求体
-    startStream(index, body);
-    // startStream(index)
+  // 使用编辑框中的 URL 进行请求
+  const url = setting.server_url; // 获取 URL
+
+  if (setting.type === 'stream_log') {
+    startStream(index, body, url); // 传递 URL
+  } else {
+    startRequest(index, body, url); // 传递 URL
+  }
 }
 
 function buildMessagePromt(index) {
@@ -252,9 +244,54 @@ function buildMessagePromt(index) {
     return res
 }
 
-async function startStream(index, body) {
-  const url = LLM_URL.value;
+async function startRequest(index, body, url) {
   const key = LLM_APIKEY.value;
+  let response = null;
+
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json", // 使用 JSON 作为接受格式
+        "Authorization": `Bearer ${key}`, // 如果需要 API 密钥
+      },
+      mode: "cors",
+      body: JSON.stringify(body),
+    });
+
+    left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].msgload = false;
+  } catch (error) {
+    left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${error.message}`;
+    return false;
+  }
+
+  if (response.status !== 200) {
+    left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += `发生了一些错误：${response.status}-${response.statusText}`;
+    return false;
+  }
+
+  try {
+    const data = await response.json();
+    if (data && data.output) { // 检查数据是否存在并包含 output
+      const outputText = data.output;
+      const currentContent = left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content;
+      if (!currentContent.includes(outputText)) {
+        left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += outputText;
+      }
+    } else {
+      throw new Error('返回的数据结构不符合预期');
+    }
+  } catch (e) {
+    console.error('Error parsing JSON:', e);
+    left_data.chat[index].msg_list[left_data.chat[index].msg_list.length - 1].content += '解析响应时发生错误';
+  }
+
+  return true; // 返回成功状态
+}
+
+
+async function startStream(index, body, url) {
   let response = null;
 
   try {
@@ -347,6 +384,13 @@ function deleteChatItemHistory(uuid) {
     const index = left_data.chat.findIndex(v => v.uuid == uuid);
     left_data.chat[index].msg_list = []
     message.success('当前会话记录已清理')
+}
+
+function confirmSettings() {
+  // 这里可以添加保存设置的逻辑
+  console.log("设置已确认:", setting);
+  // 例如，你可以关闭模态框
+  showSetting.value = false;
 }
 
 // 当前会话下载为图片
@@ -449,11 +493,11 @@ async function dom2img() {
             <div class="robot-description text-sm text-gray-600 mt-2">
               金融千问机器人，通过RAG对既有的PDF招股书建立了知识库，同时借助大模型+Agent对金融SQL数据库进行动态查询，旨在为用户提供快速、准确的金融信息和咨询服务。
             </div>
-<!--            <div class="settings-icon">-->
-<!--              <n-icon @click="showSettingFunc()">-->
-<!--                <SettingsOutline />-->
-<!--              </n-icon>-->
-<!--            </div>-->
+            <div class="settings-icon">
+              <n-icon @click="showSettingFunc()">
+                <SettingsOutline />
+              </n-icon>
+            </div>
           </div>
         </div>
       </div>
@@ -578,16 +622,19 @@ async function dom2img() {
         <n-tab-pane name="settings" tab="设置">
           <div class="grid grid-rows-3 gap-4">
             <div>
-              <span class="mr-4">Model: </span>
-              <n-select :style="{ width: '80%' }" :options="selectOptions" v-model:value="setting.model" />
+              <span class="mr-4">Server URL: </span>
+              <n-input v-model:value="setting.server_url" placeholder="请输入服务器 URL" />
             </div>
             <div>
-              <span class="mr-4">Temperatures: </span>
-              <n-input-number :style="{ width: '80%' }" :default-value="0.8" :step="0.1" :max="1" :min="0.1" v-model:value="setting.Temperatures" />
+              <span class="mr-4">type: </span>
+              <n-select :style="{ width: '80%' }" :options="selectOptions" v-model:value="setting.type" />
             </div>
-            <div>
-              <span class="mr-4">Top_p: </span>
-              <n-input-number :style="{ width: '80%' }" :default-value="1" :step="1" :max="1" :min="1" v-model:value="setting.Top_p" />
+            <div class="flex justify-end">
+              <n-button
+                  @click="confirmSettings"
+                  class="custom-button">
+                确认
+              </n-button>
             </div>
           </div>
         </n-tab-pane>
@@ -735,6 +782,20 @@ async function dom2img() {
   top: 30%; /* 垂直居中 */
   left: 50%; /* 水平居中 */
   transform: translate(-50%, -50%); /* 使 logo 在背景图中心 */
+}
+
+.custom-button {
+  background-color: #007bff; /* 按钮背景色 */
+  color: white; /* 字体颜色 */
+  border: none; /* 去掉边框 */
+  padding: 10px 20px; /* 内边距 */
+  border-radius: 5px; /* 圆角 */
+  cursor: pointer; /* 鼠标样式 */
+  transition: background-color 0.3s; /* 添加过渡效果 */
+}
+
+.custom-button:hover {
+  background-color: #0056b3; /* 悬停时的背景颜色 */
 }
 
 </style>

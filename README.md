@@ -24,10 +24,12 @@ smart-finance-bot \
         |- agent \ # 该目录用于保存agent相关代码
         |- rag \   # 该目录用于保存rag相关代码
         |- ir \   # 该目录用于保存意图识别(Intent Recognition)相关代码
+        |- data \  # 该目录用于保存PDF以及SQLite数据
         |- conf \  # 该目录用于保存配置文件
             |- .qwen # 该文件保存QWen的配置文件(请自行添加对应的API KEY)
             |- .ernie # 该文件保存百度千帆的配置文件(请自行添加对应的API KEY)
     |- chatweb \   # 该目录用于保存前端页面代码
+    |- scripts \   # 该目录用于保存脚本文件，例如：启动脚本、导入向量数据库脚本等
 ```
 
 ## 使用说明
@@ -53,6 +55,9 @@ pip install -r requirements.txt
 
 **第二步**：运行API-KEY测试脚本
 ```shell
+# 切换/保持当前目录为 smart-finance-bot
+cd smart-finance-bot
+
 # 给shell脚本赋予运行权限
 chmod +x ./scripts/test_llm.sh
 
@@ -62,7 +67,7 @@ chmod +x ./scripts/test_llm.sh
 
 ### 3、启动Chroma数据库
 ```shell
-# 切换到根目录 smart-finance-bot
+# 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot
 
 # 给shell脚本赋予运行权限
@@ -74,6 +79,9 @@ chmod +x ./scripts/start_chroma.sh
 
 ### 4、批量导入数据到向量数据库
 ```shell
+# 切换/保持当前目录为 smart-finance-bot
+cd smart-finance-bot
+
 # 给shell脚本赋予运行权限
 chmod +x ./scripts/import_pdf.sh
 
@@ -84,7 +92,7 @@ chmod +x ./scripts/import_pdf.sh
 ### 5、启动后端服务
 
 ```bash
-# 切换到根目录
+# 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot
 
 # 启动服务

@@ -47,25 +47,40 @@ git clone https://gitee.com/deadwalk/smart-finance-bot.git
 在当前目录下启动命令行，在命令行中运行如下命令
 
 ```bash
-pip install -r requirements.txt
+# 安装依赖前，强烈建议使用conda虚拟环境，例如：
+# conda create --name langchain python=3.10
+# conda activate langchain
+
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
 ### 2、配置大模型的APIKey
 **第一步**：打开配置文件 conf/.qwen，配置自己的API Key.
 
 **第二步**：运行API-KEY测试脚本
+
+Linux/Mac用户：
 ```shell
 # 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot
 
 # 给shell脚本赋予运行权限
-chmod +x ./scripts/test_llm.sh
+chmod +x ./scripts/run_test_llm.sh
 
 # 运行测试脚本
 ./scripts/test_llm.sh
+
 ```
 
+Windows用户：
+```bash
+# 运行测试脚本
+scripts\run_test_llm.bat
+```
+
+
 ### 3、启动Chroma数据库
+Linux/Mac用户：
 ```shell
 # 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot
@@ -77,7 +92,13 @@ chmod +x ./scripts/start_chroma.sh
 ./scripts/start_chroma.sh
 ```
 
+Windows用户：
+```bash
+scripts\start_chroma.bat
+```
+
 ### 4、批量导入数据到向量数据库
+Linux/Mac用户：
 ```shell
 # 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot
@@ -87,6 +108,11 @@ chmod +x ./scripts/import_pdf.sh
 
 # 启动批量导入脚本
 ./scripts/import_pdf.sh
+```
+
+Windows用户：
+```bash
+
 ```
 
 ### 5、启动后端服务

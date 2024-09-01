@@ -7,3 +7,6 @@ dashscope
 uvicorn
 sse_starlette
 tqdm
+chromadb
+langchain_chroma
+sentence-transformers

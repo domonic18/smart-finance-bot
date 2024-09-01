@@ -25,7 +25,21 @@ const route = useRoute()
 const instaceV = getCurrentInstance()
 const message = useMessage()
 
+import { onMounted } from 'vue';
 
+// 在组件的 setup 函数中添加
+onMounted(() => {
+  // 检查是否有会话记录
+  if (left_data.chat.length > 0) {
+    // 获取最后一个会话的 UUID
+    const lastChatUuid = left_data.chat[left_data.chat.length - 1].uuid;
+    // 路由跳转到最后一个会话
+    router.push({ name: 'chat', params: { uuid: lastChatUuid } });
+  } else {
+    // 如果没有会话，设置左侧列表为空
+    left_list_is_empty.value = true;
+  }
+});
 
 // 控制侧边栏显示隐藏
 var controlSidebarHidden = ref(true)

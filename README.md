@@ -116,7 +116,7 @@ chmod +x ./scripts/import_pdf.sh
 
 Windows用户：
 ```bash
-
+scripts\import_pdf.bat
 ```
 
 ### 5、启动后端服务

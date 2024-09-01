@@ -83,9 +83,15 @@ class Agent_SQL():
     
 
 if __name__ == "__main__":
+    from utils.util import get_qwen_models
+
+    llm , chat , embed = get_qwen_models()
+
     current_directory = os.getcwd()
     sql_path = os.path.join(current_directory, "app/dataset/dataset/博金杯比赛数据.db")
-    agent = Agent_SQL(path=sql_path)
+
+    agent = Agent_SQL(path=sql_path, llm=llm, chat=chat, embed=embed)
+
     input = "请帮我查询出20210415日，建筑材料一级行业涨幅超过5%（不包含）的股票数量"
     result,result_list = agent.get_result(input)
     print(result)

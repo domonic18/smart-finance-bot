@@ -38,7 +38,7 @@ class ChromaDB:
         self.path = "chroma_db"
         self.collection_name = "langchain"
 
-        # 使用qwen模型的embeddings
+        # 使用qwen模型的Gdings
         self.embedding_function = embed
 
         # 使用HuggingFaceEmbeddings
@@ -87,11 +87,18 @@ class ChromaDB:
         """
         连接到 Chroma 数据库
         """
-        client = chromadb.HttpClient(host=self.host, port=self.port)
+        
+        # 使用HTTP方式连接(此方法速度太慢，平均2batch/s)
+        # client = chromadb.HttpClient(host=self.host, port=self.port)
+        # chroma_db = Chroma(
+        #         embedding_function=self.embedding_function,
+        #         client=client
+        #     )
 
+        # 使用持久化方式连接(直接读取写入硬盘的方式，速度快，平均15batch/s)
         chroma_db = Chroma(
                 embedding_function=self.embedding_function,
-                client=client
+                persist_directory=self.path,
             )
 
         return chroma_db
@@ -217,5 +224,3 @@ if __name__ == "__main__":
     # 处理 PDF 文件
     pdf_processor.process_pdfs()
     
-    # 如果需要清空数据库，可以调用下面的方法
-    # pdf_processor.clear_database()

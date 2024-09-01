@@ -78,8 +78,30 @@ Windows用户：
 scripts\run_test_llm.bat
 ```
 
+### 3、(可选)批量导入数据到向量数据库
+如果需要重新建立向量数据库，可以通过以下方法将PDF批量导入到向量数据库中。
 
-### 3、启动Chroma数据库
+> ！！注意：执行导入脚本前，请确保没有使用命令行启动 `Chroma` 向量数据库。
+
+Linux/Mac用户：
+```shell
+# 切换/保持当前目录为 smart-finance-bot
+cd smart-finance-bot
+
+# 给shell脚本赋予运行权限
+chmod +x ./scripts/import_pdf.sh
+
+# 启动批量导入脚本
+./scripts/import_pdf.sh
+```
+
+Windows用户：
+```bash
+scripts\import_pdf.bat
+```
+
+
+### 4、启动Chroma数据库
 Linux/Mac用户：
 ```shell
 # 切换/保持当前目录为 smart-finance-bot
@@ -99,27 +121,7 @@ scripts\start_chroma.bat
 
 > 如果想复用已经建立的向量数据库，可以在启动chroma的脚本中修改启动的path。
 
-### 4、(可选)批量导入数据到向量数据库
-如果想将PDF文件导入到向量数据库，可以进行如下操作：
-- 删除原有的chroma_db目录
-- 运行以下的导入命令
 
-Linux/Mac用户：
-```shell
-# 切换/保持当前目录为 smart-finance-bot
-cd smart-finance-bot
-
-# 给shell脚本赋予运行权限
-chmod +x ./scripts/import_pdf.sh
-
-# 启动批量导入脚本
-./scripts/import_pdf.sh
-```
-
-Windows用户：
-```bash
-scripts\import_pdf.bat
-```
 
 ### 5、启动后端服务
 

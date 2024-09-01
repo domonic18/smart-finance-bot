@@ -24,7 +24,7 @@ smart-finance-bot \
         |- agent \ # 该目录用于保存agent相关代码
         |- rag \   # 该目录用于保存rag相关代码
         |- ir \   # 该目录用于保存意图识别(Intent Recognition)相关代码
-        |- data \  # 该目录用于保存PDF以及SQLite数据
+        |- dataset \  # 该目录用于保存PDF以及SQLite数据
         |- conf \  # 该目录用于保存配置文件
             |- .qwen # 该文件保存QWen的配置文件(请自行添加对应的API KEY)
             |- .ernie # 该文件保存百度千帆的配置文件(请自行添加对应的API KEY)
@@ -37,7 +37,7 @@ smart-finance-bot \
 ### 1、拉取代码
 **第一步**：拉取代码到本地
 ```shell
-git clone https://gitee.com/deadwalk/smart-finance-bot.git
+git clone --recurse-submodules https://gitee.com/deadwalk/smart-finance-bot.git
 ```
 
 > Git客户端[gitee使用教程](https://blog.csdn.net/weixin_50470247/article/details/133585369)
@@ -97,7 +97,11 @@ Windows用户：
 scripts\start_chroma.bat
 ```
 
-### 4、批量导入数据到向量数据库
+### 4、(可选)批量导入数据到向量数据库
+目前在项目目录下，已经预置了一份导入PDF的chroma向量数据库，保存在 chroma_db 目录下。如果希望重新导入向量数据库，可以进行如下操作
+- 删除原有的chroma_db目录
+- 运行以下的导入命令
+
 Linux/Mac用户：
 ```shell
 # 切换/保持当前目录为 smart-finance-bot

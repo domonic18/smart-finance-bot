@@ -30,7 +30,7 @@ CHROMA_HOST = "localhost"
 CHROMA_PORT = 8000
 
 current_directory = os.getcwd()
-SQLDATABASE_URI = os.path.join(current_directory, "app/data/dataset/博金杯比赛数据.db")
+SQLDATABASE_URI = os.path.join(current_directory, "app/dataset/dataset/博金杯比赛数据.db")
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')

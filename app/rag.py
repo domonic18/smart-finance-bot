@@ -79,6 +79,11 @@ class My_Chroma_RAG():
 
 
 if __name__ == "__main__":
-    rag = My_Chroma_RAG(host="localhost", port=8000)
+    from utils.util import get_qwen_models
+
+    llm , chat , embed = get_qwen_models()
+
+    rag = My_Chroma_RAG(host="localhost", port=8000, llm=llm, chat=chat, embed=embed)
+    
     result = rag.get_result("内蒙古君正能源化工股份有限公司的法定代表人是谁？")
     print(result)

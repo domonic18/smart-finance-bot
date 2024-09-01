@@ -31,29 +31,8 @@ smart-finance-bot \
 ```
 
 ## 使用说明
-### 启动Chroma数据库
-```shell
-# 进入根目录 smart-finance-bot
-cd smart-finance-bot
 
-# 给shell脚本赋予运行权限
-chmod +x ./scripts/start_chroma.sh
-
-# 启动Chroma数据库
-./scripts/start_chroma.sh
-```
-
-### 批量导入数据到向量数据库
-```shell
-# 给shell脚本赋予运行权限
-chmod +x ./scripts/import_pdf.sh
-
-# 启动批量导入脚本
-./scripts/import_pdf.sh
-```
-
-### 后端服务启动方法
-
+### 1、拉取代码
 **第一步**：拉取代码到本地
 ```shell
 git clone https://gitee.com/deadwalk/smart-finance-bot.git
@@ -69,9 +48,43 @@ git clone https://gitee.com/deadwalk/smart-finance-bot.git
 pip install -r requirements.txt
 ```
 
-**第三步**：启动langserve服务
+### 2、配置大模型的APIKey
+**第一步**：打开配置文件 conf/.qwen，配置自己的API Key.
+
+**第二步**：运行API-KEY测试脚本
+```shell
+# 给shell脚本赋予运行权限
+chmod +x ./scripts/test_llm.sh
+
+# 运行测试脚本
+./scripts/test_llm.sh
+```
+
+### 3、启动Chroma数据库
+```shell
+# 切换到根目录 smart-finance-bot
+cd smart-finance-bot
+
+# 给shell脚本赋予运行权限
+chmod +x ./scripts/start_chroma.sh
+
+# 启动Chroma数据库
+./scripts/start_chroma.sh
+```
+
+### 4、批量导入数据到向量数据库
+```shell
+# 给shell脚本赋予运行权限
+chmod +x ./scripts/import_pdf.sh
+
+# 启动批量导入脚本
+./scripts/import_pdf.sh
+```
+
+### 5、启动后端服务
+
 ```bash
-# 进入项目目录
+# 切换到根目录
 cd smart-finance-bot
 
 # 启动服务
@@ -79,7 +92,7 @@ python app/server.py
 
 ```
 
-### 前端服务运行方法
+### 6、启动前端服务
 **第一步**：安装Node.js
 - 访问https://nodejs.cn/download/
 - 按照页面提示下载Node.js到本地后进行安装
@@ -98,4 +111,3 @@ npm install
 # 启动服务
 npm run dev
 ```
-

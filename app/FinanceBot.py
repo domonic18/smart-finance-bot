@@ -13,16 +13,14 @@ from langchain_core.output_parsers import CommaSeparatedListOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import FewShotChatMessagePromptTemplate
 from langchain_openai import ChatOpenAI
+from utils.util import get_qwen_models
 from langchain_community.llms.tongyi import Tongyi
 from langchain_community.chat_models import ChatTongyi
 from langchain_community.embeddings import DashScopeEmbeddings
 
-# llm大模型
-llm = Tongyi(model = "qwen-max",temperature=0.1,top_p=0.7,max_tokens=1024,api_key="sk-2be00aba82564503af9ca25d22cda9cd")
-# chat大模型
-chat = ChatTongyi(model = "qwen-max",temperature=0.1,top_p=0.7,max_tokens=1024,api_key="sk-2be00aba82564503af9ca25d22cda9cd")
-# embedding大模型
-embed = DashScopeEmbeddings(model="text-embedding-v3",dashscope_api_key="sk-2be00aba82564503af9ca25d22cda9cd")
+# 连接大模型
+llm, chat, embed = get_qwen_models()
+
 
 BASE_URL = "http://direct.virtaicloud.com:45181/v1"
 API_KEY = "EMPTY"
@@ -49,10 +47,10 @@ class FinanceBot:
                                                  api_key=API_KEY, 
                                                  model=MODEL)                 
         
-        self.rag = My_Chroma_RAG(host=CHROMA_HOST, port=CHROMA_PORT)
+        self.rag = My_Chroma_RAG(host=CHROMA_HOST, port=CHROMA_PORT, llm=llm, chat=chat, embed=embed)
 
         # 单独创建一个agent的大模型连接
-        self.agent = Agent_SQL(path=SQLDATABASE_URI)                       
+        self.agent = Agent_SQL(path=SQLDATABASE_URI, llm=llm, chat=chat, embed=embed)                       
 
 
     def init_recognition(self, base_url, api_key, model):
@@ -212,8 +210,9 @@ class FinanceBot:
         intent = self.recognize_intent(query)
         logging.info(f"意图识别结果: {intent}")  
 
+        logging.info(f"根据意图开展Action: {intent}")   
         result = self.do_action(intent)
-        logging.info(f"意图之后Action结果: {result}") 
+        logging.info(f"经过Action执行结果: {result}") 
         
         final_result = self.get_fresult(input=query, intent=intent, result=result)
         logging.info(f"融合后的结果: {final_result}")

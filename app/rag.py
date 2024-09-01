@@ -19,58 +19,35 @@ from langchain_community.llms.tongyi import Tongyi
 from langchain_community.chat_models import ChatTongyi
 from langchain_community.embeddings import DashScopeEmbeddings
 
-# llm大模型
-llm = Tongyi(model = "qwen-max",temperature=0.1,top_p=0.7,max_tokens=1024,api_key="sk-2be00aba82564503af9ca25d22cda9cd")
-# chat大模型
-chat = ChatTongyi(model = "qwen-max",temperature=0.1,top_p=0.7,max_tokens=1024,api_key="sk-2be00aba82564503af9ca25d22cda9cd")
-# embedding大模型
-embed = DashScopeEmbeddings(model="text-embedding-v3",dashscope_api_key="sk-2be00aba82564503af9ca25d22cda9cd")
 
-
-
-#rag
 class My_Chroma_RAG():
-    def __init__(self, host, port):
+    def __init__(self, host, port, llm, chat, embed):
         """连接本地数据库"""
+        self.llm = llm
+        self.chat = chat
+        self.embed = embed
+        # 连接到 Chroma 数据库
         settings = Settings(chroma_server_host=host, chroma_server_http_port=port)
         self.client = chromadb.Client(settings)
         self.store = Chroma(collection_name="langchain", 
                        embedding_function=embed,
                        client=self.client)
 
-    def get_result(self, input, k=4, mutuality=0.5):
+    def get_result(self, input, k=4, mutuality=0.3):
         """获取RAG查询结果"""
-        # 第三个级别
-        retriever = self.store.as_retriever(search_type="similarity_score_threshold",
-                                      search_kwargs={"k": k, "score_threshold": mutuality})
-        # RAG系统经典的 Prompt (A 增强的过程)
-        prompt = ChatPromptTemplate.from_messages([
-          ("human", """You are an assistant for question-answering tasks. Use the following pieces 
-          of retrieved context to answer the question. 
-          If you don't know the answer, just say that you don't know. 
-          Use three sentences maximum and keep the answer concise.
-          Question: {question} 
-          Context: {context} 
-          Answer:""")
-        ])
-        # 将 format_docs 方法包装为 Runnable
-        format_docs_runnable = RunnableLambda(self.format_docs)
-        # RAG 链
-        rag_chain = (
-            {"context": retriever | format_docs_runnable, 
-             "question": RunnablePassthrough()}
-            | prompt
-            | chat
-            | StrOutputParser()
-        )
+
+        rag_chain = self.get_chain(k, mutuality)
 
         return rag_chain.invoke(input=input)
 
-    def get_chain(self):
+    def get_chain(self, k=4, mutuality=0.3):
         """获取RAG查询链"""
 
-        retriever = self.store.as_retriever(search_type="similarity_score_threshold",
-                                      search_kwargs={"k": 4, "score_threshold": 0.5})
+        # retriever = self.store.as_retriever(search_type="similarity_score_threshold",
+        #                               search_kwargs={"k": 4, "score_threshold": 0.5})
+        
+        retriever = self.store.as_retriever()
+
         # RAG系统经典的 Prompt (A 增强的过程)
         prompt = ChatPromptTemplate.from_messages([
           ("human", """You are an assistant for question-answering tasks. Use the following pieces 
@@ -88,7 +65,7 @@ class My_Chroma_RAG():
             {"context": retriever | format_docs_runnable, 
              "question": RunnablePassthrough()}
             | prompt
-            | chat
+            | self.chat
             | StrOutputParser()
         )
 
@@ -101,3 +78,7 @@ class My_Chroma_RAG():
 
 
 
+if __name__ == "__main__":
+    rag = My_Chroma_RAG(host="localhost", port=8000)
+    result = rag.get_result("内蒙古君正能源化工股份有限公司的法定代表人是谁？")
+    print(result)

@@ -14,29 +14,23 @@ from langchain_core.messages import SystemMessage
 # 智能体Agent初始化（使用预构建的LangGraph Agent来构建）
 from langgraph.prebuilt import create_react_agent
 
-# llm大模型
-llm = Tongyi(model = "qwen-max",temperature=0.1,top_p=0.7,max_tokens=1024,api_key="sk-2be00aba82564503af9ca25d22cda9cd")
-# chat大模型
-chat = ChatTongyi(model = "qwen-max",temperature=0.1,top_p=0.7,max_tokens=1024,api_key="sk-2be00aba82564503af9ca25d22cda9cd")
-# embedding大模型
-embed = DashScopeEmbeddings(model="text-embedding-v3",dashscope_api_key="sk-2be00aba82564503af9ca25d22cda9cd")
-
 # 配置日志
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
 )
+ 
 
-# 将递归限制提高到100或更高
-# sys.setrecursionlimit(10)  
-
-# agent
 class Agent_SQL():
     
-    def __init__(self, path):
+    def __init__(self, path, llm, chat, embed):
+        self.llm = llm
+        self.chat = chat
+        self.embed = embed
+
         """连接本地数据库"""
         self.db = SQLDatabase.from_uri(f"sqlite:///{path}")
-        self.toolkit = SQLDatabaseToolkit(db=self.db, llm=llm)
+        self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
         self.tools = self.toolkit.get_tools() # 工具
         self.SQL_PREFIX = """You are an agent designed to interact with a SQL database.
             Given an input question, create a syntactically correct SQLite query to run, then look at the results of the query and return the answer.

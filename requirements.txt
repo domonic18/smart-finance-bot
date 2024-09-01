@@ -10,3 +10,4 @@ tqdm
 chromadb
 langchain_chroma
 sentence-transformers
+langgraph

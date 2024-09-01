@@ -13,7 +13,14 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
 from langchain_chroma import Chroma
+import sys
 
+# 获取当前目录
+current_directory = os.getcwd()
+sys.path.append(os.path.join(current_directory, "app"))
+from utils.util import get_qwen_models
+
+llm , chat, embed = get_qwen_models()
 
 class HuggingFaceEmbeddingsFunction(EmbeddingFunction):
     def __init__(self, embedding_function):
@@ -30,16 +37,14 @@ class ChromaDB:
         self.port = port
         self.path = "chroma_db"
         self.collection_name = "langchain"
-        self.embedding_function = HuggingFaceEmbeddings(model_name="bert-base-chinese")
+
+        # 使用qwen模型的embeddings
+        self.embedding_function = embed
+
+        # 使用HuggingFaceEmbeddings
+        # self.embedding_function = HuggingFaceEmbeddings(model_name="bert-base-chinese")
+        
         self.chroma_db = self.__connect_with_langchain__()
-
-        # self.client = self.__connect__()
-
-        # 将 embedding_function 传递给 HuggingFaceEmbeddingsFunction
-        # self.collect = self.client.create_collection(
-        #     name=self.collection_name,
-        #     embedding_function=HuggingFaceEmbeddingsFunction(self.embedding_function)
-        # )
 
     def __connect__(self):
         """
@@ -139,7 +144,7 @@ class PDFProcessor:
         logging.info("Split text into smaller chunks with RecursiveCharacterTextSplitter.")
         return docs
     
-    def insert_docs_chromadb(self, docs, batch_size=20):
+    def insert_docs_chromadb(self, docs, batch_size=6):
         """
         将文档插入到ChromaDB
         """

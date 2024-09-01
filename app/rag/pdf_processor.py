@@ -87,12 +87,11 @@ class ChromaDB:
         """
         连接到 Chroma 数据库
         """
-        setting = Settings(chroma_server_host=self.host, chroma_server_http_port=self.port)
+        client = chromadb.HttpClient(host=self.host, port=self.port)
 
-        
         chroma_db = Chroma(
                 embedding_function=self.embedding_function,
-                client_settings=setting
+                client=client
             )
 
         return chroma_db
@@ -108,7 +107,7 @@ class ChromaDB:
 class PDFProcessor:
     def __init__(self, directory, host, port):
         self.directory = directory
-        self.chroma_db = ChromaDB(host="localhost", port=8080)
+        self.chroma_db = ChromaDB(host=host, port=port)
         # 配置日志
         logging.basicConfig(
             level=logging.INFO,

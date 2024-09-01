@@ -205,7 +205,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process PDFs and interact with ChromaDB.")
     
     # 添加参数
-    parser.add_argument('--directory', type=str, default="./app/data/pdf", help='Directory containing PDF files.')
+    parser.add_argument('--directory', type=str, default="./app/dataset/pdf", help='Directory containing PDF files.')
     parser.add_argument('--host', type=str, default="localhost", help='ChromaDB host address.')
     parser.add_argument('--port', type=int, default=8000, help='ChromaDB port.')
 

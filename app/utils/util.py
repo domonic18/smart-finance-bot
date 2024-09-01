@@ -33,7 +33,7 @@ def get_qwen_models():
     # embedding 大模型
     from langchain_community.embeddings import DashScopeEmbeddings
 
-    embed = DashScopeEmbeddings(model="text-embedding-async-v2")
+    embed = DashScopeEmbeddings(model="text-embedding-v3")
 
     return llm, chat, embed
 
@@ -60,7 +60,7 @@ def get_ernie_models():
 
 
 if __name__ == "__main__":
-    llm, chat, embed = get_ernie_models()
+    llm, chat, embed = get_qwen_models()
     print(llm.invoke(input="你好"))
     print(chat.invoke(input="你好"))
     print(embed.embed_query(text="你好"))

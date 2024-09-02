@@ -12,109 +12,18 @@ from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
-from langchain_chroma import Chroma
+
 import sys
-
 # 获取当前目录
-current_directory = os.getcwd()
-sys.path.append(os.path.join(current_directory, "app"))
-from utils.util import get_qwen_models
+sys.path.append(os.path.join(os.getcwd(), "app"))
+from utils.chroma_util import ChromaDB
 
-llm , chat, embed = get_qwen_models()
-
-class HuggingFaceEmbeddingsFunction(EmbeddingFunction):
-    def __init__(self, embedding_function):
-        self.embedding_function = embedding_function
-
-    def __call__(self, texts: Documents) -> Embeddings:
-        embeddings = [self.embedding_function.embed_query(text) for text in texts]
-        return embeddings
-
-
-class ChromaDB:
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
-        self.path = "chroma_db"
-        self.collection_name = "langchain"
-
-        # 使用qwen模型的Gdings
-        # self.embedding_function = embed
-
-        # 使用HuggingFaceEmbeddings
-        self.embedding_function = HuggingFaceEmbeddings(model_name="bert-base-chinese")
-        
-        self.chroma_db = self.__connect_with_langchain__()
-
-    def __connect__(self):
-        """
-        连接到 Chroma 数据库
-        """
-        setting = Settings(chroma_server_host=self.host, chroma_server_http_port=self.port)
-
-        try:
-            self.client = Client(settings=setting)
-        except chromadb.errors.APIError as e:
-            print(f"Error connecting to ChromaDB: {e}")
-            print("Trying to start a new instance...")
-            # 如果连接失败，尝试启动一个新的实例
-            self.client = Client(settings=setting)
-
-        return self.client
-
-    def clear_database(self):
-        """
-        清空 Chroma 数据库
-        """
-        self.client.delete_collection(name=self.collection_name)
-
-    def add(self, docs):
-        """
-        将文档添加到数据库
-        """
-        documents = [doc.page_content for doc in docs]  # 提取文档内容
-        metadata = [{'timestamp': datetime.datetime.now().isoformat(), 'source': doc.metadata.get('source', 'unknown')} for doc in docs]
-
-        # 添加文档到数据库
-        self.collect.add(
-            documents=documents,
-            metadatas=metadata,
-            # 生成ids
-            ids=[f"{uuid.uuid4()}" for _ in range(len(docs))]
-        )
-
-    def __connect_with_langchain__(self):
-        """
-        连接到 Chroma 数据库
-        """
-        
-        # 使用HTTP方式连接(此方法速度太慢，平均2batch/s)
-        # client = chromadb.HttpClient(host=self.host, port=self.port)
-        # chroma_db = Chroma(
-        #         embedding_function=self.embedding_function,
-        #         client=client
-        #     )
-
-        # 使用持久化方式连接(直接读取写入硬盘的方式，速度快，平均15batch/s)
-        chroma_db = Chroma(
-                embedding_function=self.embedding_function,
-                persist_directory=self.path,
-            )
-
-        return chroma_db
-
-
-    def add_with_langchain(self, docs):
-        """
-        将文档添加到数据库
-        """
-        self.chroma_db.add_documents(documents=docs)
-            
+ 
 
 class PDFProcessor:
-    def __init__(self, directory, host, port):
+    def __init__(self, directory, chroma_server_type, persist_path):
         self.directory = directory
-        self.chroma_db = ChromaDB(host=host, port=port)
+        self.chroma_db = ChromaDB(chroma_server_type=chroma_server_type, persist_path=persist_path)
         # 配置日志
         logging.basicConfig(
             level=logging.INFO,
@@ -177,10 +86,6 @@ class PDFProcessor:
                 batch = docs[i:i + batch_size]  
 
                 # 将样本入库
-                # 方式一：使用chromadb 的add方法
-                # self.chroma_db.add(batch)
-
-                # 方式二：使用chromadb 的add_with_langchain方法
                 self.chroma_db.add_with_langchain(batch)
 
                 # 更新已插入的文档数量
@@ -219,14 +124,13 @@ if __name__ == "__main__":
     
     # 添加参数
     parser.add_argument('--directory', type=str, default="./app/dataset/pdf", help='Directory containing PDF files.')
-    parser.add_argument('--host', type=str, default="localhost", help='ChromaDB host address.')
-    parser.add_argument('--port', type=int, default=8000, help='ChromaDB port.')
+    parser.add_argument('--persist_path', type=str, default="chroma_db", help='ChromaDB local file path.')
 
     # 解析参数
     args = parser.parse_args()
 
     # 创建 PDFProcessor 实例
-    pdf_processor = PDFProcessor(directory=args.directory, host=args.host, port=args.port)
+    pdf_processor = PDFProcessor(directory=args.directory, chroma_server_type="local", persist_path=args.persist_path)
     
     # 处理 PDF 文件
     pdf_processor.process_pdfs()

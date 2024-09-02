@@ -1,13 +1,8 @@
 import os
-import sys
 import logging
 import pprint
-from datetime import datetime
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage #三个消息
 from langchain_core.runnables.base import RunnableMap
-from langchain_community.llms.tongyi import Tongyi
-from langchain_community.chat_models import ChatTongyi
-from langchain_community.embeddings import DashScopeEmbeddings
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_core.messages import SystemMessage
@@ -23,13 +18,13 @@ logging.basicConfig(
 
 class Agent_SQL():
     
-    def __init__(self, path, llm, chat, embed):
+    def __init__(self, sql_path, llm, chat, embed):
         self.llm = llm
         self.chat = chat
         self.embed = embed
 
         """连接本地数据库"""
-        self.db = SQLDatabase.from_uri(f"sqlite:///{path}")
+        self.db = SQLDatabase.from_uri(f"sqlite:///{sql_path}")
         self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
         self.tools = self.toolkit.get_tools() # 工具
         self.SQL_PREFIX = """You are an agent designed to interact with a SQL database.
@@ -87,11 +82,11 @@ if __name__ == "__main__":
 
     llm , chat , embed = get_qwen_models()
 
-    current_directory = os.getcwd()
-    sql_path = os.path.join(current_directory, "app/dataset/dataset/博金杯比赛数据.db")
+    sql_path = os.path.join(os.getcwd(), "app/dataset/dataset/博金杯比赛数据.db")
 
-    agent = Agent_SQL(path=sql_path, llm=llm, chat=chat, embed=embed)
+    agent = Agent_SQL(sql_path=sql_path, llm=llm, chat=chat, embed=embed)
 
     input = "请帮我查询出20210415日，建筑材料一级行业涨幅超过5%（不包含）的股票数量"
+    
     result,result_list = agent.get_result(input)
     print(result)

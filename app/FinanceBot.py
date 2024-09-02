@@ -1,22 +1,14 @@
 import logging
 import os
-from rag import My_Chroma_RAG
+from rag import RAG_Manager
 from agent import Agent_SQL
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import SystemMessagePromptTemplate #系统消息模板
 from langchain_core.prompts import HumanMessagePromptTemplate #用户消息模板
-from langchain_core.prompts import AIMessagePromptTemplate #挖空模板，一般不用
-from langchain_core.prompts import ChatMessagePromptTemplate #通用消息模板
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage #三个消息
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import CommaSeparatedListOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import FewShotChatMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 from utils.util import get_qwen_models
-from langchain_community.llms.tongyi import Tongyi
-from langchain_community.chat_models import ChatTongyi
-from langchain_community.embeddings import DashScopeEmbeddings
 
 # 连接大模型
 llm, chat, embed = get_qwen_models()
@@ -32,31 +24,36 @@ CHROMA_PORT = 8000
 current_directory = os.getcwd()
 
 # 连接数据库db文件的地址根据需要需要更换
-SQLDATABASE_URI = os.path.join(current_directory, "/gemini/code/博金杯比赛数据.db")
+SQLDATABASE_URI = os.path.join(current_directory, "app/dataset/dataset/博金杯比赛数据.db")
+
+# 默认本地数据库的持久化目录
+CHROMA_PERSIST_DB_PATH = "chroma_db"
+
+# 默认的ChromaDB的服务器类别
+CHROMA_SERVER_TYPE = "http"
+
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# 使用本地数据库
-path = "gemini/code/my_chroma"
 
 class FinanceBot:
-    def __init__(self, start_chromdb_server = True,noserver_path = path, llm=llm, chat=chat, embed=embed):
-        self.llm = llm                      
-        self.chat = chat
-        self.embed = embed
-        self.path = noserver_path
+    def __init__(self):
+        
 
-        # 单独创建一个意图识别的大模型连接
+        # 意图识别大模型
         self.llm_recognition = self.init_recognition(base_url=BASE_URL, 
                                                  api_key=API_KEY, 
                                                  model=MODEL)                 
+        # RAG对象
+        self.rag = RAG_Manager(chroma_server_type=CHROMA_SERVER_TYPE, 
+                               host=CHROMA_HOST, 
+                               port=CHROMA_PORT, 
+                               llm=llm, chat=chat, embed=embed)
 
-        self.rag = My_Chroma_RAG(start_chromdb_server, host=CHROMA_HOST, port=CHROMA_PORT, noserver_path=self.path, llm=self.llm, chat=self.chat, embed=self.embed)
-
-
-        # 单独创建一个agent的大模型连接
-        self.agent = Agent_SQL(path=SQLDATABASE_URI, llm=llm, chat=chat, embed=embed)                       
+        # Agent对象
+        self.agent = Agent_SQL(sql_path=SQLDATABASE_URI, 
+                               llm=llm, chat=chat, embed=embed)                       
 
 
     def init_recognition(self, base_url, api_key, model):
@@ -230,7 +227,7 @@ if __name__ == "__main__":
 
     query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
 
-    financebot = FinanceBot(llm, chat, embed)
+    financebot = FinanceBot()
     final_result = financebot.handle_query(query)
 
     print(final_result)

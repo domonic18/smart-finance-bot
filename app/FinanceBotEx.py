@@ -5,12 +5,12 @@ from langgraph.prebuilt import create_react_agent
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from rag import My_Chroma_RAG
+from rag import RAG_Manager
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from utils.util import get_qwen_models
 
 # 连接大模型
-llm, chat, embed = get_qwen_models()
+llm_qwen, chat_qwen, embed_qwen = get_qwen_models()
 
 embeddings = HuggingFaceEmbeddings(model_name="bert-base-chinese")
 
@@ -36,13 +36,13 @@ def get_datetime() -> str:
     return formatted_date
 
 class FinanceBotEx:
-    def __init__(self, llm=llm, chat=chat, embed=embed):
+    def __init__(self, llm=llm_qwen, chat=chat_qwen, embed=embed_qwen):
         self.llm = llm                      
         self.chat = chat
         self.embed = embed               
         self.tools = []
 
-        self.rag = My_Chroma_RAG(host=CHROMA_HOST, port=CHROMA_PORT, llm=llm, chat=chat, embed=embed)
+        self.rag = RAG_Manager(llm=llm, chat=chat, embed=embed)
         
         self.agent_executor = self.init_agent()
 
@@ -139,8 +139,8 @@ if __name__ == "__main__":
     # example_query = "湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？"
     # example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
     example_query = "20210304日，一级行业为非银金融的股票的成交量合计是多少？取整。"
-    
-    finnance_bot_ex = FinanceBotEx(llm=llm, chat=chat, embed=embeddings)
+
+    finnance_bot_ex = FinanceBotEx()
     finnance_bot_ex.handle_query(example_query)
 
 

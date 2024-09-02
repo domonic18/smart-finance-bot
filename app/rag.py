@@ -42,7 +42,7 @@ class My_Chroma_RAG():
                        embedding_function=embed,
                        client=self.client)
         else:
-            return "连接数据库失败"
+            print("连接数据库失败")
             
 
     def get_result(self, input, k=4, mutuality=0.3):

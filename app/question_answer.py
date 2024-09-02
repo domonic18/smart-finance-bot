@@ -1,6 +1,6 @@
 
-from FinanceBot import FinanceBot
 import json
+from FinanceBot import FinanceBot
 # llm大模型
 # chat大模型
 # embedding大模型
@@ -22,7 +22,7 @@ class TestQuestion():
                 record = json.loads(line)
                 self.data.append(record)
         
-        self.model = FinanceBot(start_chromdb_server=False,llm=llm, chat=chat, embed=embed)
+        self.model = FinanceBot()
 
     def question_inference(self,start = 0,end=5):
         """start:起始id，end：结束id+1"""

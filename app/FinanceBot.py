@@ -11,7 +11,7 @@ from langchain_openai import ChatOpenAI
 from utils.util import get_qwen_models
 
 # 连接大模型
-llm, chat, embed = get_qwen_models()
+llm_qwen, chat_qwen, embed_qwen = get_qwen_models()
 
 
 BASE_URL = "http://direct.virtaicloud.com:45181/v1"
@@ -38,8 +38,10 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 
 class FinanceBot:
-    def __init__(self):
-        
+    def __init__(self, llm=llm_qwen, chat=chat_qwen, embed=embed_qwen):
+        self.llm = llm
+        self.chat = chat
+        self.embed = embed
 
         # 意图识别大模型
         self.llm_recognition = self.init_recognition(base_url=BASE_URL, 
@@ -49,11 +51,11 @@ class FinanceBot:
         self.rag = RAG_Manager(chroma_server_type=CHROMA_SERVER_TYPE, 
                                host=CHROMA_HOST, 
                                port=CHROMA_PORT, 
-                               llm=llm, chat=chat, embed=embed)
+                               llm=self.llm, chat=self.chat, embed=self.embed)
 
         # Agent对象
         self.agent = Agent_SQL(sql_path=SQLDATABASE_URI, 
-                               llm=llm, chat=chat, embed=embed)                       
+                               llm=self.llm, chat=self.chat, embed=self.embed)                       
 
 
     def init_recognition(self, base_url, api_key, model):
@@ -170,7 +172,7 @@ class FinanceBot:
 
         if intent == "rag_question":
             # 如果是RAG相关的问题
-            result = self.rag.get_result(input=question)
+            result = self.rag.get_result(question=question)
 
             return result
         

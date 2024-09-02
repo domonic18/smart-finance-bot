@@ -58,6 +58,16 @@ def get_ernie_models():
 
     return llm, chat, embed
 
+def get_huggingface_embeddings():
+    """
+    加载嵌入模型
+    """
+    from langchain_community.embeddings import HuggingFaceEmbeddings
+
+    embeddings = HuggingFaceEmbeddings(model_name="bert-base-chinese")
+
+    return embeddings
+
 
 if __name__ == "__main__":
     llm, chat, embed = get_qwen_models()

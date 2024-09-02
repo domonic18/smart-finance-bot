@@ -3,7 +3,7 @@ from langserve import add_routes
 from fastapi.middleware.cors import CORSMiddleware
 from FinanceBot import FinanceBot
 
-financebot = FinanceBot()
+finance_bot = FinanceBot()
 
 # 创建 FastAPI 应用
 app = FastAPI(
@@ -26,7 +26,7 @@ async def query(query: dict):  # 使用字典类型代替Query模型
     try:
         # 从字典中获取input
         input_data = query.get("input")  
-        result = financebot.handle_query(input_data)
+        result = finance_bot.handle_query(input_data)
 
         # 返回字典格式的响应
         return {"output": result}  

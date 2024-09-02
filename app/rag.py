@@ -1,4 +1,4 @@
-# Chroma 原生操作
+import logging
 import chromadb
 from chromadb import Client
 from chromadb import Settings
@@ -14,11 +14,14 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.base import RunnableLambda
 from langchain_core.runnables.base import RunnableMap
+from langchain_community.embeddings import HuggingFaceEmbeddings
 
-from langchain_community.llms.tongyi import Tongyi
-from langchain_community.chat_models import ChatTongyi
-from langchain_community.embeddings import DashScopeEmbeddings
+embeddings = HuggingFaceEmbeddings(model_name="bert-base-chinese")
 
+
+# 设置日志
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class My_Chroma_RAG():
     def __init__(self, host, port, llm, chat, embed):
@@ -26,15 +29,31 @@ class My_Chroma_RAG():
         self.llm = llm
         self.chat = chat
         self.embed = embed
-        # 连接到 Chroma 数据库
-        settings = Settings(chroma_server_host=host, chroma_server_http_port=port)
-        self.client = chromadb.Client(settings)
-        self.store = Chroma(collection_name="langchain", 
-                       embedding_function=embed,
-                       client=self.client)
+
+
+        # HTTP方式连接
+        client = chromadb.HttpClient(host=host, port=port)
+        self.store = Chroma(
+                embedding_function=embed,
+                client=client
+            )
+
+        # 持久化方式连接
+        # self.store = Chroma(
+        #         embedding_function=embed,
+        #         persist_directory="chroma_db",
+        #     )
+
+
+    def get_retriever(self):
+        return self.store.as_retriever()
 
     def get_result(self, input, k=4, mutuality=0.3):
         """获取RAG查询结果"""
+
+
+        logging.basicConfig()
+        logging.getLogger("langchain.retrievers").setLevel(logging.INFO)
 
         rag_chain = self.get_chain(k, mutuality)
 
@@ -71,10 +90,37 @@ class My_Chroma_RAG():
 
         return rag_chain
 
-    # 把检索到的多条上下文的文本使用 \n\n 练成一个大的字符串
-    def format_docs(self,docs):
-        return "\n\n".join(doc.page_content for doc in docs)
+    def format_docs(self, docs):
+        # 返回检索到的资料文件名称
+        logger.info(f"检索到资料文件个数：{len(docs)}")
+        retrieved_files = "\n".join([doc.metadata["source"] for doc in docs])
+        logger.info(f"资料文件分别是:\n{retrieved_files}")
 
+        retrieved_content = "\n\n".join(doc.page_content for doc in docs)
+        logger.info(f"检索到的资料为:\n{retrieved_content}")
+
+        return retrieved_content
+
+    def MulQueryRetrieverQuery(self, question):
+        from langchain.retrievers.multi_query import MultiQueryRetriever
+
+        # 把向量操作封装为一个基本检索器
+        retriever = self.get_retriever()
+
+        retriever_from_llm = MultiQueryRetriever.from_llm(
+            retriever=retriever, llm=self.chat
+        )
+
+        logging.basicConfig()
+        logging.getLogger("langchain.retrievers.multi_query").setLevel(logging.INFO)
+
+        unique_docs = retriever_from_llm.get_relevant_documents(query=question)
+        unique_docs
+
+        print(f'返回的文档个数：{len(unique_docs)}')
+        print(f'返回的文档内容：')
+        for doc in unique_docs:
+            print(doc.page_content)
 
 
 
@@ -83,7 +129,8 @@ if __name__ == "__main__":
 
     llm , chat , embed = get_qwen_models()
 
-    rag = My_Chroma_RAG(host="localhost", port=8000, llm=llm, chat=chat, embed=embed)
+    rag = My_Chroma_RAG(host="localhost", port=8000, llm=llm, chat=chat, embed=embeddings)
     
-    result = rag.get_result("内蒙古君正能源化工股份有限公司的法定代表人是谁？")
+    result = rag.get_result("湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？")
     print(result)
+    # rag.MulQueryRetrieverQuery("湖南长远锂科股份有限公司")

@@ -30,24 +30,30 @@ CHROMA_HOST = "localhost"
 CHROMA_PORT = 8000
 
 current_directory = os.getcwd()
-SQLDATABASE_URI = os.path.join(current_directory, "app/dataset/dataset/博金杯比赛数据.db")
+
+# 连接数据库db文件的地址根据需要需要更换
+SQLDATABASE_URI = os.path.join(current_directory, "/gemini/code/博金杯比赛数据.db")
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+# 使用本地数据库
+path = "gemini/code/my_chroma"
 
 class FinanceBot:
-    def __init__(self, llm=llm, chat=chat, embed=embed):
+    def __init__(self, start_chromdb_server = True,noserver_path = path, llm=llm, chat=chat, embed=embed):
         self.llm = llm                      
         self.chat = chat
         self.embed = embed
+        self.path = noserver_path
 
         # 单独创建一个意图识别的大模型连接
         self.llm_recognition = self.init_recognition(base_url=BASE_URL, 
                                                  api_key=API_KEY, 
                                                  model=MODEL)                 
-        
-        self.rag = My_Chroma_RAG(host=CHROMA_HOST, port=CHROMA_PORT, llm=llm, chat=chat, embed=embed)
+
+        self.rag = My_Chroma_RAG(start_chromdb_server, host=CHROMA_HOST, port=CHROMA_PORT, noserver_path=self.path, llm=self.llm, chat=self.chat, embed=self.embed)
+
 
         # 单独创建一个agent的大模型连接
         self.agent = Agent_SQL(path=SQLDATABASE_URI, llm=llm, chat=chat, embed=embed)                       

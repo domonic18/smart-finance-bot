@@ -19,19 +19,31 @@ from langchain_community.llms.tongyi import Tongyi
 from langchain_community.chat_models import ChatTongyi
 from langchain_community.embeddings import DashScopeEmbeddings
 
+from utils.util import get_qwen_models
+# 连接大模型
+llm, chat, embed = get_qwen_models()
 
 class My_Chroma_RAG():
-    def __init__(self, host, port, llm, chat, embed):
+    def __init__(self,start_chromdb_server, host="localhost", port=8000, noserver_path="gemini/code/my_chroma", llm=llm, chat=chat, embed=embed):
         """连接本地数据库"""
         self.llm = llm
         self.chat = chat
         self.embed = embed
         # 连接到 Chroma 数据库
-        settings = Settings(chroma_server_host=host, chroma_server_http_port=port)
-        self.client = chromadb.Client(settings)
-        self.store = Chroma(collection_name="langchain", 
+        if start_chromdb_server == True:
+            settings = Settings(chroma_server_host=host, chroma_server_http_port=port)
+            self.client = chromadb.Client(settings)
+            self.store = Chroma(collection_name="langchain", 
+                           embedding_function=embed,
+                           client=self.client)
+        if start_chromdb_server == False:
+            self.client = chromadb.PersistentClient(path=noserver_path)
+            self.store = Chroma(collection_name="langchain", 
                        embedding_function=embed,
                        client=self.client)
+        else:
+            return "连接数据库失败"
+            
 
     def get_result(self, input, k=4, mutuality=0.3):
         """获取RAG查询结果"""

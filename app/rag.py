@@ -18,35 +18,37 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 embeddings = HuggingFaceEmbeddings(model_name="bert-base-chinese")
 
+from utils.util import get_qwen_models
+# 连接大模型
+llm, chat, embed = get_qwen_models()
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class My_Chroma_RAG():
-    def __init__(self, host, port, llm, chat, embed):
+    def __init__(self, start_chromdb_server=False, host="localhost", port=8000, noserver_path="chroma_db", llm=llm, chat=chat, embed=embed):
         """连接本地数据库"""
         self.llm = llm
         self.chat = chat
         self.embed = embed
 
-
-        # HTTP方式连接
-        client = chromadb.HttpClient(host=host, port=port)
-        self.store = Chroma(
-                embedding_function=embed,
-                client=client
-            )
-
-        # 持久化方式连接
-        # self.store = Chroma(
-        #         embedding_function=embed,
-        #         persist_directory="chroma_db",
-        #     )
-
-
-    def get_retriever(self):
-        return self.store.as_retriever()
+        # 连接到 Chroma 数据库
+        if start_chromdb_server == True:
+            settings = Settings(chroma_server_host=host, chroma_server_http_port=port)
+            self.client = chromadb.Client(settings)
+            self.store = Chroma(collection_name="langchain", 
+                           embedding_function=embed,
+                           client=self.client)
+        
+        if start_chromdb_server == False:
+            self.store = Chroma(collection_name="langchain", 
+                       embedding_function=embed,
+                       persist_directory=noserver_path
+                       )
+        else:
+            print("连接数据库失败")
+            
 
     def get_result(self, input, k=4, mutuality=0.3):
         """获取RAG查询结果"""
@@ -125,11 +127,8 @@ class My_Chroma_RAG():
 
 
 if __name__ == "__main__":
-    from utils.util import get_qwen_models
 
-    llm , chat , embed = get_qwen_models()
-
-    rag = My_Chroma_RAG(host="localhost", port=8000, llm=llm, chat=chat, embed=embeddings)
+    rag = My_Chroma_RAG(host="localhost", port=8000, llm=llm, chat=chat, embed=embed)
     
     result = rag.get_result("湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？")
     print(result)

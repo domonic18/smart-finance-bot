@@ -100,19 +100,33 @@ class PDFProcessor:
                 # 更新进度条
                 pbar.update(1)  
 
+
+    def process_pdfs_group(self, pdf_files_group):
+        # 读取PDF文件内容
+        pdf_contents = []
+
+
+        for pdf_path in pdf_files_group:
+            # 读取PDF文件内容
+            documents = self.load_pdf_content(pdf_path)
+
+            # 将documents 逐一添加到pdf_contents
+            pdf_contents.extend(documents)
+
+        # 将文本切分成小段
+        docs = self.split_text(pdf_contents)
+
+        # 将文档插入到ChromaDB
+        self.insert_docs_chromadb(docs)
+
     def process_pdfs(self):
         # 获取目录下所有的PDF文件
         pdf_files = self.load_pdf_files()
 
-        for pdf_path in tqdm(pdf_files, desc="Processing PDFs"):
-            # 读取PDF文件内容
-            documents = self.load_pdf_content(pdf_path)
-
-            # 将文本切分成小段
-            docs = self.split_text(documents)
-
-            # 将文档插入到ChromaDB
-            self.insert_docs_chromadb(docs)
+        # 每20个PDF文件为一组，分批处理
+        for i in range(0, len(pdf_files), 20):
+            pdf_files_group = pdf_files[i:i + 20]
+            self.process_pdfs_group(pdf_files_group)
 
         print("PDFs processed successfully!")
 

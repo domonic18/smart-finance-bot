@@ -501,8 +501,7 @@ async function dom2img() {
           <div class="footer flex flex-col items-center justify-between p-4 h-15">
             <div class="user-info font-bold text-lg">金融千问机器人</div>
             <div class="logo-container relative"> <!-- 添加一个容器 -->
-              <img src="../assets/background.png" alt="Background" class="background-logo" /> <!-- 新增背景图片 -->
-              <img src="../assets/logo.png" alt="Logo" class="logo" />
+              <img src="../assets/background.png" alt="Logo" class="logo" />
             </div>
             <div class="robot-description text-sm text-gray-600 mt-2">
               金融千问机器人，通过RAG对既有的PDF招股书建立了知识库，同时借助大模型+Agent对金融SQL数据库进行动态查询，旨在为用户提供快速、准确的金融信息和咨询服务。
@@ -615,7 +614,7 @@ async function dom2img() {
                   下载当前会话为图片
                 </n-tooltip>
                 <a href="" id="link" class="hidden"></a>
-                <n-input show-count @keyup.ctrl.enter="addMessageListItem(route.params.uuid)" placeholder="Ctrl+Enter 发送消息" v-model:value="input_area_value" type="textarea" size="tiny" :autosize="{ minRows: 2, maxRows: 5 }" />
+                <n-input show-count @keyup.ctrl.enter="addMessageListItem(route.params.uuid)" placeholder="Ctrl+Enter 发送消息，发送消息长度需要大于2个字" v-model:value="input_area_value" type="textarea" size="tiny" :autosize="{ minRows: 2, maxRows: 5 }" />
                 <n-button ghost class="h-auto" @click="addMessageListItem(route.params.uuid)">
                   发送
                 </n-button>

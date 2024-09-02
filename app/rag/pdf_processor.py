@@ -39,10 +39,10 @@ class ChromaDB:
         self.collection_name = "langchain"
 
         # 使用qwen模型的Gdings
-        self.embedding_function = embed
+        # self.embedding_function = embed
 
         # 使用HuggingFaceEmbeddings
-        # self.embedding_function = HuggingFaceEmbeddings(model_name="bert-base-chinese")
+        self.embedding_function = HuggingFaceEmbeddings(model_name="bert-base-chinese")
         
         self.chroma_db = self.__connect_with_langchain__()
 
@@ -144,12 +144,19 @@ class PDFProcessor:
         将文本切分成小段
         """
         # 切分文档
-        spliter = RecursiveCharacterTextSplitter(chunk_size=128, chunk_overlap=64)
-        docs = spliter.split_documents(documents)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=500,
+            chunk_overlap=100, 
+            length_function=len,
+            add_start_index=True,
+        )
+
+        docs = text_splitter.split_documents(documents)
 
         logging.info("Split text into smaller chunks with RecursiveCharacterTextSplitter.")
         return docs
     
+
     def insert_docs_chromadb(self, docs, batch_size=6):
         """
         将文档插入到ChromaDB

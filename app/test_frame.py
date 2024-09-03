@@ -98,9 +98,9 @@ def test_financebot_ex():
 
 
 if __name__ == "__main__":
-    test_agent()
-    test_rag()
-    test_import()
-    test_financebot()
+    # test_agent()
+    # test_rag()
+    # test_import()
+    # test_financebot()
+    # test_financebot_ex()
     test_answer_question()
-    test_financebot_ex()

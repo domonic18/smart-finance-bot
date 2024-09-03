@@ -1,17 +1,10 @@
 import os
-import chromadb
-import datetime
 import logging
-import uuid
 import time
 import argparse
 from tqdm import tqdm 
-from chromadb import Client
-from chromadb import Settings
 from langchain_community.document_loaders import PyMuPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from chromadb.api.types import Documents, EmbeddingFunction, Embeddings
 
 import sys
 # 获取当前目录

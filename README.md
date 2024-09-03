@@ -23,7 +23,6 @@ smart-finance-bot \
     |- app \   # 该目录用于服务端代码
         |- agent \ # 该目录用于保存agent相关代码
         |- rag \   # 该目录用于保存rag相关代码
-        |- ir \   # 该目录用于保存意图识别(Intent Recognition)相关代码
         |- dataset \  # 该目录用于保存PDF以及SQLite数据
         |- conf \  # 该目录用于保存配置文件
             |- .qwen # 该文件保存QWen的配置文件(请自行添加对应的API KEY)
@@ -51,7 +50,7 @@ git clone --recurse-submodules https://gitee.com/deadwalk/smart-finance-bot.git
 # conda create --name langchain python=3.10
 # conda activate langchain
 
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+pip install -r requirements.txt
 ```
 
 > 注意：经过实际测试Python 3.11版本会存在依赖冲突问题，所以请将Python版本切换为3.10。
@@ -123,8 +122,6 @@ scripts\start_chroma.bat
 
 > 如果想复用已经建立的向量数据库，可以在启动chroma的脚本中修改启动的path。
 
-
-
 ### 5、启动后端服务
 
 ```bash
@@ -155,3 +152,15 @@ npm install
 # 启动服务
 npm run dev
 ```
+
+
+### 开展测试工作
+
+```bash
+# 切换/保持当前目录为 smart-finance-bot
+cd smart-finance-bot
+
+# 运行测试脚本
+python app/test_frame.py
+```
+测试结果会保存在 `test_result` 目录中。

@@ -7,16 +7,7 @@ from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from rag.rag import RAG_Manager
 from utils.util import get_qwen_models
-
-# 连接大模型
-llm_qwen, chat_qwen, embed_qwen = get_qwen_models()
-
-
-CHROMA_HOST = "localhost"
-CHROMA_PORT = 8000
-
-current_directory = os.getcwd()
-SQLDATABASE_URI = os.path.join(current_directory, "app/dataset/dataset/博金杯比赛数据.db")
+import settings
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -33,7 +24,7 @@ def get_datetime() -> str:
     return formatted_date
 
 class FinanceBotEx:
-    def __init__(self, llm=llm_qwen, chat=chat_qwen, embed=embed_qwen):
+    def __init__(self, llm=settings.llm, chat=settings.chat, embed=settings.embed):
         self.llm = llm                      
         self.chat = chat
         self.embed = embed               
@@ -51,13 +42,11 @@ class FinanceBotEx:
             retriever=retriever,
             name="rag_search",
             description="按照用户的问题搜索相关的资料，对于招股书类的问题，you must use this tool!",
-            # document_prompt=rag_prompt,
         )
         return retriever_tool
 
     def init_sql_tool(self, path):
         # 连接数据库
-        path = SQLDATABASE_URI
         db = SQLDatabase.from_uri(f"sqlite:///{path}")
         toolkit = SQLDatabaseToolkit(db=db, llm=self.llm)
         sql_tools = toolkit.get_tools() # 工具
@@ -106,11 +95,17 @@ class FinanceBotEx:
         return system_prompt
 
     def init_agent(self):
-        # 创建Agent
+        
+        # 初始化 RAG 工具
         retriever_tool = self.init_rag_tools()
-        sql_tools = self.init_sql_tool(SQLDATABASE_URI)
+
+        # 初始化 SQL 工具
+        sql_tools = self.init_sql_tool(settings.SQLDATABASE_URI)
+
+        # 创建系统Prompt提示语
         system_prompt = self.create_prompt()
 
+        # 创建Agent
         agent_executor = create_react_agent(
             self.chat, 
             tools=[get_datetime, retriever_tool] + sql_tools, 

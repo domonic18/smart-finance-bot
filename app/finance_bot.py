@@ -9,52 +9,30 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import FewShotChatMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 from utils.util import get_qwen_models
-
-# 连接大模型
-llm_qwen, chat_qwen, embed_qwen = get_qwen_models()
-
-
-BASE_URL = "http://direct.virtaicloud.com:45181/v1"
-API_KEY = "EMPTY"
-MODEL = "Qwen2_7B-chat-sft2"
-
-CHROMA_HOST = "localhost"
-CHROMA_PORT = 8000
-
-current_directory = os.getcwd()
-
-# 连接数据库db文件的地址根据需要需要更换
-SQLDATABASE_URI = os.path.join(current_directory, "app/dataset/dataset/博金杯比赛数据.db")
-
-# 默认本地数据库的持久化目录
-CHROMA_PERSIST_DB_PATH = "chroma_db"
-
-# 默认的ChromaDB的服务器类别
-CHROMA_SERVER_TYPE = "http"
-
+import settings
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class FinanceBot:
-    def __init__(self, llm=llm_qwen, chat=chat_qwen, embed=embed_qwen):
+    def __init__(self, llm=settings.llm, chat=settings.chat, embed=settings.embed):
         self.llm = llm
         self.chat = chat
         self.embed = embed
 
         # 意图识别大模型
-        self.llm_recognition = self.init_recognition(base_url=BASE_URL, 
-                                                 api_key=API_KEY, 
-                                                 model=MODEL)                 
+        self.llm_recognition = self.init_recognition(base_url=settings.BASE_URL, 
+                                                 api_key=settings.API_KEY, 
+                                                 model=settings.MODEL)                 
         # RAG对象
-        self.rag = RAG_Manager(chroma_server_type=CHROMA_SERVER_TYPE, 
-                               host=CHROMA_HOST, 
-                               port=CHROMA_PORT, 
+        self.rag = RAG_Manager(chroma_server_type=settings.CHROMA_SERVER_TYPE, 
+                               host=settings.CHROMA_HOST, 
+                               port=settings.CHROMA_PORT, 
                                llm=self.llm, embed=self.embed)
 
         # Agent对象
-        self.agent = Agent_SQL(sql_path=SQLDATABASE_URI, 
+        self.agent = Agent_SQL(sql_path=settings.SQLDATABASE_URI, 
                                llm=self.chat, embed=self.embed)                       
 
 

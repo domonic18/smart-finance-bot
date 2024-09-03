@@ -1,7 +1,7 @@
 import logging
 import os
-from rag import RAG_Manager
-from agent import Agent_SQL
+from rag.rag import RAG_Manager
+from agent.agent import Agent_SQL
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import SystemMessagePromptTemplate #系统消息模板
 from langchain_core.prompts import HumanMessagePromptTemplate #用户消息模板

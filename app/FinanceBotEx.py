@@ -5,14 +5,11 @@ from langgraph.prebuilt import create_react_agent
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from rag import RAG_Manager
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from rag.rag import RAG_Manager
 from utils.util import get_qwen_models
 
 # 连接大模型
 llm_qwen, chat_qwen, embed_qwen = get_qwen_models()
-
-embeddings = HuggingFaceEmbeddings(model_name="bert-base-chinese")
 
 
 CHROMA_HOST = "localhost"

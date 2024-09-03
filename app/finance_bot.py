@@ -51,11 +51,11 @@ class FinanceBot:
         self.rag = RAG_Manager(chroma_server_type=CHROMA_SERVER_TYPE, 
                                host=CHROMA_HOST, 
                                port=CHROMA_PORT, 
-                               llm=self.llm, chat=self.chat, embed=self.embed)
+                               llm=self.llm, embed=self.embed)
 
         # Agent对象
         self.agent = Agent_SQL(sql_path=SQLDATABASE_URI, 
-                               llm=self.llm, chat=self.chat, embed=self.embed)                       
+                               llm=self.chat, embed=self.embed)                       
 
 
     def init_recognition(self, base_url, api_key, model):
@@ -224,12 +224,3 @@ class FinanceBot:
         
         return final_result
     
-
-if __name__ == "__main__":
-
-    query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
-
-    financebot = FinanceBot()
-    final_result = financebot.handle_query(query)
-
-    print(final_result)

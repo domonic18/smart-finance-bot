@@ -39,7 +39,7 @@ class FinanceBotEx:
         self.embed = embed               
         self.tools = []
 
-        self.rag = RAG_Manager(llm=llm, chat=chat, embed=embed)
+        self.rag = RAG_Manager(llm=llm, embed=embed)
         
         self.agent_executor = self.init_agent()
 
@@ -128,16 +128,4 @@ class FinanceBotEx:
         # 打印流式事件的消息
         for event in events:
             event["messages"][-1].pretty_print()
-
-
-
-if __name__ == "__main__":
-    # example_query = "现在几点了？"
-    # example_query = "湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？"
-    # example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
-    example_query = "20210304日，一级行业为非银金融的股票的成交量合计是多少？取整。"
-
-    finnance_bot_ex = FinanceBotEx()
-    finnance_bot_ex.handle_query(example_query)
-
 

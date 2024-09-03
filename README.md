@@ -54,6 +54,8 @@ git clone --recurse-submodules https://gitee.com/deadwalk/smart-finance-bot.git
 pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 ```
 
+> 注意：经过实际测试Python 3.11版本会存在依赖冲突问题，所以请将Python版本切换为3.10。
+
 ### 2、配置大模型的APIKey
 **第一步**：打开配置文件 conf/.qwen，配置自己的API Key.
 

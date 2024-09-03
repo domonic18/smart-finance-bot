@@ -121,3 +121,5 @@ class FinanceBotEx:
         # 打印流式事件的消息
         for event in events:
             event["messages"][-1].pretty_print()
+
+        return event["messages"][-1].content

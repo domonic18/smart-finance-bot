@@ -6,8 +6,12 @@ from rag.pdf_processor import PDFProcessor
 
 
 def import_pdf(directory):
-    # 假设 get_huggingface_embeddings 和 PDFProcessor 已经实现
-    embed = get_huggingface_embeddings()
+    # 使用 HuggingFace 的模型
+    # embed = get_huggingface_embeddings()
+
+    # 使用 Qwen 的模型
+    _, _, embed = get_qwen_models()
+
 
     persist_path = "chroma_db"
     server_type = "local"

@@ -70,7 +70,7 @@ cd smart-finance-bot
 chmod +x ./scripts/run_test_llm.sh
 
 # 运行测试脚本
-./scripts/test_llm.sh
+./scripts/run_test_llm.sh
 
 ```
 

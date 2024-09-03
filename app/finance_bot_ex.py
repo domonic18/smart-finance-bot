@@ -1,12 +1,10 @@
 import logging
-import os
 import datetime
 from langgraph.prebuilt import create_react_agent
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from rag.rag import RAG_Manager
-from utils.util import get_qwen_models
+from rag.rag import RagManager
 import settings
 
 # 配置日志记录
@@ -23,19 +21,19 @@ def get_datetime() -> str:
 
     return formatted_date
 
+
 class FinanceBotEx:
     def __init__(self, llm=settings.llm, chat=settings.chat, embed=settings.embed):
-        self.llm = llm                      
+        self.llm = llm
         self.chat = chat
-        self.embed = embed               
+        self.embed = embed
         self.tools = []
 
-        self.rag = RAG_Manager(llm=llm, embed=embed)
-        
+        self.rag = RagManager(llm=llm, embed=embed)
+
         self.agent_executor = self.init_agent()
 
     def init_rag_tools(self):
-
         # 给大模型 RAG 检索器工具
         retriever = self.rag.get_retriever()
         retriever_tool = create_retriever_tool(
@@ -49,11 +47,12 @@ class FinanceBotEx:
         # 连接数据库
         db = SQLDatabase.from_uri(f"sqlite:///{path}")
         toolkit = SQLDatabaseToolkit(db=db, llm=self.llm)
-        sql_tools = toolkit.get_tools() # 工具
-        
+        sql_tools = toolkit.get_tools()  # 工具
+
         return sql_tools
 
-    def create_prompt(self):
+    @staticmethod
+    def create_prompt():
         system_prompt = """你是一位金融助手，可以帮助用户查询数据库中的信息。
             你要尽可能的回答用户提出的问题，为了更好的回答问题，你可以使用工具进行多轮的尝试。
                                                 
@@ -95,7 +94,6 @@ class FinanceBotEx:
         return system_prompt
 
     def init_agent(self):
-        
         # 初始化 RAG 工具
         retriever_tool = self.init_rag_tools()
 
@@ -107,10 +105,10 @@ class FinanceBotEx:
 
         # 创建Agent
         agent_executor = create_react_agent(
-            self.chat, 
-            tools=[get_datetime, retriever_tool] + sql_tools, 
-            state_modifier = system_prompt
-            )
+            self.chat,
+            tools=[get_datetime, retriever_tool] + sql_tools,
+            state_modifier=system_prompt
+        )
         return agent_executor
 
     def handle_query(self, example_query):
@@ -123,4 +121,3 @@ class FinanceBotEx:
         # 打印流式事件的消息
         for event in events:
             event["messages"][-1].pretty_print()
-

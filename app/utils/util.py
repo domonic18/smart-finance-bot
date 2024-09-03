@@ -37,6 +37,7 @@ def get_qwen_models():
 
     return llm, chat, embed
 
+
 def get_ernie_models():
     """
     加载文心系列大模型
@@ -56,6 +57,7 @@ def get_ernie_models():
     embed = QianfanEmbeddingsEndpoint(model="bge-large-zh")
 
     return llm, chat, embed
+
 
 def get_huggingface_embeddings():
     """

@@ -3,34 +3,33 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
-from rag.chroma_conn import ChromaDB
+from .chroma_conn import ChromaDB
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-class RAG_Manager():
-    def __init__(self, 
-                 chroma_server_type="http", 
-                 host="localhost", port=8000, 
-                 persist_path="chroma_db", 
+class RagManager:
+    def __init__(self,
+                 chroma_server_type="http",
+                 host="localhost", port=8000,
+                 persist_path="chroma_db",
                  llm=None, embed=None):
-
         self.llm = llm
-        self.embed = embed       
+        self.embed = embed
 
-        chrom_db = ChromaDB(chroma_server_type=chroma_server_type, 
-                            host=host, port=port, 
+        chrom_db = ChromaDB(chroma_server_type=chroma_server_type,
+                            host=host, port=port,
                             persist_path=persist_path,
                             embed=embed)
         self.store = chrom_db.get_store()
 
     def get_chain(self, retriever):
         """获取RAG查询链"""
-        
+
         # RAG系统经典的 Prompt (A 增强的过程)
         prompt = ChatPromptTemplate.from_messages([
-          ("human", """You are an assistant for question-answering tasks. Use the following pieces 
+            ("human", """You are an assistant for question-answering tasks. Use the following pieces 
           of retrieved context to answer the question. 
           If you don't know the answer, just say that you don't know. 
           Use three sentences maximum and keep the answer concise.
@@ -42,11 +41,11 @@ class RAG_Manager():
         format_docs_runnable = RunnableLambda(self.format_docs)
         # RAG 链
         rag_chain = (
-            {"context": retriever | format_docs_runnable, 
-             "question": RunnablePassthrough()}
-            | prompt
-            | self.llm
-            | StrOutputParser()
+                {"context": retriever | format_docs_runnable,
+                 "question": RunnablePassthrough()}
+                | prompt
+                | self.llm
+                | StrOutputParser()
         )
 
         return rag_chain
@@ -63,10 +62,9 @@ class RAG_Manager():
         return retrieved_content
 
     def get_retriever(self, k=4, mutuality=0.3):
-
         retriever = self.store.as_retriever(search_type="similarity_score_threshold",
-                        search_kwargs={"k": k, "score_threshold":mutuality})     
-        
+                                            search_kwargs={"k": k, "score_threshold": mutuality})
+
         return retriever
 
     def get_multi_query_retriever(self):
@@ -78,20 +76,19 @@ class RAG_Manager():
         retriever_from_llm = MultiQueryRetriever.from_llm(
             retriever=retriever, llm=self.llm
         )
-        
+
         return retriever_from_llm
-    
+
     def get_result(self, question, k=4, mutuality=0.3):
         """获取RAG查询结果"""
 
         retriever = self.get_retriever(k, mutuality)
-        
+
         rag_chain = self.get_chain(retriever)
 
         return rag_chain.invoke(input=question)
 
     def get_result_by_multi_query(self, question):
-        
         retriever = self.get_multi_query_retriever()
 
         rag_chain = self.get_chain(retriever)

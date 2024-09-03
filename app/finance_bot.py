@@ -1,14 +1,11 @@
 import logging
-import os
-from rag.rag import RAG_Manager
-from agent.agent import Agent_SQL
-from langchain_core.prompts import ChatPromptTemplate
+from rag.rag import RagManager
+from agent.agent import AgentSql
 from langchain_core.prompts import SystemMessagePromptTemplate #系统消息模板
 from langchain_core.prompts import HumanMessagePromptTemplate #用户消息模板
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import FewShotChatMessagePromptTemplate
 from langchain_openai import ChatOpenAI
-from utils.util import get_qwen_models
 import settings
 
 # 配置日志记录
@@ -26,14 +23,14 @@ class FinanceBot:
                                                  api_key=settings.API_KEY, 
                                                  model=settings.MODEL)                 
         # RAG对象
-        self.rag = RAG_Manager(chroma_server_type=settings.CHROMA_SERVER_TYPE, 
-                               host=settings.CHROMA_HOST, 
-                               port=settings.CHROMA_PORT, 
-                               llm=self.llm, embed=self.embed)
+        self.rag = RagManager(chroma_server_type=settings.CHROMA_SERVER_TYPE,
+                              host=settings.CHROMA_HOST,
+                              port=settings.CHROMA_PORT,
+                              llm=self.llm, embed=self.embed)
 
         # Agent对象
-        self.agent = Agent_SQL(sql_path=settings.SQLDATABASE_URI, 
-                               llm=self.chat, embed=self.embed)                       
+        self.agent = AgentSql(sql_path=settings.SQLDATABASE_URI,
+                              llm=self.chat, embed=self.embed)
 
 
     def init_recognition(self, base_url, api_key, model):

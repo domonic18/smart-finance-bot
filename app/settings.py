@@ -33,4 +33,3 @@ CHROMA_PORT = 8000
 """
 # 连接数据库db文件的地址根据需要需要更换
 SQLDATABASE_URI = os.path.join(os.getcwd(), "app/dataset/dataset/博金杯比赛数据.db")
-

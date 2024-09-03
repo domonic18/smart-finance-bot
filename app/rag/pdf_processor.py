@@ -1,27 +1,27 @@
 import os
 import logging
 import time
-from tqdm import tqdm 
+from tqdm import tqdm
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from rag.chroma_conn import ChromaDB
 
 
 class PDFProcessor:
-    def __init__(self, 
-                 directory,                 # PDF文件所在目录
-                 chroma_server_type,        # ChromaDB服务器类型
-                 persist_path,              # ChromaDB持久化路径
-                 embed):                    # 向量化函数
-        
+    def __init__(self,
+                 directory,  # PDF文件所在目录
+                 chroma_server_type,  # ChromaDB服务器类型
+                 persist_path,  # ChromaDB持久化路径
+                 embed):  # 向量化函数
+
         self.directory = directory
-        self.file_group_num = 10            # 每组处理的文件数
-        self.batch_num = 6                  # 每次插入的批次数量
+        self.file_group_num = 10  # 每组处理的文件数
+        self.batch_num = 6  # 每次插入的批次数量
 
-        self.chunksize = 500                # 切分文本的大小
-        self.overlap = 100                  # 切分文本的重叠大小
+        self.chunksize = 500  # 切分文本的大小
+        self.overlap = 100  # 切分文本的重叠大小
 
-        self.chroma_db = ChromaDB(chroma_server_type=chroma_server_type, 
+        self.chroma_db = ChromaDB(chroma_server_type=chroma_server_type,
                                   persist_path=persist_path,
                                   embed=embed)
         # 配置日志
@@ -35,7 +35,11 @@ class PDFProcessor:
         """
         加载目录下的所有PDF文件
         """
-        pdf_files = [os.path.join(self.directory, file) for file in os.listdir(self.directory) if file.lower().endswith('.pdf')]
+        pdf_files = []
+        for file in os.listdir(self.directory):
+            if file.lower().endswith('.pdf'):
+                pdf_files.append(os.path.join(self.directory, file))
+
         logging.info(f"Found {len(pdf_files)} PDF files.")
         return pdf_files
 
@@ -55,7 +59,7 @@ class PDFProcessor:
         # 切分文档
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunksize,
-            chunk_overlap=self.overlap, 
+            chunk_overlap=self.overlap,
             length_function=len,
             add_start_index=True,
         )
@@ -64,7 +68,6 @@ class PDFProcessor:
 
         logging.info("Split text into smaller chunks with RecursiveCharacterTextSplitter.")
         return docs
-    
 
     def insert_docs_chromadb(self, docs, batch_size=6):
         """
@@ -74,39 +77,36 @@ class PDFProcessor:
         logging.info(f"Inserting {len(docs)} documents into ChromaDB.")
 
         # 记录开始时间
-        start_time = time.time()  
+        start_time = time.time()
         total_docs_inserted = 0
 
         # 计算总批次
-        total_batches = (len(docs) + batch_size - 1) // batch_size  
+        total_batches = (len(docs) + batch_size - 1) // batch_size
 
         with tqdm(total=total_batches, desc="Inserting batches", unit="batch") as pbar:
             for i in range(0, len(docs), batch_size):
                 # 获取当前批次的样本
-                batch = docs[i:i + batch_size]  
+                batch = docs[i:i + batch_size]
 
                 # 将样本入库
                 self.chroma_db.add_with_langchain(batch)
                 # self.chroma_db.async_add_with_langchain(batch)
-                
 
                 # 更新已插入的文档数量
-                total_docs_inserted += len(batch)  
-            
+                total_docs_inserted += len(batch)
+
                 # 计算并显示当前的TPM
                 elapsed_time = time.time() - start_time  # 计算已用时间（秒）
                 if elapsed_time > 0:  # 防止除以零
                     tpm = (total_docs_inserted / elapsed_time) * 60  # 转换为每分钟插入的文档数
                     pbar.set_postfix({"TPM": f"{tpm:.2f}"})  # 更新进度条的后缀信息
-                
-                # 更新进度条
-                pbar.update(1)  
 
+                # 更新进度条
+                pbar.update(1)
 
     def process_pdfs_group(self, pdf_files_group):
         # 读取PDF文件内容
         pdf_contents = []
-
 
         for pdf_path in pdf_files_group:
             # 读取PDF文件内容

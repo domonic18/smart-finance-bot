@@ -88,10 +88,6 @@ def test_financebot_ex():
     # example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
     example_query = "20210304日，一级行业为非银金融的股票的成交量合计是多少？取整。"
 
-    financebot.create_prompt()
-    financebot.init_rag_tools()
-    financebot.init_sql_tool(path="app/dataset/question.json")
-
     financebot.handle_query(example_query)
 
 
@@ -99,6 +95,6 @@ if __name__ == "__main__":
     # test_agent()
     # test_rag()
     # test_import()
-    test_financebot()
-    test_answer_question()
+    # test_financebot()
+    # test_answer_question()
     test_financebot_ex()

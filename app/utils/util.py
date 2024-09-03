@@ -37,7 +37,6 @@ def get_qwen_models():
 
     return llm, chat, embed
 
-
 def get_ernie_models():
     """
     加载文心系列大模型

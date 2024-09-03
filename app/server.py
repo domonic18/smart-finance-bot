@@ -54,7 +54,7 @@ async def query(query: dict):  # 使用字典类型代替Query模型
 # 添加路由
 add_routes(
     app,
-    finance_bot_ex.init_agent() | chat ,
+    finance_bot_ex.init_agent(),
     path="/chat",
 )
 

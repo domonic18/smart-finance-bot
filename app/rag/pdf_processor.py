@@ -15,7 +15,7 @@ class PDFProcessor:
                  embed):  # 向量化函数
 
         self.directory = directory
-        self.file_group_num = 10  # 每组处理的文件数
+        self.file_group_num = 80  # 每组处理的文件数
         self.batch_num = 6  # 每次插入的批次数量
 
         self.chunksize = 500  # 切分文本的大小

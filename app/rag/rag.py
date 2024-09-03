@@ -1,31 +1,28 @@
 import logging
 from langchain_core.prompts import ChatPromptTemplate
-#字符串格式化输出（解析器）
-from langchain_core.output_parsers import StrOutputParser
-#可运行对象（占位符）
 from langchain_core.runnables import RunnablePassthrough
-from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables.base import RunnableLambda
-from langchain_core.runnables.base import RunnableMap
-from utils.chroma_util import ChromaDB
-from utils.util import get_qwen_models
-
-# 连接大模型
-llm, chat, embed = get_qwen_models()
+from langchain_core.output_parsers import StrOutputParser
+from rag.chroma_conn import ChromaDB
 
 # 配置日志记录
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class RAG_Manager():
-    def __init__(self, chroma_server_type="http", host="localhost", port=8000, persist_path="chroma_db", 
-                llm=llm, chat=chat, embed=embed):
+    def __init__(self, 
+                 chroma_server_type="http", 
+                 host="localhost", port=8000, 
+                 persist_path="chroma_db", 
+                 llm=None, embed=None):
 
         self.llm = llm
-        self.chat = chat
-        self.embed = embed
-        self.store = None
-        chrom_db = ChromaDB(chroma_server_type=chroma_server_type, host=host, port=port, persist_path=persist_path)
+        self.embed = embed       
+
+        chrom_db = ChromaDB(chroma_server_type=chroma_server_type, 
+                            host=host, port=port, 
+                            persist_path=persist_path,
+                            embed=embed)
         self.store = chrom_db.get_store()
 
     def get_chain(self, retriever):
@@ -48,7 +45,7 @@ class RAG_Manager():
             {"context": retriever | format_docs_runnable, 
              "question": RunnablePassthrough()}
             | prompt
-            | self.chat
+            | self.llm
             | StrOutputParser()
         )
 
@@ -79,7 +76,7 @@ class RAG_Manager():
         retriever = self.get_retriever()
 
         retriever_from_llm = MultiQueryRetriever.from_llm(
-            retriever=retriever, llm=self.chat
+            retriever=retriever, llm=self.llm
         )
         
         return retriever_from_llm
@@ -102,14 +99,3 @@ class RAG_Manager():
         unique_docs = retriever.get_relevant_documents(query=question)
 
         return rag_chain.invoke(input=question)
-
-
-if __name__ == "__main__":
-
-    rag = RAG_Manager(host="localhost", port=8000, llm=llm, chat=chat, embed=embed)
-    
-    result = rag.get_result("湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？")
-    
-    result = rag.get_result_by_multi_query("湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？")
-
-    print(result)

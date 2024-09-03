@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from langserve import add_routes
 from fastapi.middleware.cors import CORSMiddleware
-from FinanceBot import FinanceBot
+from app.finance_bot import FinanceBot
 
 finance_bot = FinanceBot()
 

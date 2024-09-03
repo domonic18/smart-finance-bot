@@ -1,28 +1,29 @@
 import os
 import logging
 import time
-import argparse
 from tqdm import tqdm 
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
+from rag.chroma_conn import ChromaDB
 
-import sys
-# 获取当前目录
-sys.path.append(os.path.join(os.getcwd(), "app"))
-from utils.chroma_util import ChromaDB
-
- 
 
 class PDFProcessor:
-    def __init__(self, directory, chroma_server_type, persist_path):
+    def __init__(self, 
+                 directory,                 # PDF文件所在目录
+                 chroma_server_type,        # ChromaDB服务器类型
+                 persist_path,              # ChromaDB持久化路径
+                 embed):                    # 向量化函数
+        
         self.directory = directory
-        self.file_group_num = 80            # 每组处理的文件数
+        self.file_group_num = 10            # 每组处理的文件数
         self.batch_num = 6                  # 每次插入的批次数量
 
         self.chunksize = 500                # 切分文本的大小
         self.overlap = 100                  # 切分文本的重叠大小
 
-        self.chroma_db = ChromaDB(chroma_server_type=chroma_server_type, persist_path=persist_path)
+        self.chroma_db = ChromaDB(chroma_server_type=chroma_server_type, 
+                                  persist_path=persist_path,
+                                  embed=embed)
         # 配置日志
         logging.basicConfig(
             level=logging.INFO,
@@ -86,6 +87,8 @@ class PDFProcessor:
 
                 # 将样本入库
                 self.chroma_db.add_with_langchain(batch)
+                # self.chroma_db.async_add_with_langchain(batch)
+                
 
                 # 更新已插入的文档数量
                 total_docs_inserted += len(batch)  
@@ -130,23 +133,3 @@ class PDFProcessor:
             self.process_pdfs_group(pdf_files_group)
 
         print("PDFs processed successfully!")
-
-
-
-if __name__ == "__main__":
-    # 创建解析器
-    parser = argparse.ArgumentParser(description="Process PDFs and interact with ChromaDB.")
-    
-    # 添加参数
-    parser.add_argument('--directory', type=str, default="./app/dataset/pdf", help='Directory containing PDF files.')
-    parser.add_argument('--persist_path', type=str, default="chroma_db", help='ChromaDB local file path.')
-
-    # 解析参数
-    args = parser.parse_args()
-
-    # 创建 PDFProcessor 实例
-    pdf_processor = PDFProcessor(directory=args.directory, chroma_server_type="local", persist_path=args.persist_path)
-    
-    # 处理 PDF 文件
-    pdf_processor.process_pdfs()
-    

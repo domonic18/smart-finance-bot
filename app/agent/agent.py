@@ -6,7 +6,6 @@ from langchain_core.runnables.base import RunnableMap
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_core.messages import SystemMessage
-# 智能体Agent初始化（使用预构建的LangGraph Agent来构建）
 from langgraph.prebuilt import create_react_agent
 
 # 配置日志
@@ -18,9 +17,8 @@ logging.basicConfig(
 
 class Agent_SQL():
     
-    def __init__(self, sql_path, llm, chat, embed):
+    def __init__(self, sql_path, llm, embed):
         self.llm = llm
-        self.chat = chat
         self.embed = embed
 
         """连接本地数据库"""
@@ -47,7 +45,7 @@ class Agent_SQL():
             如果查询过程中SQL语句有语法错误，减少查询量,总体查询次数应控制在15次以内。"""
         
         self.system_message = SystemMessage(content=self.SQL_PREFIX)
-        self.agent_executor = create_react_agent(chat, self.tools, state_modifier =self.system_message)
+        self.agent_executor = create_react_agent(self.llm, self.tools, state_modifier =self.system_message)
 
     def get_chain(self):
         """获取链"""
@@ -75,18 +73,4 @@ class Agent_SQL():
         final_result = event["messages"][-1].content if result_list else None
         logging.info(f"最终结果: {final_result}")
         return final_result, result_list
-    
 
-if __name__ == "__main__":
-    from utils.util import get_qwen_models
-
-    llm , chat , embed = get_qwen_models()
-
-    sql_path = os.path.join(os.getcwd(), "app/dataset/dataset/博金杯比赛数据.db")
-
-    agent = Agent_SQL(sql_path=sql_path, llm=llm, chat=chat, embed=embed)
-
-    input = "请帮我查询出20210415日，建筑材料一级行业涨幅超过5%（不包含）的股票数量"
-    
-    result,result_list = agent.get_result(input)
-    print(result)

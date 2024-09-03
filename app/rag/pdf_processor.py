@@ -23,6 +23,12 @@ from utils.chroma_util import ChromaDB
 class PDFProcessor:
     def __init__(self, directory, chroma_server_type, persist_path):
         self.directory = directory
+        self.file_group_num = 80            # 每组处理的文件数
+        self.batch_num = 6                  # 每次插入的批次数量
+
+        self.chunksize = 500                # 切分文本的大小
+        self.overlap = 100                  # 切分文本的重叠大小
+
         self.chroma_db = ChromaDB(chroma_server_type=chroma_server_type, persist_path=persist_path)
         # 配置日志
         logging.basicConfig(
@@ -54,8 +60,8 @@ class PDFProcessor:
         """
         # 切分文档
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=500,
-            chunk_overlap=100, 
+            chunk_size=self.chunksize,
+            chunk_overlap=self.overlap, 
             length_function=len,
             add_start_index=True,
         )
@@ -117,15 +123,17 @@ class PDFProcessor:
         docs = self.split_text(pdf_contents)
 
         # 将文档插入到ChromaDB
-        self.insert_docs_chromadb(docs)
+        self.insert_docs_chromadb(docs, self.batch_num)
 
     def process_pdfs(self):
         # 获取目录下所有的PDF文件
         pdf_files = self.load_pdf_files()
 
-        # 每20个PDF文件为一组，分批处理
-        for i in range(0, len(pdf_files), 20):
-            pdf_files_group = pdf_files[i:i + 20]
+        group_num = self.file_group_num
+
+        # group_num 个PDF文件为一组，分批处理
+        for i in range(0, len(pdf_files), group_num):
+            pdf_files_group = pdf_files[i:i + group_num]
             self.process_pdfs_group(pdf_files_group)
 
         print("PDFs processed successfully!")

@@ -161,6 +161,16 @@ npm run dev
 cd smart-finance-bot
 
 # 运行测试脚本
-python app/test_frame.py
+python app/test_framework.py
 ```
 测试结果会保存在 `test_result` 目录中。
+
+
+### SQLite数据库批量建立索引方法
+```bash 
+# 切换/保持当前目录为 smart-finance-bot
+cd smart-finance-bot
+
+# 运行添加索引脚本
+./scripts/run_addindexs.sh
+```

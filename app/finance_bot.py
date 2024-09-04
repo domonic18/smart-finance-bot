@@ -12,7 +12,7 @@ from utils.logger_config import LoggerManager
 logger = LoggerManager().logger
 
 class FinanceBot:
-    def __init__(self, llm=settings.llm, chat=settings.chat, embed=settings.embed):
+    def __init__(self, llm=settings.LLM, chat=settings.CHAT, embed=settings.EMBED):
         self.llm = llm
         self.chat = chat
         self.embed = embed

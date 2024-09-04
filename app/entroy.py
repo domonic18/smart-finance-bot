@@ -3,18 +3,14 @@ import argparse
 import subprocess
 from utils.util import get_huggingface_embeddings, get_qwen_models
 from rag.pdf_processor import PDFProcessor
-
+import settings
 
 def import_pdf(directory):
     # 使用 HuggingFace 的模型
-    # embed = get_huggingface_embeddings()
+    embed = settings.EMBED
 
-    # 使用 Qwen 的模型
-    _, _, embed = get_qwen_models()
-
-
-    persist_path = "chroma_db"
-    server_type = "local"
+    persist_path = settings.CHROMA_PERSIST_DB_PATH
+    server_type = settings.CHROMA_SERVER_TYPE_IMPORT
 
     # 创建 PDFProcessor 实例
     pdf_processor = PDFProcessor(directory=directory,

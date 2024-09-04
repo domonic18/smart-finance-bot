@@ -1,5 +1,6 @@
 import os
 from utils.util import get_qwen_models
+from utils.util import get_ernie_models
 from utils.util import get_huggingface_embeddings
 from utils.util import get_bge_embeddings
 from utils.util import get_bce_embeddings
@@ -10,15 +11,20 @@ from utils.util import get_bce_embeddings
 
 # 连接大模型
 # 如果想更换模型，在配置中进行相应修改即可
-llm, chat, embed = get_qwen_models()
 
-LLM = llm
-CHAT = chat
-EMBED = embed 
+# 阿里千问系列模型
+LLM = get_qwen_models()[0]
+CHAT = get_qwen_models()[1]
+# EMBED = get_qwen_models()[2] 
+
+# 百度文心一言系列模型
+# LLM = get_ernie_models()[0]
+# CHAT = get_ernie_models()[1]
+# EMBED = get_ernie_models()[2] 
 
 
 # 使用智普bge-m3的向量化模型
-# EMBED = get_bge_embeddings()
+EMBED = get_bge_embeddings()
 
 # 使用网易的bce for rag向量化模型
 # EMBED = get_bce_embeddings()
@@ -43,6 +49,8 @@ CHROMA_PERSIST_DB_PATH = "chroma_db"
 
 CHROMA_HOST = "localhost"
 CHROMA_PORT = 8000
+
+CHROMA_SERVER_TYPE_IMPORT = "local"
 
 """
 本地SQLite数据库相关的配置

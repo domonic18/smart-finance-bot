@@ -1,6 +1,8 @@
 import os
 from utils.util import get_qwen_models
 from utils.util import get_huggingface_embeddings
+from utils.util import get_bge_embeddings
+from utils.util import get_bce_embeddings
 
 """
 大模型相关的配置
@@ -10,15 +12,19 @@ from utils.util import get_huggingface_embeddings
 # 如果想更换模型，在配置中进行相应修改即可
 llm, chat, embed = get_qwen_models()
 
-# 单轮对话模型的配置
 LLM = llm
-
-# 多轮对话模型的配置
 CHAT = chat
+EMBED = embed 
 
-# 向量化函数的配置
-# EMBED = embed 
-EMBED = get_huggingface_embeddings()
+
+# 使用智普bge-m3的向量化模型
+# EMBED = get_bge_embeddings()
+
+# 使用网易的bce for rag向量化模型
+# EMBED = get_bce_embeddings()
+
+# 使用Huggingface的embedding
+# EMBED = get_huggingface_embeddings()
 
 
 
@@ -28,7 +34,7 @@ API_KEY = "EMPTY"
 MODEL = "Qwen2_7B-chat-sft2"
 
 """
-向量数据库相关的配置
+向量数据库使用时的相关的配置
 """
 # 默认的ChromaDB的服务器类别
 CHROMA_SERVER_TYPE = "http"

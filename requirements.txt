@@ -11,4 +11,4 @@ langchain-core
 langchain_chroma
 langgraph
 chromadb
-xinference[all]
+xinference_client

@@ -63,7 +63,6 @@ class PDFProcessor:
             length_function=len,
             add_start_index=True,
         )
-
         docs = text_splitter.split_documents(documents)
 
         logging.info("Split text into smaller chunks with RecursiveCharacterTextSplitter.")

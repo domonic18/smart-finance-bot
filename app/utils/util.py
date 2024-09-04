@@ -1,5 +1,8 @@
 from dotenv import load_dotenv
 import os
+import torch
+from langchain_community.embeddings import XinferenceEmbeddings
+
 
 # 获取当前文件的目录
 current_dir = os.path.dirname(__file__)
@@ -37,7 +40,6 @@ def get_qwen_models():
 
     return llm, chat, embed
 
-
 def get_ernie_models():
     """
     加载文心系列大模型
@@ -70,8 +72,26 @@ def get_huggingface_embeddings():
     return embeddings
 
 
+def get_bge_embeddings():
+    server_url="http://sy-direct.virtaicloud.com:49173"
+    model_uid="bge-m3"
+    model_uid="bce-embedding-base_v1"
+    
+    embed = XinferenceEmbeddings(server_url=server_url, model_uid=model_uid)
+    return embed
+
+def get_bce_embeddings():
+    server_url="http://sy-direct.virtaicloud.com:49173"
+    model_uid="bce-embedding-base_v1"
+    
+    embed = XinferenceEmbeddings(server_url=server_url, model_uid=model_uid)
+    return embed
+
+
 if __name__ == "__main__":
     llm, chat, embed = get_qwen_models()
     print(llm.invoke(input="你好"))
     print(chat.invoke(input="你好"))
+    # embed = get_bge_embeddings()
+    # embed = get_bce_embeddings()
     print(embed.embed_query(text="你好"))

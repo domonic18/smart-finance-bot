@@ -26,12 +26,22 @@ def test_agent():
 
 # 测试RAG主流程
 def test_rag():
-    llm, chat, embed = get_qwen_models()
-    rag = RagManager(host="localhost", port=8000, llm=llm, embed=embed)
+    from rag.retrievers import MultiQueryRetrieverWrapper
 
-    rag.get_result("湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？")
+    llm, chat, _ = get_qwen_models()
+    embed = get_huggingface_embeddings()
 
-    result = rag.get_result_by_multi_query("湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？")
+    # 普通检索器
+    rag_manager = RagManager(host="localhost", port=8000, llm=llm, embed=embed)
+
+    # 多查询检索器
+    rag_manager = RagManager(host="localhost", port=8000, llm=llm, embed=embed,
+                             retriever_cls=MultiQueryRetrieverWrapper)
+
+    example_query = "湖南长远锂科股份有限公司"
+    example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
+
+    result = rag_manager.get_result(example_query)
 
     print(result)
 
@@ -57,16 +67,32 @@ def test_import():
 
 # 测试 FinanceBot主流程
 def test_financebot():
-    llm, chat, embed = get_qwen_models()
+    llm, chat, _ = get_qwen_models()
+    embed = get_huggingface_embeddings()
+
     financebot = FinanceBot(llm=llm, chat=chat, embed=embed)
 
-    example_query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
-    financebot.handle_query(example_query)
+    # example_query = "根据武汉兴图新科电子股份有限公司招股意向书，电子信息行业的上游涉及哪些企业？"
+    example_query = "武汉兴图新科电子股份有限公司"
+    # example_query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
 
-    query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
-    final_result = financebot.handle_query(query)
+    final_result = financebot.handle_query(example_query)
 
     print(final_result)
+
+# 测试 FinanceBotEx 主流程
+def test_financebot_ex():
+    llm, chat, embed = get_qwen_models()
+    financebot = FinanceBotEx(llm=llm, chat=chat, embed=embed)
+
+    # example_query = "现在几点了？"
+    # example_query = "湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？"
+    # example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
+    # example_query = "20210304日，一级行业为非银金融的股票的成交量合计是多少？取整。"
+    # example_query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
+    example_query = "根据武汉兴图新科电子股份有限公司招股意向书，电子信息行业的上游涉及哪些企业？"
+
+    financebot.handle_query(example_query)
 
 
 def test_answer_question():
@@ -83,24 +109,10 @@ def test_answer_question():
     test_question = TestQuestion(input_question_all_path, out_answer_path)
     test_question.question_inference(start=0, end=1)
 
-
-# 测试 FinanceBotEx 主流程
-def test_financebot_ex():
-    llm, chat, embed = get_qwen_models()
-    financebot = FinanceBotEx(llm=llm, chat=chat, embed=embed)
-
-    # example_query = "现在几点了？"
-    # example_query = "湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？"
-    # example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
-    example_query = "20210304日，一级行业为非银金融的股票的成交量合计是多少？取整。"
-
-    financebot.handle_query(example_query)
-
-
 if __name__ == "__main__":
     # test_agent()
-    # test_rag()
+    test_rag()
     # test_import()
     # test_financebot()
     # test_financebot_ex()
-    test_answer_question()
+    # test_answer_question()

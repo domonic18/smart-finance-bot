@@ -64,4 +64,6 @@ class RagManager:
         """获取RAG查询结果"""
         retriever = self.retriever_instance.create_retriever()
         rag_chain = self.get_chain(retriever)
-        return rag_chain.invoke(input=question)
+        result = rag_chain.invoke(input=question)
+        logger.info(f"RAG查询结果：{result}")
+        return result

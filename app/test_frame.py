@@ -115,5 +115,5 @@ if __name__ == "__main__":
     # test_rag()
     # test_import()
     # test_financebot()
-    test_financebot_ex()
-    # test_answer_question()
+    # test_financebot_ex()
+    test_answer_question()

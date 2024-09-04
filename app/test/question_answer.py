@@ -1,6 +1,7 @@
 import json
 import os
 from finance_bot import FinanceBot
+from finance_bot_ex import FinanceBotEx
 from utils.logger_config import LoggerManager
 
 logger_manager = LoggerManager(name="TestQuestion", log_file="test_question.log")
@@ -28,7 +29,8 @@ class TestQuestion():
                 record = json.loads(line)
                 self.data.append(record)
 
-        self.model = FinanceBot()
+        # self.model = FinanceBot()
+        self.model = FinanceBotEx()
 
 
     def question_inference(self, start=0, end=5):
@@ -42,9 +44,8 @@ class TestQuestion():
 
         try:
             for item in self.data[start:end]:
-                print(f"ID: {item['id']}, Question: {item['question']}")
-                result = self.model.recognize_intent(item['question'])
-                answer = self.model.do_action(result)
+                logger.info(f"ID: {item['id']}, Question: {item['question']}")
+                answer = self.model.handle_query(item['question'])
 
                 data_out = {"id": item['id'], "question": item['question'], "answer": answer}
                 data_to_write.append(data_out)
@@ -56,4 +57,4 @@ class TestQuestion():
                     f.write(json_line + "\n")
 
         except Exception as e:
-            print(f"Error writing to file: {e}")
+            logger.info(f"Error writing to file: {e}")

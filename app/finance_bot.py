@@ -50,10 +50,10 @@ class FinanceBot:
         try:
             # 发送一个简单的消息
             response = llm_recognition("你是谁？")
-            logger.info("Response from the model:", response)
+            logger.info(f"Response from the model: {response}" )
             return llm_recognition
         except Exception as e:
-            logger.info("连接意图识别大模型失败:", e)
+            logger.info(f"连接意图识别大模型失败: {e}" )
             return None
 
     def recognize_intent(self, input):

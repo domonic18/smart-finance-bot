@@ -7,5 +7,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PYTHON_SCRIPT="$SCRIPT_DIR/../app/entroy.py"
 
 # 调用 entroy.py，传入参数
+echo "Running entroy.py to renametables to DB..."
+python "$PYTHON_SCRIPT" --job renametables
+
 echo "Running entroy.py to addindexes to DB..."
 python "$PYTHON_SCRIPT" --job addindexes

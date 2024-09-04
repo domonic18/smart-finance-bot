@@ -4,6 +4,8 @@ import subprocess
 from utils.util import get_huggingface_embeddings, get_qwen_models
 from rag.pdf_processor import PDFProcessor
 import settings
+import sqlite3
+import re
 
 def import_pdf(directory):
     # 使用 HuggingFace 的模型
@@ -39,10 +41,6 @@ def test_apik():
     print(embed.embed_query(text="你好"))
 
 
-import sqlite3
-
-import sqlite3
-
 def add_indexes_to_all_tables(db_path):
     # 连接到 SQLite 数据库
     conn = sqlite3.connect(db_path)
@@ -77,6 +75,60 @@ def add_indexes_to_all_tables(db_path):
     print("All indexes created successfully.")
 
 
+def sanitize_name(name):
+    """替换不安全字符为安全字符"""
+    # 定义要替换的字符和替换后的字符
+    replacements = {
+        '(': '_lparen_',
+        ')': '_rparen_',
+        ' ': '_',  # 替换空格为下划线
+        '-': '_dash_',  # 替换连字符为下划线
+        # 可以根据需要添加更多替换规则
+    }
+    
+    for unsafe_char, safe_char in replacements.items():
+        name = name.replace(unsafe_char, safe_char)
+    
+    return name
+
+def rename_tables_and_columns(db_path):
+    # 连接到 SQLite 数据库
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # 获取所有表名
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+
+    for table in tables:
+        table_name = table[0]
+        sanitized_table_name = sanitize_name(table_name)
+
+        # 如果表名需要更改，重命名表
+        if sanitized_table_name != table_name:
+            print(f"Renaming table: {table_name} to {sanitized_table_name}")
+            cursor.execute(f"ALTER TABLE \"{table_name}\" RENAME TO \"{sanitized_table_name}\";")
+            table_name = sanitized_table_name  # 更新当前表名
+
+        # 获取表的所有字段
+        cursor.execute(f"PRAGMA table_info({table_name});")
+        columns = cursor.fetchall()
+
+        for column in columns:
+            column_name = column[1]
+            sanitized_column_name = sanitize_name(column_name)
+
+            # 如果字段名需要更改，重命名字段
+            if sanitized_column_name != column_name:
+                print(f"Renaming column: {column_name} to {sanitized_column_name} in table {table_name}")
+                cursor.execute(f"ALTER TABLE \"{table_name}\" RENAME COLUMN \"{column_name}\" TO \"{sanitized_column_name}\";")
+
+    # 提交更改并关闭连接
+    conn.commit()
+    conn.close()
+    print("All names sanitized successfully.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Entroy script for executing jobs.")
     parser.add_argument('--job', type=str, required=True, help='Job to execute: importpdf, startchroma, testapik')
@@ -106,6 +158,8 @@ def main():
         test_apik()
     elif args.job == 'addindexes':
         add_indexes_to_all_tables(settings.SQLDATABASE_URI)
+    elif args.job == 'renametables':
+        rename_tables_and_columns(settings.SQLDATABASE_URI)
     else:
         print("未知的任务类型。请使用: importpdf, startchroma, 或 testapik")
 

@@ -20,8 +20,8 @@ class ChromaDB:
 
         # 如果是http协议方式连接数据库
         if chroma_server_type == "http":
-            settings = Settings(chroma_server_host=host, chroma_server_http_port=port)
-            client = chromadb.Client(settings)
+            client = chromadb.HttpClient(host=host, port=port)
+
             self.store = Chroma(collection_name=collection_name,
                                 embedding_function=embed,
                                 client=client)

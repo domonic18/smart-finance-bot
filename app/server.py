@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from langserve import add_routes
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from finance_bot import FinanceBot
 from finance_bot_ex import FinanceBotEx
@@ -50,13 +51,6 @@ async def query(query: dict):  # 使用字典类型代替Query模型
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
-# 添加路由
-add_routes(
-    app,
-    finance_bot_ex.init_agent(),
-    path="/chat",
-)
 
 # 运行Uvicorn服务器
 if __name__ == "__main__":

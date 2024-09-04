@@ -39,6 +39,44 @@ def test_apik():
     print(embed.embed_query(text="你好"))
 
 
+import sqlite3
+
+import sqlite3
+
+def add_indexes_to_all_tables(db_path):
+    # 连接到 SQLite 数据库
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # 获取所有表名
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = cursor.fetchall()
+
+    for table in tables:
+        table_name = table[0]
+        print(f"Processing table: {table_name}")
+
+        # 获取表的所有字段
+        cursor.execute(f"PRAGMA table_info({table_name});")
+        columns = cursor.fetchall()
+
+        for column in columns:
+            column_name = column[1]
+            index_name = f"idx_{table_name}_{column_name}".replace(' ', '_')  # 替换空格以避免问题
+
+            # 使用双引号转义表名和列名
+            try:
+                print(f"Creating index: {index_name} on column: {column_name}")
+                cursor.execute(f"CREATE INDEX IF NOT EXISTS \"{index_name}\" ON \"{table_name}\" (\"{column_name}\");")
+            except sqlite3.OperationalError as e:
+                print(f"Error creating index for {column_name} in table {table_name}: {e}")
+
+    # 提交更改并关闭连接
+    conn.commit()
+    conn.close()
+    print("All indexes created successfully.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Entroy script for executing jobs.")
     parser.add_argument('--job', type=str, required=True, help='Job to execute: importpdf, startchroma, testapik')
@@ -66,6 +104,8 @@ def main():
         start_chroma(args.path, args.port, args.host)
     elif args.job == 'testapik':
         test_apik()
+    elif args.job == 'addindexes':
+        add_indexes_to_all_tables(settings.SQLDATABASE_URI)
     else:
         print("未知的任务类型。请使用: importpdf, startchroma, 或 testapik")
 

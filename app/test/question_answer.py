@@ -1,7 +1,10 @@
 import json
 import os
 from finance_bot import FinanceBot
+from utils.logger_config import LoggerManager
 
+logger_manager = LoggerManager(name="TestQuestion", log_file="test_question.log")
+logger = logger_manager.logger
 
 class TestQuestion():
     """
@@ -14,6 +17,10 @@ class TestQuestion():
         self.input_question_path = input_question_all_path
         self.out_answer_path = out_answer_path
         self.data = []
+
+        log_path = os.path.join(self.out_answer_path, "test_question.log")
+        logger_manager.set_log_file(log_path)
+
         # 一次性把数据存到内存中
         with open(self.input_question_path, mode='r', encoding='utf-8') as f:
             for line in f:
@@ -22,6 +29,7 @@ class TestQuestion():
                 self.data.append(record)
 
         self.model = FinanceBot()
+
 
     def question_inference(self, start=0, end=5):
         """start: 起始id，end：结束id+1"""
@@ -49,17 +57,3 @@ class TestQuestion():
 
         except Exception as e:
             print(f"Error writing to file: {e}")
-
-# if __name__ == "__main__":
-#     current_path = os.getcwd()
-#     # 获取当前时间，以便生成以时间命名的文件夹
-#     current_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-
-#     input_question_all_path = os.path.join(current_path, "app/dataset/question.json")
-#     out_answer_path = os.path.join(current_path, "app/test/test_result", current_time)
-
-#     if out_answer_path and not os.path.exists(out_answer_path):
-#         os.makedirs(out_answer_path)
-
-#     test_question = TestQuestion(input_question_all_path, out_answer_path)
-#     test_question.question_inference(start=0, end=1)

@@ -1,16 +1,13 @@
-import logging
+# import logging
 import pprint
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from langchain_core.messages import SystemMessage
 from langgraph.prebuilt import create_react_agent
+from utils.logger_config import LoggerManager
 
-# 配置日志
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-)
- 
+
+logger = LoggerManager().logger
 
 class AgentSql:
     
@@ -52,7 +49,7 @@ class AgentSql:
         """查询 Agent"""
         
         example_query = input
-        logging.info(f"查询输入: {example_query}")
+        logger.info(f"查询输入: {example_query}")
 
         events = self.agent_executor.stream(
             {"messages": [("user", example_query)]},
@@ -62,11 +59,13 @@ class AgentSql:
         result_list = []
         try:
             for event in events:
-                logging.info(pprint.pformat(event["messages"][-1].pretty_print()))
+                logger.info(event["messages"][-1].pretty_print())
+
                 result_list.append(event["messages"][-1].content)
         except Exception as e:
-            logging.error(f"处理事件时发生错误: {e}")
+            logger.error(f"处理事件时发生错误: {e}")
         
         final_result = event["messages"][-1].content if result_list else None
-        logging.info(f"最终结果: {final_result}")
+        logger.info(f"查询过程: {result_list}")
+        logger.info(f"最终结果: {final_result}")
         return final_result, result_list

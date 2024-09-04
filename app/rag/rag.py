@@ -5,10 +5,10 @@ from langchain_core.runnables.base import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
 from .chroma_conn import ChromaDB
 from .retrievers import SimpleRetriever
+from utils.logger_config import LoggerManager
 
 # 配置日志记录
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
+logger = LoggerManager().logger
 
 class RagManager:
     def __init__(self,
@@ -51,12 +51,12 @@ class RagManager:
 
     def format_docs(self, docs):
         """格式化文档"""
-        logging.info(f"检索到资料文件个数：{len(docs)}")
+        logger.info(f"检索到资料文件个数：{len(docs)}")
         retrieved_files = "\n".join([doc.metadata["source"] for doc in docs])
-        logging.info(f"资料文件分别是:\n{retrieved_files}")
+        logger.info(f"资料文件分别是:\n{retrieved_files}")
 
         retrieved_content = "\n\n".join(doc.page_content for doc in docs)
-        logging.info(f"检索到的资料为:\n{retrieved_content}")
+        logger.info(f"检索到的资料为:\n{retrieved_content}")
 
         return retrieved_content
 

@@ -6,9 +6,9 @@ from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from rag.rag import RagManager
 import settings
+from utils.logger_config import LoggerManager
 
-# 配置日志记录
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = LoggerManager().logger
 
 
 # 定义调用函数
@@ -120,8 +120,15 @@ class FinanceBotEx:
             stream_mode="values",
         )
 
+        result_list = []
+
         # 打印流式事件的消息
         for event in events:
-            event["messages"][-1].pretty_print()
+            logger.info(event["messages"][-1].pretty_print())
 
-        return event["messages"][-1].content
+            result_list.append(event["messages"][-1].content)
+
+        final_result = event["messages"][-1].content if result_list else None
+        logger.info(f"查询过程: {result_list}")
+        logger.info(f"最终结果: {final_result}")
+        return final_result

@@ -7,10 +7,9 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.prompts import FewShotChatMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 import settings
+from utils.logger_config import LoggerManager
 
-# 配置日志记录
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
+logger = LoggerManager().logger
 
 class FinanceBot:
     def __init__(self, llm=settings.llm, chat=settings.chat, embed=settings.embed):
@@ -51,10 +50,10 @@ class FinanceBot:
         try:
             # 发送一个简单的消息
             response = llm_recognition("你是谁？")
-            print("Response from the model:", response)
+            logger.info("Response from the model:", response)
             return llm_recognition
         except Exception as e:
-            print("连接意图识别大模型失败:", e)
+            logger.info("连接意图识别大模型失败:", e)
             return None
 
     def recognize_intent(self, input):
@@ -188,14 +187,14 @@ class FinanceBot:
         处理用户查询
         """
         intent = self.recognize_intent(query)
-        logging.info(f"意图识别结果: {intent}")  
+        logger.info(f"意图识别结果: {intent}")  
 
-        logging.info(f"根据意图开展Action: {intent}")   
+        logger.info(f"根据意图开展Action: {intent}")   
         result = self.do_action(intent)
-        logging.info(f"经过Action执行结果: {result}") 
+        logger.info(f"经过Action执行结果: {result}") 
         
         final_result = self.get_fresult(input=query, intent=intent, result=result)
-        logging.info(f"融合后的结果: {final_result}")
+        logger.info(f"融合后的结果: {final_result}")
         
         return final_result
     

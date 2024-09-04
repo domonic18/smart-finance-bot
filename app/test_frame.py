@@ -8,28 +8,30 @@ from utils.util import get_huggingface_embeddings
 from test.question_answer import TestQuestion
 from finance_bot_ex import FinanceBotEx
 from finance_bot import FinanceBot
+import settings
 
 
 # 测试Agent主流程
 def test_agent():
-    llm, chat, embed = get_qwen_models()
-
-    sql_path = os.path.join(os.getcwd(), "app/dataset/dataset/博金杯比赛数据.db")
-
+    # 从配置文件取出模型
+    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
+    sql_path = settings.SQLDATABASE_URI
     agent = AgentSql(sql_path=sql_path, llm=chat, embed=embed)
 
-    input = "请帮我查询出20210415日，建筑材料一级行业涨幅超过5%（不包含）的股票数量"
 
-    result, result_list = agent.get_result(input)
+    example_query = "请帮我查询出20210415日，建筑材料一级行业涨幅超过5%（不包含）的股票数量"
+
+    result, result_list = agent.get_result(example_query)
+
     print(result)
+    print(result_list)
 
 
 # 测试RAG主流程
 def test_rag():
     from rag.retrievers import MultiQueryRetrieverWrapper
 
-    llm, chat, _ = get_qwen_models()
-    embed = get_huggingface_embeddings()
+    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
 
     # 普通检索器
     rag_manager = RagManager(host="localhost", port=8000, llm=llm, embed=embed)
@@ -48,8 +50,7 @@ def test_rag():
 
 # 测试导入PDF到向量库主流程
 def test_import():
-    # llm , chat , embed = get_qwen_models()
-    embed = get_huggingface_embeddings()
+    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
 
     directory = "./app/dataset/pdf"
     persist_path = "chroma_db"
@@ -67,8 +68,7 @@ def test_import():
 
 # 测试 FinanceBot主流程
 def test_financebot():
-    llm, chat, _ = get_qwen_models()
-    embed = get_huggingface_embeddings()
+    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
 
     financebot = FinanceBot(llm=llm, chat=chat, embed=embed)
 
@@ -82,7 +82,8 @@ def test_financebot():
 
 # 测试 FinanceBotEx 主流程
 def test_financebot_ex():
-    llm, chat, embed = get_qwen_models()
+    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
+
     financebot = FinanceBotEx(llm=llm, chat=chat, embed=embed)
 
     # example_query = "现在几点了？"
@@ -111,8 +112,8 @@ def test_answer_question():
 
 if __name__ == "__main__":
     # test_agent()
-    test_rag()
+    # test_rag()
     # test_import()
     # test_financebot()
-    # test_financebot_ex()
+    test_financebot_ex()
     # test_answer_question()

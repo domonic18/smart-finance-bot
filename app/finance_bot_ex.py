@@ -35,7 +35,9 @@ class FinanceBotEx:
 
     def init_rag_tools(self):
         # 给大模型 RAG 检索器工具
-        retriever = self.rag.get_retriever()
+        # retriever = self.rag.get_retriever()
+        retriever = self.rag.retriever_instance.create_retriever()
+        
         retriever_tool = create_retriever_tool(
             retriever=retriever,
             name="rag_search",

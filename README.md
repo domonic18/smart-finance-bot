@@ -154,19 +154,10 @@ npm run dev
 ```
 
 
-### 开展测试工作
+### 关于如何进行批量化问题提问的测试
 
-```bash
-# 切换/保持当前目录为 smart-finance-bot
-cd smart-finance-bot
-
-# 运行测试脚本
-python app/test_framework.py
-```
-测试结果会保存在 `test_result` 目录中。
-
-
-### SQLite数据库批量建立索引方法
+第一步：给SQLite数据库建立索引
+####  SQLite数据库批量建立索引方法
 ```bash 
 # 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot
@@ -174,3 +165,25 @@ cd smart-finance-bot
 # 运行添加索引脚本
 ./scripts/run_addindexs.sh
 ```
+> 注意：该项工作仅运行一次即可。
+
+
+第二步：运行测试脚本
+#### 执行批量化问题提问脚本的方法
+```bash
+# 切换/保持当前目录为 smart-finance-bot
+cd smart-finance-bot
+
+# 运行测试脚本
+./scripts/run_test_cases.sh
+```
+> 说明：
+> 1、测试结果会保存在 `test_result` 目录中。
+> 2、如果想调整运行的测试用例，可以直接编辑 `run_test_cases.sh` 文件，修改 `--start` 和 `--end` 参数。
+
+
+## 附录
+### 向量数据库
+1、访问[趋动云数据集](https://open.virtaicloud.com/web/profile/45814/publishDataDetail/486776150082502656)
+2、可以获取下载链接，下载对应的向量数据库
+3、下载后将数据库文件移动至当前工程目录下，例如：将`chroma_db_qwen`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`即可在启动chromadb时加载使用。

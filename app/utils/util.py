@@ -1,7 +1,17 @@
 from dotenv import load_dotenv
 import os
 import torch
+from langchain_openai import ChatOpenAI
 from langchain_community.embeddings import XinferenceEmbeddings
+# 同义Qwen
+from langchain_community.llms.tongyi import Tongyi
+from langchain_community.chat_models import ChatTongyi
+from langchain_community.embeddings import DashScopeEmbeddings
+
+# 百度千帆
+from langchain_community.llms import QianfanLLMEndpoint
+from langchain_community.chat_models import QianfanChatEndpoint
+from langchain_community.embeddings import QianfanEmbeddingsEndpoint
 
 
 # 获取当前文件的目录
@@ -20,46 +30,44 @@ load_dotenv(dotenv_path=conf_file_path_qwen)
 load_dotenv(dotenv_path=conf_file_path_ernie)
 
 
-def get_qwen_models():
+def get_qwen_models(model="qwen-max"):
     """
     加载千问系列大模型
     """
-    # llm 大模型
-    from langchain_community.llms.tongyi import Tongyi
 
-    llm = Tongyi(model="qwen-max", temperature=0.1, top_p=0.7, max_tokens=1024)
+    llm = Tongyi(model=model, temperature=0.1, top_p=0.7, max_tokens=1024)
 
-    # chat 大模型
-    from langchain_community.chat_models import ChatTongyi
+    chat = ChatTongyi(model=model, temperature=0.01, top_p=0.2, max_tokens=1024)
 
-    chat = ChatTongyi(model="qwen-max", temperature=0.01, top_p=0.2, max_tokens=1024)
-    # embedding 大模型
-    from langchain_community.embeddings import DashScopeEmbeddings
 
-    embed = DashScopeEmbeddings(model="text-embedding-v3")
+    return llm, chat
 
-    return llm, chat, embed
-
-def get_ernie_models():
+def get_ernie_models(model="ERNIE-Bot-turbo"):
     """
     加载文心系列大模型
     """
-    # LLM 大语言模型（单轮对话版）
-    from langchain_community.llms import QianfanLLMEndpoint
 
-    # Chat 聊天版大模型（支持多轮对话）
-    from langchain_community.chat_models import QianfanChatEndpoint
+    llm = QianfanLLMEndpoint(model=model, temperature=0.1, top_p=0.2)
+    
+    chat = QianfanChatEndpoint(model=model, top_p=0.2, temperature=0.1)
 
-    # Embeddings 嵌入模型
-    from langchain_community.embeddings import QianfanEmbeddingsEndpoint
+    return llm, chat
 
-    llm = QianfanLLMEndpoint(model="ERNIE-Bot-turbo", temperature=0.1, top_p=0.2)
-    chat = QianfanChatEndpoint(model="ERNIE-Lite-8K", top_p=0.2, temperature=0.1)
+def get_erine_embeddings():
+    """
+    加载文心系列嵌入模型
+    """
+    embeddings = DashScopeEmbeddings(model="bge-large-zh")
 
-    embed = QianfanEmbeddingsEndpoint(model="bge-large-zh")
+    return embeddings
 
-    return llm, chat, embed
+def get_qwen_embeddings():
+    """
+    加载千问系列嵌入模型
+    """
+    embeddings = DashScopeEmbeddings(model="text-embedding-v3")
 
+    return embeddings
 
 def get_huggingface_embeddings():
     """
@@ -70,7 +78,6 @@ def get_huggingface_embeddings():
     embeddings = HuggingFaceEmbeddings(model_name="bert-base-chinese")
 
     return embeddings
-
 
 def get_bge_embeddings():
     server_url="http://sy-direct.virtaicloud.com:49173"
@@ -88,10 +95,27 @@ def get_bce_embeddings():
     return embed
 
 
+def get_zhipu_models(model="GLM-4-Plus"):
+    """
+    加载智普系列大模型
+    """
+
+    llm = ChatOpenAI(
+        temperature=0.95,
+        model=model,
+        openai_api_key="your api key",
+        openai_api_base="https://open.bigmodel.cn/api/paas/v4/"
+    )
+
+    return llm
+
 if __name__ == "__main__":
-    llm, chat, embed = get_qwen_models()
-    print(llm.invoke(input="你好"))
-    print(chat.invoke(input="你好"))
+    llm = get_zhipu_models()
+    # chat = get_qwen_models()
+    # embed = get_qwen_embeddings()
     # embed = get_bge_embeddings()
     # embed = get_bce_embeddings()
-    print(embed.embed_query(text="你好"))
+
+    print(llm.invoke(input="你好"))
+    # print(chat.invoke(input="你好"))
+    # print(embed.embed_query(text="你好"))

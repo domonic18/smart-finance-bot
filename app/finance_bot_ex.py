@@ -144,19 +144,13 @@ class FinanceBotEx:
         # 流式处理事件
         config = {"configurable": {"thread_id": "thread-1"}}
 
-        events = self.agent_executor.stream(
-            {"messages": [("user", example_query)]},
-            config=config,
-            stream_mode="values",
-        )
-        # events = self.agent_executor.stream(
-        #     {"messages": [("user", example_query)]},
-        #     stream_mode="values",
-        # )
-
-        result_list = []
-
         try:
+            events = self.agent_executor.stream(
+                {"messages": [("user", example_query)]},
+                config=config,
+                stream_mode="values",
+            )
+            result_list = []
             # 打印流式事件的消息
             for event in events:
                 logger.info(event["messages"][-1].pretty_print())
@@ -189,17 +183,16 @@ class FinanceBotEx:
             1、你需要根据用户的问题，创建一个语法正确的SQLite查询来运行，然后查看查询的结果并返回答案。
             2、除非用户指定了他们希望获得的特定数量的示例，否则总是将查询限制为最多5个结果。
             3、您可以按相关列对结果进行排序，以返回数据库中最有趣的示例。
-            4、永远不要查询指定表的所有列以避免查询性能问题，你只查询给定问题的相关列即可。
+            4、永远不要使用*来查询指定表的所有列，以避免查询性能问题，你只查询给定问题的相关列即可。
             5、你必须在执行查询之前仔细检查查询。如果执行查询时出现错误，请重新编写查询并重试。
             6、请勿对数据库进行任何DML语句（INSERT，UPDATE，DELETE，DROP等）。
+            7、如果生成的SQL语句中，字段带有英文括号()，请使用双引号包裹起来，例如：收盘价(元) 双引号包裹为 "收盘价(元)"。
+            8、如果查询了15次还没有结果,那么就不要继续查询，直接返回最终答案。  
             
             ## 工具使用过程
             1、首先，你应该始终查看数据库中的表，看看可以查询什么，这一步骤很重要，注意不要跳过。
             2、然后，你应该查询最相关表的schema。
             
-            ## 工具使用注意事项：
-            1、如果生成的SQL语句中，字段带有英文括号()，请使用双引号包裹起来，例如：收盘价(元) 双引号包裹为 "收盘价(元)"。
-            2、如果查询过程中SQL语句有语法错误，减少查询量,总体查询次数应控制在15次以内。      
                                                 
             # 关于你的思考和行动过程，请按照如下格式：
             问题：你必须回答的输入问题

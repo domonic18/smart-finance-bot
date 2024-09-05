@@ -156,13 +156,16 @@ class FinanceBotEx:
                 logger.info(event["messages"][-1].pretty_print())
 
                 result_list.append(event["messages"][-1].content)
+            
+            final_result = event["messages"][-1].content if result_list else None
+            logger.info(f"查询过程: {result_list}")
+            logger.info(f"最终结果: {final_result}")
+            return final_result
         except Exception as e:
             logger.error(f"处理查询时出错: {e}")
+            return f'{example_query} 处理查询时出错: {e}'
         
-        final_result = event["messages"][-1].content if result_list else None
-        logger.info(f"查询过程: {result_list}")
-        logger.info(f"最终结果: {final_result}")
-        return final_result
+
     
     def create_agent(self):
         from langchain.agents.format_scratchpad import format_to_openai_functions

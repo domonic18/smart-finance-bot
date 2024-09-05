@@ -49,22 +49,25 @@ class AgentSql:
         
         example_query = input
         logger.info(f"查询输入: {example_query}")
-
-        events = self.agent_executor.stream(
-            {"messages": [("user", example_query)]},
-            stream_mode="values",
-        )
-        
-        result_list = []
         try:
+            events = self.agent_executor.stream(
+                {"messages": [("user", example_query)]},
+                stream_mode="values",
+            )
+            
+            result_list = []
+
             for event in events:
                 logger.info(event["messages"][-1].pretty_print())
 
                 result_list.append(event["messages"][-1].content)
+            
+            final_result = event["messages"][-1].content if result_list else None
+            logger.info(f"查询过程: {result_list}")
+            logger.info(f"最终结果: {final_result}")
+            return final_result, result_list
         except Exception as e:
             logger.error(f"处理事件时发生错误: {e}")
+            return f'{example_query} 处理事件时发生错误: {e}', []
         
-        final_result = event["messages"][-1].content if result_list else None
-        logger.info(f"查询过程: {result_list}")
-        logger.info(f"最终结果: {final_result}")
-        return final_result, result_list
+

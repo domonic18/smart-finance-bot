@@ -12,3 +12,4 @@ langchain_chroma~=0.1.2
 langgraph~=0.2.14
 chromadb
 xinference_client
+pyjwt

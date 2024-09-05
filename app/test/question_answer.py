@@ -78,12 +78,9 @@ class TestQuestion():
 
                     # 提示用户是否继续执行
                     user_input = input("检测到上次未执行的结果，是否继续执行？(y/n): ")
-                    if user_input.lower() != 'y':
-                        self.test_case_start = 0  # 重新执行
-                    else:
+                    if user_input.lower() == 'y':
                         self.test_case_start = current_id
-        else:
-            self.test_case_start = 0  # 新的执行
+
 
     def update_progress(self, current):
         """更新进度信息"""
@@ -121,4 +118,4 @@ class TestQuestion():
                     f.write(json_line + "\n")
 
         except Exception as e:
-            logger.info(f"Error writing to file: {e}")
+            logger.error(f"Error writing to file: {e}")

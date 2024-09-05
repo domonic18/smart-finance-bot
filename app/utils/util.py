@@ -16,6 +16,10 @@ from langchain_community.embeddings import QianfanEmbeddingsEndpoint
 # 百川
 from langchain_community.chat_models import ChatBaichuan
 
+# 智谱
+from langchain_community.chat_models import ChatZhipuAI
+
+
 
 # 获取当前文件的目录
 current_dir = os.path.dirname(__file__)
@@ -115,14 +119,12 @@ def get_zhipu_models(model="glm-4-plus"):
     加载智普系列大模型
     """
 
-    llm = ChatOpenAI(
-        temperature=0.95,
-        model=model,
-        openai_api_key="your api key",
-        openai_api_base="https://open.bigmodel.cn/api/paas/v4/"
+    zhipuai_chat = ChatZhipuAI(
+        temperature=0.5,
+        model="glm-4",
     )
 
-    return llm
+    return zhipuai_chat
 
 def get_baichuan_chat(model="Baichuan4"):
     """
@@ -134,12 +136,12 @@ def get_baichuan_chat(model="Baichuan4"):
     return chat
 
 if __name__ == "__main__":
-    llm = get_zhipu_models()
-    # chat = get_qwen_models()
+    # llm = get_qwen_models()
+    chat = get_zhipu_models()
     # embed = get_qwen_embeddings()
     # embed = get_bge_embeddings()
     # embed = get_bce_embeddings()
 
-    print(llm.invoke(input="你好"))
-    # print(chat.invoke(input="你好"))
+    # print(llm.invoke(input="你好"))
+    print(chat.invoke(input="你好"))
     # print(embed.embed_query(text="你好"))

@@ -98,17 +98,11 @@ def test_financebot_ex():
 
 def test_answer_question():
     current_path = os.getcwd()
-    # 获取当前时间，以便生成以时间命名的文件夹
-    current_time = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
-    input_question_all_path = os.path.join(current_path, "app/dataset/question.json")
-    out_answer_path = os.path.join(current_path, "app/test_result", current_time)
+    input_file_path = os.path.join(current_path, "app/dataset/question.json")
 
-    if out_answer_path and not os.path.exists(out_answer_path):
-        os.makedirs(out_answer_path)
-
-    test_question = TestQuestion(input_question_all_path, out_answer_path)
-    test_question.question_inference(start=0, end=1)
+    test_question = TestQuestion(input_file_path, test_case_start=0, test_case_end=5)
+    test_question.run_cases()
 
 if __name__ == "__main__":
     # test_agent()

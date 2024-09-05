@@ -26,7 +26,7 @@ class LoggerManager:
     def _setup_handlers(self):
         if not self.logger.hasHandlers():
             
-            file_handler = logging.FileHandler(self.log_file)
+            file_handler = logging.FileHandler(self.log_file, encoding='utf-8')
             file_handler.setLevel(self.logger.level)
             file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
             file_handler.setFormatter(file_formatter)
@@ -51,7 +51,7 @@ class LoggerManager:
             if isinstance(handler, logging.FileHandler):
                 self.logger.removeHandler(handler)
         # 添加新的文件处理器
-        file_handler = logging.FileHandler(self.log_file)
+        file_handler = logging.FileHandler(self.log_file, encoding='utf-8')
         file_handler.setLevel(self.logger.level)
         file_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(file_formatter)

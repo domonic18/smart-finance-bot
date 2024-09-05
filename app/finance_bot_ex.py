@@ -10,6 +10,7 @@ from utils.logger_config import LoggerManager
 from langchain_core.prompts import SystemMessagePromptTemplate
 from langchain_core.prompts import HumanMessagePromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
+from langgraph.checkpoint.memory import MemorySaver
 
 logger = LoggerManager().logger
 
@@ -24,6 +25,24 @@ def get_datetime() -> str:
 
     return formatted_date
 
+from typing import TypedDict, Annotated, List, Union
+from langchain_core.agents import AgentAction, AgentFinish
+from langchain_core.messages import BaseMessage
+import operator
+
+
+class AgentState(TypedDict):
+   # The input string
+   input: str
+   # The list of previous messages in the conversation
+   chat_history: list[BaseMessage]
+   # The outcome of a given call to the agent
+   # Needs `None` as a valid type, since this is what this will start as
+   agent_outcome: Union[AgentAction, AgentFinish, None]
+   # List of actions and corresponding observations
+   # Here we annotate this with `operator.add` to indicate that operations to
+   # this state should be ADDED to the existing values (not overwrite it)
+   intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
 
 class FinanceBotEx:
     def __init__(self, llm=settings.LLM, chat=settings.CHAT, embed=settings.EMBED):
@@ -57,7 +76,7 @@ class FinanceBotEx:
         return sql_tools
 
     @staticmethod
-    def create_prompt():
+    def create_sys_prompt():
         system_prompt = """你是一位金融助手，可以帮助用户查询数据库中的信息。
             你要尽可能的回答用户提出的问题，为了更好的回答问题，你可以使用工具进行多轮的尝试。
                                                 
@@ -76,8 +95,9 @@ class FinanceBotEx:
             7、SQL查询的表名和字段名，请务必双引号包裹起来，例如：收盘价(元) 双引号包裹为 "收盘价(元)"。
             
             ## 工具使用过程
-            1、首先，你应该始终查看数据库中的表，看看可以查询什么，这一步骤很重要，注意不要跳过。
+            1、首先，你可以查看数据库中的表，看看可以查询什么，这一步骤很重要，注意不要跳过。
             2、然后，你应该查询最相关表的schema。
+            3、之后，记住上面的数据库表和相关表的schema，后续查询的时候优先从记忆中寻找表的信息。
             
             ## 工具使用注意事项：
             1、如果查询过程中SQL语句有语法错误，减少查询量,总体查询次数应控制在15次以内。 
@@ -106,36 +126,47 @@ class FinanceBotEx:
         sql_tools = self.init_sql_tool(settings.SQLDATABASE_URI)
 
         # 创建系统Prompt提示语
-        system_prompt = self.create_prompt()
+        system_prompt = self.create_sys_prompt()
 
         # 创建Agent
         agent_executor = create_react_agent(
             self.chat,
             tools=[get_datetime, retriever_tool] + sql_tools,
-            state_modifier=system_prompt
+            state_modifier=system_prompt,
+            checkpointer=MemorySaver()
+            # state_modifier=modify_state_messages,
         )
         return agent_executor
 
     def handle_query(self, example_query):
         # 流式处理事件
+        config = {"configurable": {"thread_id": "thread-1"}}
+
         events = self.agent_executor.stream(
             {"messages": [("user", example_query)]},
+            config=config,
             stream_mode="values",
         )
+        # events = self.agent_executor.stream(
+        #     {"messages": [("user", example_query)]},
+        #     stream_mode="values",
+        # )
 
         result_list = []
 
-        # 打印流式事件的消息
-        for event in events:
-            logger.info(event["messages"][-1].pretty_print())
+        try:
+            # 打印流式事件的消息
+            for event in events:
+                logger.info(event["messages"][-1].pretty_print())
 
-            result_list.append(event["messages"][-1].content)
-
+                result_list.append(event["messages"][-1].content)
+        except Exception as e:
+            logger.error(f"处理查询时出错: {e}")
+        
         final_result = event["messages"][-1].content if result_list else None
         logger.info(f"查询过程: {result_list}")
         logger.info(f"最终结果: {final_result}")
         return final_result
-    
     
     def create_agent(self):
         from langchain.agents.format_scratchpad import format_to_openai_functions

@@ -95,7 +95,7 @@ def get_bce_embeddings():
     return embed
 
 
-def get_zhipu_models(model="GLM-4-Plus"):
+def get_zhipu_models(model="glm-4-plus"):
     """
     加载智普系列大模型
     """

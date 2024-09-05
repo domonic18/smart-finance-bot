@@ -19,15 +19,14 @@ from utils.util import get_zhipu_models
 # 默认使用qwen-max模型
 #   模型调用-输入:0.04/text_token（千个）
 #   模型调用-输出:0.12/text_token（千个）
-# LLM = get_qwen_models()[0]
-# CHAT = get_qwen_models()[1]
-# EMBED = get_qwen_embeddings()
+LLM = get_qwen_models()[0]
+CHAT = get_qwen_models()[1]
 
 # qwen-long模型
 #   模型调用-输入:0.0005/text_token（千个）
 #   模型调用-输出:0.002/text_token（千个）
 # LLM = get_qwen_models(model="qwen-long")[0]
-CHAT = get_qwen_models(model="qwen-long")[1]
+# CHAT = get_qwen_models(model="qwen-long")[1]
 
 # 百度文心一言系列模型
 # 默认模型：ERNIE-Bot-turbo
@@ -54,14 +53,18 @@ CHAT = get_qwen_models(model="qwen-long")[1]
 # 活动：注册送500万tokens, 新客专享充值99元 1000万tokens
 # GLM-4-Plus模型
 #   单价：0.05 元 / 千tokens
-# LLM = get_zhipu_models()
-# CHAT = get_zhipu_models()
+# LLM = get_zhipu_models(model="glm-4-long")
+# CHAT = get_zhipu_models(model="glm-4-long")
 
 # GLM-4-Air模型
 #   单价：0.001 元 / 千tokens
 #   Batch API 定价：0.0005元 / 千tokens
-LLM = get_zhipu_models(model="GLM-4-Air")
-CHAT = get_zhipu_models(model="GLM-4-Air")
+# LLM = get_zhipu_models(model="GLM-4-Air")
+# CHAT = get_zhipu_models(model="GLM-4-Air")
+
+
+# 使用Qwen的embedding
+# EMBED = get_qwen_embeddings()
 
 
 # 使用智普bge-m3的向量化模型

@@ -82,7 +82,8 @@ class FinanceBotEx:
                                                 
             # 关于retriever_tool工具的使用：
             1、你需要结合对检索出来的上下文进行回答问题。
-            2、如果你不知道答案，就说你不知道。请使用不超过三句话的简洁回答。
+            2、你可以使用检索工具来查找相关的资料，以便回答用户的问题。
+            3、检索的词语最好使用命名实体，例如：公司名称、人名、产品名称等。
             
             # 关于sql类工具的使用： 
             ## 工具使用规则                                     
@@ -104,6 +105,8 @@ class FinanceBotEx:
             2、请注意SQL语句的查询性能，SQL语句中如果有`SUM`、`COUNT(*)`的情况，务必使用`WITH FilteredIndustry`先筛选出符合条件的数据，然后再进行计算。
             3、对于复杂查询，请在生成 SQL 语句后使用 EXPLAIN 来评估查询计划，避免使用全表扫描或其他低效操作。
 
+            # 关于最终答案：
+            1、如果你不知道答案，就说你不知道。请使用不超过三句话的简洁回答。
                                                 
             # 关于你的思考和行动过程，请按照如下格式：
             问题：你必须回答的输入问题
@@ -168,57 +171,18 @@ class FinanceBotEx:
 
     
     def create_agent(self):
+        """
+        使用langgraph创建Agent，该函数还未启用
+        """
         from langchain.agents.format_scratchpad import format_to_openai_functions
         from langchain.prompts import MessagesPlaceholder, ChatPromptTemplate
         from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
         from langchain.tools.render import format_tool_to_openai_function 
         from langchain_core.output_parsers import StrOutputParser
 
-        sys_msg = SystemMessagePromptTemplate.from_template(template="""你是一位金融助手，可以帮助用户查询数据库中的信息。
-            你要尽可能的回答用户提出的问题，为了更好的回答问题，你可以使用工具进行多轮的尝试。
-                                                
-            # 关于retriever_tool工具的使用：
-            1、你需要结合对检索出来的上下文进行回答问题。
-            2、如果你不知道答案，就说你不知道。请使用不超过三句话的简洁回答。
-            
-            # 关于sql类工具的使用： 
-            ## 工具使用规则                                     
-            1、你需要根据用户的问题，创建一个语法正确的SQLite查询来运行，然后查看查询的结果并返回答案。
-            2、除非用户指定了他们希望获得的特定数量的示例，否则总是将查询限制为最多5个结果。
-            3、您可以按相关列对结果进行排序，以返回数据库中最有趣的示例。
-            4、永远不要使用*来查询指定表的所有列，以避免查询性能问题，你只查询给定问题的相关列即可。
-            5、你必须在执行查询之前仔细检查查询。如果执行查询时出现错误，请重新编写查询并重试。
-            6、请勿对数据库进行任何DML语句（INSERT，UPDATE，DELETE，DROP等）。
-            7、如果生成的SQL语句中，字段带有英文括号()，请使用双引号包裹起来，例如：收盘价(元) 双引号包裹为 "收盘价(元)"。
-            8、如果查询了15次还没有结果,那么就不要继续查询，直接返回最终答案。  
-            
-            ## 工具使用过程
-            1、首先，你应该始终查看数据库中的表，看看可以查询什么，这一步骤很重要，注意不要跳过。
-            2、然后，你应该查询最相关表的schema。
-            
-                                                
-            # 关于你的思考和行动过程，请按照如下格式：
-            问题：你必须回答的输入问题
-            思考：你应该总是考虑该怎么做
-            行动：你应该采取的行动，应该是以下工具之一：
-            行动输入：行动的输入
-            观察：行动的结果
-            ... (这个思考/行动/行动输入/观察可以重复N次)
-            思考: 我现在知道最终答案了
-            最终答案：原始输入问题的最终答案
-
-            
-            Begin!
-            """)
+        sys_msg = SystemMessagePromptTemplate.from_template(template=self.create_sys_prompt())
         user_msg = HumanMessagePromptTemplate.from_template(template="""
             问题：{input}
-            思考：
-            行动：
-            行动输入：
-            观察：
-            ... (这个思考/行动/行动输入/观察可以重复N次)
-            思考: 我现在知道最终答案了
-            最终答案：原始输入问题的最终答案
         """)
         messages = [sys_msg, user_msg]
         prompt = ChatPromptTemplate.from_messages(messages=messages) 

@@ -8,4 +8,4 @@ PYTHON_SCRIPT="$SCRIPT_DIR/../app/entroy.py"
 
 # 调用 entroy.py，传入参数
 echo "Running entroy.py to run test_question..."
-python "$PYTHON_SCRIPT" --job test_question --start 0 --end 2
+python "$PYTHON_SCRIPT" --job test_question --start 0 --end 100

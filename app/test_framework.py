@@ -101,7 +101,7 @@ def test_answer_question():
 
     input_file_path = os.path.join(current_path, "app/dataset/question.json")
 
-    test_question = TestQuestion(input_file_path, test_case_start=100, test_case_end=102)
+    test_question = TestQuestion(input_file_path, test_case_start=0, test_case_end=10)
     test_question.run_cases()
 
 if __name__ == "__main__":

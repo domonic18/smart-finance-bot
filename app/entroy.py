@@ -3,9 +3,10 @@ import argparse
 import subprocess
 from utils.util import get_huggingface_embeddings, get_qwen_models
 from rag.pdf_processor import PDFProcessor
+from test.question_answer import TestQuestion
 import settings
 import sqlite3
-import re
+import os
 
 def import_pdf(directory):
     # 使用 HuggingFace 的模型
@@ -128,10 +129,17 @@ def rename_tables_and_columns(db_path):
     conn.close()
     print("All names sanitized successfully.")
 
+def run_test_answer_question(start, end):
+    current_path = os.getcwd()
+    input_file_path = os.path.join(current_path, "app/dataset/question.json")
+
+    test_question = TestQuestion(input_file_path, test_case_start=start, test_case_end=end)
+    test_question.run_cases()
+
 
 def main():
     parser = argparse.ArgumentParser(description="Entroy script for executing jobs.")
-    parser.add_argument('--job', type=str, required=True, help='Job to execute: importpdf, startchroma, testapik')
+    parser.add_argument('--job', type=str, required=True, help='Job to execute: importpdf, startchroma, testapik, addindexes, renametables, test_question')
 
     # 添加 importpdf 任务的参数
     parser.add_argument('--dir', type=str, help='Directory for PDF files')
@@ -140,6 +148,11 @@ def main():
     parser.add_argument('--path', type=str, default='chroma_db', help='Path for Chroma DB')
     parser.add_argument('--port', type=int, default=8000, help='Port to run Chroma on')
     parser.add_argument('--host', type=str, default='localhost', help='Host address for Chroma server')
+
+    # 添加 test_question 任务的参数
+    parser.add_argument('--start', type=int, default=0, help='Test case start id')
+    parser.add_argument('--end', type=int, default=5, help='Test case end id')
+
 
     if len(sys.argv) == 1:
         parser.print_help()
@@ -160,6 +173,8 @@ def main():
         add_indexes_to_all_tables(settings.SQLDATABASE_URI)
     elif args.job == 'renametables':
         rename_tables_and_columns(settings.SQLDATABASE_URI)
+    elif args.job == 'test_question':
+        run_test_answer_question(args.start, args.end) 
     else:
         print("未知的任务类型。请使用: importpdf, startchroma, 或 testapik")
 

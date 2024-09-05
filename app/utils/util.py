@@ -29,6 +29,9 @@ conf_file_path_ernie = os.path.join(current_dir, '..', 'conf', '.ernie')
 # 构建到 conf/.baichuan 的相对路径
 conf_file_path_baichuan = os.path.join(current_dir, '..', 'conf', '.baichuan')
 
+# 构建到 conf/.baichuan 的相对路径
+conf_file_path_zhipu = os.path.join(current_dir, '..', 'conf', '.zhipu')
+
 # 加载千问环境变量
 load_dotenv(dotenv_path=conf_file_path_qwen)
 
@@ -37,6 +40,9 @@ load_dotenv(dotenv_path=conf_file_path_ernie)
 
 # 加载百川环境变量
 load_dotenv(dotenv_path=conf_file_path_baichuan)
+
+# 加载智普环境变量
+load_dotenv(dotenv_path=conf_file_path_zhipu)
 
 
 def get_qwen_models(model="qwen-max"):
@@ -128,7 +134,7 @@ def get_baichuan_chat(model="Baichuan4"):
     return chat
 
 if __name__ == "__main__":
-    llm = get_baichuan_chat()
+    llm = get_zhipu_models()
     # chat = get_qwen_models()
     # embed = get_qwen_embeddings()
     # embed = get_bge_embeddings()

@@ -13,6 +13,9 @@ from langchain_community.llms import QianfanLLMEndpoint
 from langchain_community.chat_models import QianfanChatEndpoint
 from langchain_community.embeddings import QianfanEmbeddingsEndpoint
 
+# 百川
+from langchain_community.chat_models import ChatBaichuan
+
 
 # 获取当前文件的目录
 current_dir = os.path.dirname(__file__)
@@ -23,11 +26,17 @@ conf_file_path_qwen = os.path.join(current_dir, '..', 'conf', '.qwen')
 # 构建到 conf/.ernie 的相对路径
 conf_file_path_ernie = os.path.join(current_dir, '..', 'conf', '.ernie')
 
+# 构建到 conf/.baichuan 的相对路径
+conf_file_path_baichuan = os.path.join(current_dir, '..', 'conf', '.baichuan')
+
 # 加载千问环境变量
 load_dotenv(dotenv_path=conf_file_path_qwen)
 
 # 加载文心环境变量
 load_dotenv(dotenv_path=conf_file_path_ernie)
+
+# 加载百川环境变量
+load_dotenv(dotenv_path=conf_file_path_baichuan)
 
 
 def get_qwen_models(model="qwen-max"):
@@ -109,8 +118,17 @@ def get_zhipu_models(model="glm-4-plus"):
 
     return llm
 
+def get_baichuan_chat(model="Baichuan4"):
+    """
+    加载百川大模型
+    """
+
+    chat = ChatBaichuan(model=model, temperature=0.1, top_p=0.7, max_tokens=1024)
+
+    return chat
+
 if __name__ == "__main__":
-    llm = get_zhipu_models()
+    llm = get_baichuan_chat()
     # chat = get_qwen_models()
     # embed = get_qwen_embeddings()
     # embed = get_bge_embeddings()

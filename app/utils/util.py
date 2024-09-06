@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import os
-import torch
 from langchain_openai import ChatOpenAI
 from langchain_community.embeddings import XinferenceEmbeddings
 # 同义Qwen
@@ -135,13 +134,3 @@ def get_baichuan_chat(model="Baichuan4"):
 
     return chat
 
-if __name__ == "__main__":
-    # llm = get_qwen_models()
-    chat = get_zhipu_models()
-    # embed = get_qwen_embeddings()
-    # embed = get_bge_embeddings()
-    # embed = get_bce_embeddings()
-
-    # print(llm.invoke(input="你好"))
-    print(chat.invoke(input="你好"))
-    # print(embed.embed_query(text="你好"))

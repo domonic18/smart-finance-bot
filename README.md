@@ -56,28 +56,14 @@ pip install -r requirements.txt
 > 注意：经过实际测试Python 3.11版本会存在依赖冲突问题，所以请将Python版本切换为3.10。
 
 ### 2、配置大模型的APIKey
-**第一步**：打开配置文件 conf/.qwen，配置自己的API Key.
+打开配置文件 conf/.qwen，配置自己的API Key.
 
-**第二步**：运行API-KEY测试脚本
+> 备注：
+> .ernie 文件中对应百度千帆的API Key
+> .zhipu 文件中对应智谱的API Key
 
-Linux/Mac用户：
-```shell
-# 切换/保持当前目录为 smart-finance-bot
-cd smart-finance-bot
+如果想测试API-KEY是否生效，可以参照 `附录` 中 `关于如何配置智谱大模型` 的章节内容。
 
-# 给shell脚本赋予运行权限
-chmod +x ./scripts/run_test_llm.sh
-
-# 运行测试脚本
-./scripts/run_test_llm.sh
-
-```
-
-Windows用户：
-```bash
-# 运行测试脚本
-scripts\run_test_llm.bat
-```
 
 ### 3、(可选)批量导入数据到向量数据库
 如果需要重新建立向量数据库，可以通过以下方法将PDF批量导入到向量数据库中。
@@ -153,6 +139,7 @@ npm install
 npm run dev
 ```
 
+## 附录
 
 ### 关于如何进行批量化问题提问的测试
 
@@ -182,7 +169,15 @@ cd smart-finance-bot
 > 2、如果想调整运行的测试用例，可以直接编辑 `run_test_cases.sh` 文件，修改 `--start` 和 `--end` 参数。
 
 
-## 附录
+### 关于如何配置智谱大模型
+1、访问智谱开放平台https://bigmodel.cn/
+2、注册账号并且登录
+3、在 `API密钥` 中创建自己的API Key
+4、在 `conf/.zhipu` 文件中配置好第3步创建好的密钥
+5、在 `app/settings.py` 中修改全局配置CHAT的赋值，即： `CHAT = get_zhipu_models(model="glm-4-long")`
+6、至此，大模型修改完毕，你可以使用 `test_framework.py` 中的 `test_llm_api()` 进行测试。
+
+
 ### 向量数据库
 1、访问[趋动云数据集](https://open.virtaicloud.com/web/profile/45814/publishDataDetail/486776150082502656)
 2、可以获取下载链接，下载对应的向量数据库

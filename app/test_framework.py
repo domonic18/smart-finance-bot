@@ -1,5 +1,6 @@
 import os
 import datetime
+import settings
 from agent.agent import AgentSql
 from rag.rag import RagManager
 from rag.pdf_processor import PDFProcessor
@@ -8,7 +9,18 @@ from utils.util import get_huggingface_embeddings
 from test.question_answer import TestQuestion
 from finance_bot_ex import FinanceBotEx
 from finance_bot import FinanceBot
-import settings
+from langchain_openai import ChatOpenAI
+from langchain_community.embeddings import XinferenceEmbeddings
+
+from utils.util import get_qwen_models
+from utils.util import get_ernie_models
+from utils.util import get_huggingface_embeddings
+from utils.util import get_bge_embeddings
+from utils.util import get_bce_embeddings
+from utils.util import get_qwen_embeddings
+from utils.util import get_erine_embeddings
+from utils.util import get_zhipu_models
+
 
 
 # 测试Agent主流程
@@ -104,10 +116,24 @@ def test_answer_question():
     test_question = TestQuestion(input_file_path, test_case_start=0, test_case_end=10)
     test_question.run_cases()
 
+
+def test_llm_api():
+    # llm = get_qwen_models()
+    chat = get_zhipu_models()
+    # embed = get_qwen_embeddings()
+    # embed = get_bge_embeddings()
+    # embed = get_bce_embeddings()
+
+    # print(llm.invoke(input="你好"))
+    print(chat.invoke(input="你好"))
+    # print(embed.embed_query(text="你好"))
+
+
 if __name__ == "__main__":
     # test_agent()
     # test_rag()
     # test_import()
     # test_financebot()
     # test_financebot_ex()
+    test_llm_api()
     test_answer_question()

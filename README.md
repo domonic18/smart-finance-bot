@@ -182,3 +182,16 @@ cd smart-finance-bot
 1、访问[趋动云数据集](https://open.virtaicloud.com/web/profile/45814/publishDataDetail/486776150082502656)
 2、可以获取下载链接，下载对应的向量数据库
 3、下载后将数据库文件移动至当前工程目录下，例如：将`chroma_db_qwen`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`即可在启动chromadb时加载使用。
+
+
+### 启动Milvus向量数据库
+第一步：安装Docker，具体方法不再赘述，可以查看[10分钟学会Docker的安装和使用](https://blog.csdn.net/yohnyang/article/details/138435593)
+
+第二步：在命令行下运行如下命令
+```bash
+# 下载安装脚本
+$ curl -sfL https://raw.githubusercontent.com/milvus-io/milvus/master/scripts/standalone_embed.sh -o standalone_embed.sh
+
+# 启动Milvus的Docker容器
+$ bash standalone_embed.sh start
+```

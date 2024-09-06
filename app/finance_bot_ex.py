@@ -1,11 +1,11 @@
-import logging
 import datetime
+import settings
 from langgraph.prebuilt import create_react_agent
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
 from rag.rag import RagManager
-import settings
+from rag.vector_db import ChromaDB, MilvusDB
 from utils.logger_config import LoggerManager
 from langchain_core.prompts import SystemMessagePromptTemplate
 from langchain_core.prompts import HumanMessagePromptTemplate
@@ -45,13 +45,34 @@ class AgentState(TypedDict):
    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
 
 class FinanceBotEx:
-    def __init__(self, llm=settings.LLM, chat=settings.CHAT, embed=settings.EMBED):
+    def __init__(self, llm=settings.LLM, chat=settings.CHAT, embed=settings.EMBED, vector_db_type='chroma'):
         self.llm = llm
         self.chat = chat
         self.embed = embed
         self.tools = []
 
-        self.rag = RagManager(llm=llm, embed=embed)
+        if vector_db_type.lower() == 'chroma':
+            # 使用示例
+            db_config = {
+                "chroma_server_type": settings.CHROMA_SERVER_TYPE,  
+                "host": settings.CHROMA_HOST,
+                "port": settings.CHROMA_PORT,
+                "persist_path": settings.CHROMA_PERSIST_DB_PATH,
+                "collection_name": settings.CHROMA_COLLECTION_NAME,
+            }
+
+            self.rag = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=self.llm, embed=self.embed)
+        else:
+            # 使用示例
+            db_config = {
+                "milvus_server_type": settings.MILVUS_SERVER_TYPE,
+                "host": settings.MILVUS_HOST,
+                "port": settings.MILVUS_PORT,
+                "collection_name": settings.MILVUS_COLLECTION_NAME,
+            }
+
+            self.rag = RagManager(vector_db_class=MilvusDB, db_config=db_config, llm=self.llm, embed=self.embed)
+
 
         self.agent_executor = self.init_agent()
 

@@ -70,10 +70,10 @@ class PDFProcessor:
 
     def insert_docs_chromadb(self, docs, batch_size=6):
         """
-        将文档插入到ChromaDB
+        将文档插入到VectorDB
         """
         # 分批入库
-        logging.info(f"Inserting {len(docs)} documents into ChromaDB.")
+        logging.info(f"Inserting {len(docs)} documents into VectorDB.")
 
         # 记录开始时间
         start_time = time.time()

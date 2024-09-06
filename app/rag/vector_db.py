@@ -35,12 +35,12 @@ class ChromaDB(VectorDB):
         if chroma_server_type == "http":
             client = chromadb.HttpClient(host=host, port=port)
             self.store = Chroma(collection_name=collection_name,
-                                embedding_function=embed,
+                                embedding_function=self.embed,
                                 client=client)
 
         elif chroma_server_type == "local":
             self.store = Chroma(collection_name=collection_name,
-                                embedding_function=embed,
+                                embedding_function=self.embed,
                                 persist_directory=persist_path)
 
         if self.store is None:
@@ -55,7 +55,7 @@ class ChromaDB(VectorDB):
 
 class MilvusDB(VectorDB):
     def __init__(self,
-                 milvus_server_type="local",
+                 milvus_server_type="http",
                  host="localhost", port=19530,
                  collection_name="LangChainCollection",
                  embed=None):
@@ -65,12 +65,21 @@ class MilvusDB(VectorDB):
         self.embed = embed
         self.collection_name = collection_name
 
-        self.store = Milvus(
-            collection_name=self.collection_name,
-            connection_args={"uri": f"http://{host}:{port}"},
-            embedding_function=self.embed,
-            auto_id=True
-        )
+        if milvus_server_type == "http":
+            self.store = Milvus(
+                collection_name=self.collection_name,
+                connection_args={"uri": f"http://{host}:{port}"},
+                embedding_function=self.embed,
+                auto_id=True
+            )
+        else:
+            # 目前没有找到直接连本地 Milvus 的方法
+            self.store = Milvus(
+                collection_name=self.collection_name,
+                connection_args={"uri": f"tcp://{host}:{port}"},
+                embedding_function=self.embed,
+                auto_id=True
+            )
 
     def add_with_langchain(self, docs):
         self.store.add_documents(documents=docs)

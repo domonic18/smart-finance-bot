@@ -8,11 +8,12 @@ from langchain_core.prompts import FewShotChatMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 import settings
 from utils.logger_config import LoggerManager
+from rag.vector_db import ChromaDB, MilvusDB
 
 logger = LoggerManager().logger
 
 class FinanceBot:
-    def __init__(self, llm=settings.LLM, chat=settings.CHAT, embed=settings.EMBED):
+    def __init__(self, llm=settings.LLM, chat=settings.CHAT, embed=settings.EMBED, vector_db_type='chroma'):
         self.llm = llm
         self.chat = chat
         self.embed = embed
@@ -21,16 +22,32 @@ class FinanceBot:
         self.llm_recognition = self.init_recognition(base_url=settings.BASE_URL, 
                                                  api_key=settings.API_KEY, 
                                                  model=settings.MODEL)                 
-        # RAG对象
-        self.rag = RagManager(chroma_server_type=settings.CHROMA_SERVER_TYPE,
-                              host=settings.CHROMA_HOST,
-                              port=settings.CHROMA_PORT,
-                              llm=self.llm, embed=self.embed)
-
         # Agent对象
         self.agent = AgentSql(sql_path=settings.SQLDATABASE_URI,
                               llm=self.chat, embed=self.embed)
+        
+        # RAG对象
+        if vector_db_type.lower() == 'chroma':
+            # 使用示例
+            db_config = {
+                "chroma_server_type": settings.CHROMA_SERVER_TYPE,  
+                "host": settings.CHROMA_HOST,
+                "port": settings.CHROMA_PORT,
+                "persist_path": settings.CHROMA_PERSIST_DB_PATH,
+                "collection_name": settings.CHROMA_COLLECTION_NAME,
+            }
 
+            self.rag = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=self.llm, embed=self.embed)
+        else:
+            # 使用示例
+            db_config = {
+                "milvus_server_type": settings.MILVUS_SERVER_TYPE,
+                "host": settings.MILVUS_HOST,
+                "port": settings.MILVUS_PORT,
+                "collection_name": settings.MILVUS_COLLECTION_NAME,
+            }
+
+            self.rag = RagManager(vector_db_class=MilvusDB, db_config=db_config, llm=self.llm, embed=self.embed)
 
     def init_recognition(self, base_url, api_key, model):
         """

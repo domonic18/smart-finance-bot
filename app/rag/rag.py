@@ -3,8 +3,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
-from .chroma_conn import ChromaDB
 from .retrievers import SimpleRetriever
+from .vector_db import ChromaDB, MilvusDB  # 导入 VectorDB 子类
 from utils.logger_config import LoggerManager
 
 # 配置日志记录
@@ -12,19 +12,26 @@ logger = LoggerManager().logger
 
 class RagManager:
     def __init__(self,
-                 chroma_server_type="http",
-                 host="localhost", port=8000,
-                 persist_path="chroma_db",
+                 vector_db_class=ChromaDB,          # 默认使用 ChromaDB
+                 db_config=None,                    # 数据库配置参数
                  llm=None, embed=None,
                  retriever_cls=SimpleRetriever, **retriever_kwargs):
         self.llm = llm
         self.embed = embed
 
-        chrom_db = ChromaDB(chroma_server_type=chroma_server_type,
-                            host=host, port=port,
-                            persist_path=persist_path,
-                            embed=embed)
-        self.store = chrom_db.get_store()
+        # 如果没有提供 db_config，使用默认配置
+        if db_config is None:
+            db_config = {
+                "chroma_server_type": "http",
+                "host": "localhost",
+                "port": 8000,
+                "persist_path": "chroma_db",
+                "collection_name": "langchain"
+            }
+        # 创建向量数据库实例
+        self.vector_db = vector_db_class(**db_config, embed=self.embed)
+        self.store = self.vector_db.get_store()
+
         self.retriever_instance = retriever_cls(self.store, self.llm, **retriever_kwargs)
 
     def get_chain(self, retriever):
@@ -51,12 +58,14 @@ class RagManager:
 
     def format_docs(self, docs):
         """格式化文档"""
-        logger.info(f"检索到资料文件个数：{len(docs)}")
-        retrieved_files = "\n".join([doc.metadata["source"] for doc in docs])
-        logger.info(f"资料文件分别是:\n{retrieved_files}")
 
         retrieved_content = "\n\n".join(doc.page_content for doc in docs)
         logger.info(f"检索到的资料为:\n{retrieved_content}")
+
+        retrieved_files = "\n".join([doc.metadata["source"] for doc in docs])
+        logger.info(f"资料文件分别是:\n{retrieved_files}")
+        
+        logger.info(f"检索到资料文件个数：{len(docs)}")
 
         return retrieved_content
 

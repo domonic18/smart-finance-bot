@@ -11,8 +11,10 @@ from finance_bot_ex import FinanceBotEx
 from finance_bot import FinanceBot
 from langchain_openai import ChatOpenAI
 from langchain_community.embeddings import XinferenceEmbeddings
+from utils.logger_config import LoggerManager
+from rag.vector_db import ChromaDB, MilvusDB
 
-
+logger = LoggerManager().logger
 
 # 测试Agent主流程
 def test_agent():
@@ -36,12 +38,22 @@ def test_rag():
 
     llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
 
-    # 普通检索器
-    rag_manager = RagManager(host="localhost", port=8000, llm=llm, embed=embed)
+    # Chroma的配置
+    db_config = {
+        "chroma_server_type": "http",
+        "host": "localhost",
+        "port": 8000,
+        "persist_path": "chroma_db",
+        "collection_name": "langchaintest",
+    }
 
+    # 普通检索器
+    # rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed)
+    
     # 多查询检索器
-    rag_manager = RagManager(host="localhost", port=8000, llm=llm, embed=embed,
-                             retriever_cls=MultiQueryRetrieverWrapper)
+    rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed,
+                             etriever_cls=MultiQueryRetrieverWrapper)
+
 
     example_query = "湖南长远锂科股份有限公司"
     example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
@@ -71,9 +83,7 @@ def test_import():
 
 # 测试 FinanceBot主流程
 def test_financebot():
-    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
-
-    financebot = FinanceBot(llm=llm, chat=chat, embed=embed)
+    financebot = FinanceBot()
 
     # example_query = "根据武汉兴图新科电子股份有限公司招股意向书，电子信息行业的上游涉及哪些企业？"
     example_query = "武汉兴图新科电子股份有限公司"
@@ -85,9 +95,12 @@ def test_financebot():
 
 # 测试 FinanceBotEx 主流程
 def test_financebot_ex():
-    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
+    # 使用Chroma 的向量库
+    financebot = FinanceBotEx()
 
-    financebot = FinanceBotEx(llm=llm, chat=chat, embed=embed)
+    # 使用milvus 的向量库
+    # financebot = FinanceBotEx(vector_db_type='milvus')
+
 
     # example_query = "现在几点了？"
     # example_query = "湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？"
@@ -136,9 +149,20 @@ def test_chroma_connect():
     client = chromadb.HttpClient(host='localhost', port=8000)
 
     store = Chroma(collection_name='langchain',
+                   persist_directory='chroma_db',
                         embedding_function=settings.EMBED,
                         client=client)
+    # 增加时间戳
+    logger.info(f"Start searching at {datetime.datetime.now()}")
+    query = "安徽黄山胶囊有限公司"
+    docs = store.similarity_search(query, k=3)
+    logger.info(f"End searching at {datetime.datetime.now()}")
+    # 打印结果
+    for doc in docs:
+        logger.info("="*100)
+        logger.info(doc.page_content)
 
+    logger.info(f'检索文档个数：{len(docs)}')
 # 测试Milvus的基础使用方法
 def test_milvus():
     from langchain_community.document_loaders import PyMuPDFLoader
@@ -146,7 +170,7 @@ def test_milvus():
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
-    mdb = MilvusDB(collection_name="LangChainCollectionTest", embed=settings.EMBED)
+    mdb = MilvusDB(collection_name="LangChainCollectionImportTest", embed=settings.EMBED)
     
     pdf_path = os.path.join(os.getcwd(), "app/dataset/pdf/0b46f7a2d67b5b59ad67cafffa0e12a9f0837790.pdf")
 
@@ -169,21 +193,21 @@ def test_milvus():
     # 分批入库
     for i in range(0, len(docs), batch_size):
         batch = docs[i:i + batch_size]  # 获取当前批次的样本
-        mdb.add_with_langchain(docs=batch)  # 入库
+        # mdb.add_with_langchain(docs=batch)  # 入库
     
     # 查询
-    query = "湖南长远锂科股份有限公司"
+    # 增加时间戳
+    logger.info(f"Start searching at {datetime.datetime.now()}")
+    query = "安徽黄山胶囊有限公司"
     milvus_store = mdb.get_store()
     docs = milvus_store.similarity_search(query, k=3)
-
-    print(len(docs))
-
+    logger.info(f"End searching at {datetime.datetime.now()}")
     # 打印结果
     for doc in docs:
-        print("="*100)
-        print(doc.page_content)
+        logger.info("="*100)
+        logger.info(doc.page_content)
 
-
+    logger.info(f'检索文档个数：{len(docs)}')
 def test_import_with_milvus():
     from rag.pdf_processor import PDFProcessor
     from rag.milvus_conn import MilvusDB
@@ -205,11 +229,11 @@ def test_import_with_milvus():
 if __name__ == "__main__":
     # test_agent()
     # test_rag()
-    # test_import()
+    test_import()
     # test_financebot()
     # test_financebot_ex()
     # test_llm_api()
     # test_chroma_connect()
     # test_answer_question()
     # test_milvus()
-    test_import_with_milvus()
+    # test_import_with_milvus()

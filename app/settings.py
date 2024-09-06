@@ -26,7 +26,7 @@ from utils.util import get_zhipu_embeddings
 #   模型调用-输出:0.002/text_token（千个）
 
 LLM = get_qwen_models(model="qwen-max")[0]
-# CHAT = get_qwen_models(model="qwen-max")[1]
+CHAT = get_qwen_models(model="qwen-max")[1]
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 百度文心一言系列模型
@@ -54,8 +54,8 @@ LLM = get_qwen_models(model="qwen-max")[0]
 #   Batch API 定价：0.0005元 / 千tokens
 
 # LLM = get_zhipu_models(model="glm-4-plus")
-CHAT = get_zhipu_models(model="glm-4-flash")
-EMBED = get_zhipu_embeddings(model="embedding-3")
+# CHAT = get_zhipu_models(model="glm-4-flash")
+# EMBED = get_zhipu_embeddings(model="embedding-3")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -73,13 +73,13 @@ MODEL_UID_BGE = "bge-m3"
 
 SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:49173"
 MODEL_UID_BCE = "bce-embedding-base_v1"
-# EMBED = get_bce_embeddings()
+EMBED = get_bce_embeddings()
 
 # 使用Huggingface的embedding
 # EMBED = get_huggingface_embeddings()
 
 """
-向量数据库使用时的相关的配置
+Chroma向量数据库使用时的相关的配置
 """
 # 默认的ChromaDB的服务器类别
 CHROMA_SERVER_TYPE = "http"
@@ -88,8 +88,19 @@ CHROMA_PERSIST_DB_PATH = "chroma_db"
 
 CHROMA_HOST = "localhost"
 CHROMA_PORT = 8000
+CHROMA_COLLECTION_NAME = "langchain"
 
 CHROMA_SERVER_TYPE_IMPORT = "local"
+
+"""
+Milvus向量数据库使用时的相关的配置
+"""
+# 默认的ChromaDB的服务器类别
+MILVUS_SERVER_TYPE = "http"
+MILVUS_HOST = "localhost"
+MILVUS_PORT = 19530
+MILVUS_COLLECTION_NAME = "langchain"
+
 
 """
 本地SQLite数据库相关的配置

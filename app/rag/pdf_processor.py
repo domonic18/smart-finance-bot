@@ -4,26 +4,26 @@ import time
 from tqdm import tqdm
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from rag.chroma_conn import ChromaDB
+from rag.vector_db import VectorDB
 
 
 class PDFProcessor:
     def __init__(self,
-                 directory,  # PDF文件所在目录
-                 chroma_server_type,  # ChromaDB服务器类型
-                 persist_path,  # ChromaDB持久化路径
-                 embed):  # 向量化函数
+                 directory,  
+                 vector_db: VectorDB,  # 向量数据库实例
+                 file_group_num=20,  
+                 batch_num=6,  
+                 chunksize=500,  
+                 overlap=100,  
+                 embed=None):  
 
-        self.directory = directory
-        self.file_group_num = 20  # 每组处理的文件数
-        self.batch_num = 6  # 每次插入的批次数量
+        self.directory = directory              # PDF文件所在目录
+        self.file_group_num = file_group_num    # 每组处理的文件数
+        self.batch_num = batch_num              # 每次插入的批次数量
+        self.chunksize = chunksize              # 切分文本的大小
+        self.overlap = overlap                  # 切分文本的重叠大小
+        self.vector_db = vector_db              # 使用多态向量数据库实例
 
-        self.chunksize = 500  # 切分文本的大小
-        self.overlap = 100  # 切分文本的重叠大小
-
-        self.chroma_db = ChromaDB(chroma_server_type=chroma_server_type,
-                                  persist_path=persist_path,
-                                  embed=embed)
         # 配置日志
         logging.basicConfig(
             level=logging.INFO,
@@ -88,8 +88,7 @@ class PDFProcessor:
                 batch = docs[i:i + batch_size]
 
                 # 将样本入库
-                self.chroma_db.add_with_langchain(batch)
-                # self.chroma_db.async_add_with_langchain(batch)
+                self.vector_db.add_with_langchain(batch)
 
                 # 更新已插入的文档数量
                 total_docs_inserted += len(batch)

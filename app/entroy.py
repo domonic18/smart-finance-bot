@@ -6,19 +6,32 @@ from test.question_answer import TestQuestion
 import settings
 import sqlite3
 import os
+from rag.vector_db import ChromaDB
+from rag.vector_db import MilvusDB
 
-def import_pdf(directory):
-    # 使用 HuggingFace 的模型
-    embed = settings.EMBED
+def import_pdf_to_Chroma(directory):
 
-    persist_path = settings.CHROMA_PERSIST_DB_PATH
-    server_type = settings.CHROMA_SERVER_TYPE_IMPORT
+    # 创建 ChromaDB 实例
+    chroma_db = ChromaDB(chroma_server_type=settings.CHROMA_SERVER_TYPE_IMPORT, 
+                         persist_path=settings.CHROMA_PERSIST_DB_PATH, 
+                         embed=settings.EMBED)
+
 
     # 创建 PDFProcessor 实例
     pdf_processor = PDFProcessor(directory=directory,
-                                 chroma_server_type=server_type,
-                                 persist_path=persist_path,
-                                 embed=embed)
+                                 vector_db=chroma_db)
+
+    # 处理 PDF 文件
+    pdf_processor.process_pdfs()
+
+def import_pdf_to_Milvus(directory):
+
+    # 创建 MilvusDB 实例
+    milvus_db = MilvusDB(embed=settings.EMBED)
+
+    # 创建 PDFProcessor 实例
+    pdf_processor = PDFProcessor(directory=directory,
+                                 vector_db=milvus_db)
 
     # 处理 PDF 文件
     pdf_processor.process_pdfs()
@@ -132,7 +145,8 @@ def main():
 
     # 添加 importpdf 任务的参数
     parser.add_argument('--dir', type=str, help='Directory for PDF files')
-
+    parser.add_argument('--db_type', type=str, choices=['chroma', 'milvus'], required=True, help='Type of vector database to import PDFs into')
+    
     # 添加 startchroma 任务的参数
     parser.add_argument('--path', type=str, default='chroma_db', help='Path for Chroma DB')
     parser.add_argument('--port', type=int, default=8000, help='Port to run Chroma on')
@@ -153,11 +167,14 @@ def main():
         if not args.dir:
             print("请提供 --dir 参数以指定 PDF 文件目录")
         else:
-            import_pdf(args.dir)
+            if args.db_type == 'chroma':
+                import_pdf_to_Chroma(args.dir)
+            elif args.db_type == 'milvus':
+                import_pdf_to_Milvus(args.dir)
+            else:
+                print("未知的数据库类型。请使用: chroma 或 milvus")
     elif args.job == 'startchroma':
         start_chroma(args.path, args.port, args.host)
-    elif args.job == 'testapik':
-        test_apik()
     elif args.job == 'addindexes':
         add_indexes_to_all_tables(settings.SQLDATABASE_URI)
     elif args.job == 'renametables':

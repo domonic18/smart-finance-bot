@@ -11,4 +11,4 @@ PDF_DIR="$SCRIPT_DIR/../app/dataset/pdf"
 
 # 调用 entroy.py，传入参数
 echo "Running entroy.py to import PDF files..."
-python "$PYTHON_SCRIPT" --job importpdf --dir "$PDF_DIR"
+python "$PYTHON_SCRIPT" --job importpdf --dir "$PDF_DIR" --db_type chroma

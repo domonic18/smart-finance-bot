@@ -133,7 +133,7 @@ def test_chroma_connect():
     from chromadb import Settings
     from langchain_chroma import Chroma
 
-    client = chromadb.HttpClient(host='localhost', port=8900)
+    client = chromadb.HttpClient(host='localhost', port=8000)
 
     store = Chroma(collection_name='langchain',
                         embedding_function=settings.EMBED,

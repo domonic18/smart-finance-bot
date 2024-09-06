@@ -12,15 +12,6 @@ from finance_bot import FinanceBot
 from langchain_openai import ChatOpenAI
 from langchain_community.embeddings import XinferenceEmbeddings
 
-from utils.util import get_qwen_models
-from utils.util import get_ernie_models
-from utils.util import get_huggingface_embeddings
-from utils.util import get_bge_embeddings
-from utils.util import get_bce_embeddings
-from utils.util import get_qwen_embeddings
-from utils.util import get_erine_embeddings
-from utils.util import get_zhipu_models
-
 
 
 # 测试Agent主流程
@@ -118,6 +109,15 @@ def test_answer_question():
 
 
 def test_llm_api():
+    from utils.util import get_qwen_models
+    from utils.util import get_ernie_models
+    from utils.util import get_huggingface_embeddings
+    from utils.util import get_bge_embeddings
+    from utils.util import get_bce_embeddings
+    from utils.util import get_qwen_embeddings
+    from utils.util import get_erine_embeddings
+    from utils.util import get_zhipu_models
+
     # llm = get_qwen_models()
     chat = get_zhipu_models()
     # embed = get_qwen_embeddings()
@@ -139,6 +139,68 @@ def test_chroma_connect():
                         embedding_function=settings.EMBED,
                         client=client)
 
+# 测试Milvus的基础使用方法
+def test_milvus():
+    from langchain_community.document_loaders import PyMuPDFLoader
+    from rag.milvus_conn import MilvusDB
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+
+    mdb = MilvusDB(collection_name="LangChainCollectionTest", embed=settings.EMBED)
+    
+    pdf_path = os.path.join(os.getcwd(), "app/dataset/pdf/0b46f7a2d67b5b59ad67cafffa0e12a9f0837790.pdf")
+
+    pdf_loader = PyMuPDFLoader(file_path=pdf_path)
+    documents = pdf_loader.load()
+
+    chunksize = 500  # 切分文本的大小
+    overlap = 100  # 切分文本的重叠大小
+
+    # 切分文档
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunksize,
+        chunk_overlap=overlap,
+        length_function=len,
+        add_start_index=True,
+    )
+    docs = text_splitter.split_documents(documents)
+
+    batch_size = 6  # 每次处理的样本数量
+    # 分批入库
+    for i in range(0, len(docs), batch_size):
+        batch = docs[i:i + batch_size]  # 获取当前批次的样本
+        mdb.add_with_langchain(docs=batch)  # 入库
+    
+    # 查询
+    query = "湖南长远锂科股份有限公司"
+    milvus_store = mdb.get_store()
+    docs = milvus_store.similarity_search(query, k=3)
+
+    print(len(docs))
+
+    # 打印结果
+    for doc in docs:
+        print("="*100)
+        print(doc.page_content)
+
+
+def test_import_with_milvus():
+    from rag.pdf_processor import PDFProcessor
+    from rag.milvus_conn import MilvusDB
+
+    directory = "./app/dataset/pdf"
+    persist_path = "milvus_db"
+    server_type = "local"
+
+    # 创建 PDFProcessor 实例
+    pdf_processor = PDFProcessor(directory=directory,
+                                 chroma_server_type=server_type,
+                                 persist_path=persist_path,
+                                 embed=settings.EMBED)
+
+    # 处理 PDF 文件
+    pdf_processor.process_pdfs()
+
 
 if __name__ == "__main__":
     # test_agent()
@@ -147,5 +209,7 @@ if __name__ == "__main__":
     # test_financebot()
     # test_financebot_ex()
     # test_llm_api()
-    test_chroma_connect()
-    test_answer_question()
+    # test_chroma_connect()
+    # test_answer_question()
+    # test_milvus()
+    test_import_with_milvus()

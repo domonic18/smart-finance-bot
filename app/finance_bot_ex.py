@@ -166,7 +166,7 @@ class FinanceBotEx:
             return final_result
         except Exception as e:
             logger.error(f"处理查询时出错: {e}")
-            return f'{example_query} 处理查询时出错: {e}'
+            raise e
         
 
     

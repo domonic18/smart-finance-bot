@@ -12,7 +12,7 @@ logger = logger_manager.logger
 class TestQuestion():
     def __init__(self, 
                  input_question_path,                               # 测试用例文件的读取路径
-                 output_answer_root_dic="app/test_result",          # 测试结果输出的保存目录
+                 output_answer_root_dic="test_result",              # 测试结果输出的保存目录
                  test_plan_name="TestPlan",                         # 测试计划名称
                  test_case_start=0,                                 # 测试用例的起始ID
                  test_case_end=5                                    # 测试用例的结束ID
@@ -101,21 +101,26 @@ class TestQuestion():
         # 收集所有需要写入的数据
         data_to_write = []
 
-        try:
-            for i in range(self.test_case_start, self.test_case_end):
-                item = self.test_case_data[i]
-                logger.info(f"ID: {item['id']}, Question: {item['question']}")
+        for i in range(self.test_case_start, self.test_case_end):
+            item = self.test_case_data[i]
+            logger.info(f"ID: {item['id']}, Question: {item['question']}")
+
+            try:
                 answer = self.model.handle_query(item['question'])
+            except Exception as e:
+                # 如果发生了异常，那么后续继续跑case就没有意义了，应该抛出异常停止
+                logger.error(f"Error processing question: {e}")
+                raise
 
-                data_out = {"id": item['id'], "question": item['question'], "answer": answer}
-                data_to_write.append(data_out)
+            data_out = {"id": item['id'], "question": item['question'], "answer": answer}
+            data_to_write.append(data_out)
 
-                # 更新进度
-                self.update_progress(i + 1)
-
-                with open(file=file_path, mode='a', encoding='utf-8') as f:
-                    json_line = json.dumps(data_out, ensure_ascii=False)
-                    f.write(json_line + "\n")
+            # 更新进度
+            self.update_progress(i + 1)
+        try:
+            with open(file=file_path, mode='a', encoding='utf-8') as f:
+                json_line = json.dumps(data_out, ensure_ascii=False)
+                f.write(json_line + "\n")
 
         except Exception as e:
             logger.error(f"Error writing to file: {e}")

@@ -7,6 +7,7 @@ from utils.util import get_bce_embeddings
 from utils.util import get_qwen_embeddings
 from utils.util import get_erine_embeddings
 from utils.util import get_zhipu_models
+from utils.util import get_zhipu_embeddings
 
 """
 大模型相关的配置
@@ -54,6 +55,7 @@ LLM = get_qwen_models(model="qwen-max")[0]
 
 # LLM = get_zhipu_models(model="glm-4-plus")
 CHAT = get_zhipu_models(model="glm-4-flash")
+EMBED = get_zhipu_embeddings(model="embedding-3")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -64,7 +66,7 @@ CHAT = get_zhipu_models(model="glm-4-flash")
 #  本地部署：免费
 SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:49173"
 MODEL_UID_BGE = "bge-m3"
-EMBED = get_bge_embeddings()
+# EMBED = get_bge_embeddings()
 
 # 使用网易的bce for rag向量化模型
 #  本地部署：免费

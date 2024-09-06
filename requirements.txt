@@ -10,6 +10,8 @@ langchain_openai~=0.1.23
 langchain-core~=0.2.35
 langchain_chroma~=0.1.2
 langgraph~=0.2.14
+langchain-milvus
 chromadb
 xinference_client
 pyjwt
+zhipuai

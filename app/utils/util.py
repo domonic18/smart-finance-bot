@@ -18,6 +18,7 @@ from langchain_community.chat_models import ChatBaichuan
 
 # 智谱
 from langchain_community.chat_models import ChatZhipuAI
+from langchain_community.embeddings import ZhipuAIEmbeddings
 
 
 
@@ -112,6 +113,9 @@ def get_bce_embeddings():
     embed = XinferenceEmbeddings(server_url=server_url, model_uid=model_uid)
     return embed
 
+def get_zhipu_embeddings(model="embedding-2"):
+    embed = ZhipuAIEmbeddings(model=model)
+    return embed
 
 def get_zhipu_models(model="glm-4-plus"):
     """

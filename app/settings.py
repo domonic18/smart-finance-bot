@@ -101,11 +101,3 @@ BASE_URL = "http://direct.virtaicloud.com:45181/v1"
 API_KEY = "EMPTY"
 MODEL = "Qwen2_7B-chat-sft2"
 
-"""
-自主搭建的Embedding服务的配置
-"""
-SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:49173"
-MODEL_UID_BGE = "bge-m3"
-
-SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:49173"
-MODEL_UID_BCE = "bce-embedding-base_v1"

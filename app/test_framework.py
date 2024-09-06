@@ -128,6 +128,17 @@ def test_llm_api():
     print(chat.invoke(input="你好"))
     # print(embed.embed_query(text="你好"))
 
+def test_chroma_connect():
+    import chromadb
+    from chromadb import Settings
+    from langchain_chroma import Chroma
+
+    client = chromadb.HttpClient(host='localhost', port=8900)
+
+    store = Chroma(collection_name='langchain',
+                        embedding_function=settings.EMBED,
+                        client=client)
+
 
 if __name__ == "__main__":
     # test_agent()
@@ -135,5 +146,6 @@ if __name__ == "__main__":
     # test_import()
     # test_financebot()
     # test_financebot_ex()
-    test_llm_api()
+    # test_llm_api()
+    test_chroma_connect()
     test_answer_question()

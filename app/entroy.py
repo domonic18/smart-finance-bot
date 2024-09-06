@@ -1,7 +1,6 @@
 import sys
 import argparse
 import subprocess
-from utils.util import get_huggingface_embeddings, get_qwen_models
 from rag.pdf_processor import PDFProcessor
 from test.question_answer import TestQuestion
 import settings
@@ -32,15 +31,6 @@ def start_chroma(path, port, host):
         subprocess.run(command, shell=True, check=True)
     except subprocess.CalledProcessError as e:
         print(f"启动 Chroma 时出错: {e}")
-
-
-def test_apik():
-    # 假设 get_qwen_models 已经实现
-    llm, chat, embed = get_qwen_models()
-    print(llm.invoke(input="你好"))
-    print(chat.invoke(input="你好"))
-    print(embed.embed_query(text="你好"))
-
 
 def add_indexes_to_all_tables(db_path):
     # 连接到 SQLite 数据库
@@ -74,7 +64,6 @@ def add_indexes_to_all_tables(db_path):
     conn.commit()
     conn.close()
     print("All indexes created successfully.")
-
 
 def sanitize_name(name):
     """替换不安全字符为安全字符"""

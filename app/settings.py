@@ -53,7 +53,7 @@ LLM = get_qwen_models(model="qwen-max")[0]
 #   Batch API 定价：0.0005元 / 千tokens
 
 # LLM = get_zhipu_models(model="glm-4-plus")
-CHAT = get_zhipu_models(model="glm-4-long")
+CHAT = get_zhipu_models(model="glm-4-flash")
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -62,11 +62,15 @@ CHAT = get_zhipu_models(model="glm-4-long")
 
 # 使用智普bge-m3的向量化模型
 #  本地部署：免费
-
+SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:49173"
+MODEL_UID_BGE = "bge-m3"
 EMBED = get_bge_embeddings()
 
 # 使用网易的bce for rag向量化模型
 #  本地部署：免费
+
+SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:49173"
+MODEL_UID_BCE = "bce-embedding-base_v1"
 # EMBED = get_bce_embeddings()
 
 # 使用Huggingface的embedding

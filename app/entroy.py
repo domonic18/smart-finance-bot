@@ -145,7 +145,7 @@ def main():
 
     # 添加 importpdf 任务的参数
     parser.add_argument('--dir', type=str, help='Directory for PDF files')
-    parser.add_argument('--db_type', type=str, choices=['chroma', 'milvus'], required=True, help='Type of vector database to import PDFs into')
+    parser.add_argument('--db_type', type=str, choices=['chroma', 'milvus'], help='Type of vector database to import PDFs into')
     
     # 添加 startchroma 任务的参数
     parser.add_argument('--path', type=str, default='chroma_db', help='Path for Chroma DB')

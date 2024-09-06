@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+import settings
 from langchain_openai import ChatOpenAI
 from langchain_community.embeddings import XinferenceEmbeddings
 # 同义Qwen
@@ -71,44 +72,43 @@ def get_ernie_models(model="ERNIE-Bot-turbo"):
 
     return llm, chat
 
-def get_erine_embeddings():
+def get_erine_embeddings(model="bge-large-zh"):
     """
     加载文心系列嵌入模型
     """
-    embeddings = DashScopeEmbeddings(model="bge-large-zh")
+    embeddings = DashScopeEmbeddings(model=model)
 
     return embeddings
 
-def get_qwen_embeddings():
+def get_qwen_embeddings(model="text-embedding-v3"):
     """
     加载千问系列嵌入模型
     """
-    embeddings = DashScopeEmbeddings(model="text-embedding-v3")
+    embeddings = DashScopeEmbeddings(model=model)
 
     return embeddings
 
-def get_huggingface_embeddings():
+def get_huggingface_embeddings(model_name="bert-base-chinese"):
     """
     加载嵌入模型
     """
     from langchain_community.embeddings import HuggingFaceEmbeddings
 
-    embeddings = HuggingFaceEmbeddings(model_name="bert-base-chinese")
+    embeddings = HuggingFaceEmbeddings(model_name=model_name)
 
     return embeddings
 
 def get_bge_embeddings():
-    server_url="http://sy-direct.virtaicloud.com:49173"
-    model_uid="bge-m3"
-    model_uid="bce-embedding-base_v1"
-    
+    server_url=settings.SERVER_URL_BGE
+    model_uid=settings.MODEL_UID_BGE
+
     embed = XinferenceEmbeddings(server_url=server_url, model_uid=model_uid)
     return embed
 
 def get_bce_embeddings():
-    server_url="http://sy-direct.virtaicloud.com:49173"
-    model_uid="bce-embedding-base_v1"
-    
+    server_url=settings.SERVER_URL_BCE
+    model_uid=settings.MODEL_UID_BCE
+
     embed = XinferenceEmbeddings(server_url=server_url, model_uid=model_uid)
     return embed
 
@@ -120,7 +120,7 @@ def get_zhipu_models(model="glm-4-plus"):
 
     zhipuai_chat = ChatZhipuAI(
         temperature=0.5,
-        model="glm-4",
+        model=model,
     )
 
     return zhipuai_chat

@@ -69,9 +69,9 @@ pip install -r requirements.txt
 打开配置文件 app/conf的配置文件，配置自己的API Key即可。
 
 > 备注：
-> .qwen 文件中对应QWen的API Key
-> .ernie 文件中对应百度千帆的API Key
-> .zhipu 文件中对应智谱的API Key
+> - `.qwen` 文件中对应QWen的API Key
+> - `.ernie` 文件中对应百度千帆的API Key
+> - `.zhipu` 文件中对应智谱的API Key
 
 如果想测试API-KEY是否生效，可以参照 `附录` 中 `关于如何配置智谱大模型` 的章节内容。
 
@@ -102,9 +102,9 @@ scripts\import_pdf.bat
 ```
 
 **第二种：** 运行自动化命令批量导入
-1、访问[同义金融大模型的向量数据库](https://platform.virtaicloud.com/gemini_web/workspace/space/jxmdlbjjdhj4/data/detail/486768881516830720)
-2、可以获取下载链接，下载对应的向量数据库
-3、下载后将数据库文件移动至当前工程目录下，例如：将`chroma_db_qwen`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`即可在启动chromadb时加载使用。
+1. 访问[同义金融大模型的向量数据库](https://platform.virtaicloud.com/gemini_web/workspace/space/jxmdlbjjdhj4/data/detail/486768881516830720)
+2. 可以获取下载链接，下载对应的向量数据库
+3. 下载后将数据库文件移动至当前工程目录下，例如：将`chroma_db_qwen`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`即可在启动chromadb时加载使用。
 
 ##### 4、启动Chroma数据库
 Linux/Mac用户：
@@ -201,15 +201,15 @@ cd smart-finance-bot
 ./scripts/run_test_cases.sh
 ```
 > 说明：
-> 1、测试结果会保存在 `test_result` 目录中。
-> 2、如果想调整运行的测试用例，可以直接编辑 `run_test_cases.sh` 文件，修改 `--start` 和 `--end` 参数。
+> 1. 测试结果会保存在 `test_result` 目录中。
+> 2. 如果想调整运行的测试用例，可以直接编辑 `run_test_cases.sh` 文件，修改 `--start` 和 `--end` 参数。
 
 
 ### 关于如何配置智谱大模型
-1、访问智谱开放平台https://bigmodel.cn/
-2、注册账号并且登录
-3、在 `API密钥` 中创建自己的API Key
-4、在 `conf/.zhipu` 文件中配置好第3步创建好的密钥
-5、在 `app/settings.py` 中修改全局配置CHAT的赋值，即： `CHAT = get_zhipu_models(model="glm-4-plus")`
-6、至此，大模型修改完毕，你可以使用 `test_framework.py` 中的 `test_llm_api()` 进行测试。
+1. 访问智谱开放平台https://bigmodel.cn/
+2. 注册账号并且登录
+3. 在 `API密钥` 中创建自己的API Key
+4. 在 `conf/.zhipu` 文件中配置好第3步创建好的密钥
+5. 在 `app/settings.py` 中修改全局配置CHAT的赋值，即： `CHAT = get_zhipu_models(model="glm-4-plus")`
+6. 至此，大模型修改完毕，你可以使用 `test_framework.py` 中的 `test_llm_api()` 进行测试。
 

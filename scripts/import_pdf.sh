@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PYTHON_SCRIPT="$SCRIPT_DIR/../app/entroy.py"
 
 # 设置 PDF 文件目录
-PDF_DIR="$SCRIPT_DIR/../app/dataset/pdf"
+PDF_DIR="$SCRIPT_DIR/../dataset/pdf"
 
 # 调用 entroy.py，传入参数
 echo "Running entroy.py to import PDF files..."

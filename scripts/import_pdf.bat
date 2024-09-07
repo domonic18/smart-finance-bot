@@ -10,7 +10,7 @@ REM 设置 Python 脚本的路径
 SET PYTHON_SCRIPT=%SCRIPT_DIR%..\app\entroy.py
 
 REM 设置 PDF 文件目录
-SET PDF_DIR=%SCRIPT_DIR%..\app\dataset\pdf
+SET PDF_DIR=%SCRIPT_DIR%..\dataset\pdf
 
 REM 调用 entroy.py，传入参数
 echo Running entroy.py to import PDF files...

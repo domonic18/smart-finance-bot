@@ -138,3 +138,14 @@ def get_baichuan_chat(model="Baichuan4"):
 
     return chat
 
+def get_zhipu_chat_model():
+    # 使用OpenAI的Chat模型连接
+    from langchain_openai import ChatOpenAI
+
+    # 连接大模型
+    chat = ChatOpenAI(base_url=settings.SERVER_URL_BGE_CHAT,
+                      model=settings.MODEL_UID_BGE_CHAT, 
+                      temperature=0.01, max_tokens=512,
+                      api_key="xxxx",)
+
+    return chat

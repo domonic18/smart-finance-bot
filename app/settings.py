@@ -8,6 +8,7 @@ from utils.util import get_qwen_embeddings
 from utils.util import get_erine_embeddings
 from utils.util import get_zhipu_models
 from utils.util import get_zhipu_embeddings
+from utils.util import get_zhipu_chat_model
 
 """
 大模型相关的配置
@@ -26,7 +27,7 @@ from utils.util import get_zhipu_embeddings
 #   模型调用-输出:0.002/text_token（千个）
 
 LLM = get_qwen_models(model="qwen-max")[0]
-CHAT = get_qwen_models(model="qwen-max")[1]
+# CHAT = get_qwen_models(model="qwen-max")[1]
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 百度文心一言系列模型
@@ -57,6 +58,9 @@ CHAT = get_qwen_models(model="qwen-max")[1]
 # CHAT = get_zhipu_models(model="glm-4-flash")
 # EMBED = get_zhipu_embeddings(model="embedding-3")
 
+SERVER_URL_BGE_CHAT = "http://sy-direct.virtaicloud.com:42796/v1"
+MODEL_UID_BGE_CHAT = "glm-4-9b-chat"
+CHAT = get_zhipu_chat_model()
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 使用Qwen的embedding

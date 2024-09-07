@@ -20,5 +20,5 @@ COPY app/. .
 # 暴露服务端口
 EXPOSE 8082
 
-# 设置容器启动命令，等待 chroma 服务启动
-CMD ["wait-for-it", "chroma:8000", "--", "python", "app.py"]
+# # 设置容器启动命令，等待 chroma 服务启动
+# CMD ["wait-for-it", "chroma:8000", "--", "python", "app.py"]

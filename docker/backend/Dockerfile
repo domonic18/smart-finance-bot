@@ -2,7 +2,7 @@
 FROM python:3.10-slim
 
 # 复制 wait-for-it.sh 脚本
-COPY scripts/wait-for-it.sh /usr/local/bin/wait-for-it
+COPY ../scripts/wait-for-it.sh /usr/local/bin/wait-for-it
 
 # 给予执行权限
 RUN chmod +x /usr/local/bin/wait-for-it

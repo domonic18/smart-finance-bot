@@ -31,7 +31,6 @@ def test_agent():
     print(result)
     print(result_list)
 
-
 # 测试RAG主流程
 def test_rag():
     from rag.retrievers import MultiQueryRetrieverWrapper
@@ -62,7 +61,6 @@ def test_rag():
 
     print(result)
 
-
 # 测试导入PDF到向量库主流程
 def test_import():
     llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
@@ -79,7 +77,6 @@ def test_import():
 
     # 处理 PDF 文件
     pdf_processor.process_pdfs()
-
 
 # 测试 FinanceBot主流程
 def test_financebot():
@@ -111,7 +108,6 @@ def test_financebot_ex():
 
     financebot.handle_query(example_query)
 
-
 def test_answer_question():
     current_path = os.getcwd()
 
@@ -119,7 +115,6 @@ def test_answer_question():
 
     test_question = TestQuestion(input_file_path, test_case_start=0, test_case_end=10)
     test_question.run_cases()
-
 
 def test_llm_api():
     from utils.util import get_qwen_models
@@ -130,9 +125,11 @@ def test_llm_api():
     from utils.util import get_qwen_embeddings
     from utils.util import get_erine_embeddings
     from utils.util import get_zhipu_models
+    from utils.util import get_bge_chat_model
 
     # llm = get_qwen_models()
-    chat = get_zhipu_models()
+    # chat = get_zhipu_models()
+    chat = get_bge_chat_model()
     # embed = get_qwen_embeddings()
     # embed = get_bge_embeddings()
     # embed = get_bce_embeddings()
@@ -164,9 +161,8 @@ def test_chroma_connect():
 
     logger.info(f'检索文档个数：{len(docs)}')
 # 测试Milvus的基础使用方法
-def test_milvus():
+def test_milvus_connect():
     from langchain_community.document_loaders import PyMuPDFLoader
-    from rag.milvus_conn import MilvusDB
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
@@ -208,32 +204,43 @@ def test_milvus():
         logger.info(doc.page_content)
 
     logger.info(f'检索文档个数：{len(docs)}')
-def test_import_with_milvus():
-    from rag.pdf_processor import PDFProcessor
-    from rag.milvus_conn import MilvusDB
 
-    directory = "./app/dataset/pdf"
-    persist_path = "milvus_db"
-    server_type = "local"
+def clean_test_result():
+    import json
+    # 读取json文件
+    test_file_path = os.path.join(os.getcwd(), "test_result/测试结果汇总/TestPlan_embed_bge_chat_glmlong_0_405_financebotex_by_dongming/answer_id_0_999.json")
+    test_file_save_path = os.path.join(os.getcwd(), "test_result/测试结果汇总/TestPlan_embed_bge_chat_glmlong_0_405_financebotex_by_dongming/answer_id_0_999_clean.json")
 
-    # 创建 PDFProcessor 实例
-    pdf_processor = PDFProcessor(directory=directory,
-                                 chroma_server_type=server_type,
-                                 persist_path=persist_path,
-                                 embed=settings.EMBED)
+    data_to_write = []
 
-    # 处理 PDF 文件
-    pdf_processor.process_pdfs()
+    with open(test_file_path, mode='r', encoding='utf-8') as f:
+        for line in f:
+            # 解析每一行的 JSON 数据
+            record = json.loads(line)
+            # print(record)
+            answer = record.get("answer")
+
+            # 将answer中"最终答案："字符之前的内容剔除掉
+            if "最终答案：" in answer:
+                answer = answer.split("最终答案：")[1]
+                record["answer"] = answer
+                print(record)
+            data_to_write.append(record)
+    with open(test_file_save_path, mode='w', encoding='utf-8') as f:
+        for record in data_to_write:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    pass
 
 
 if __name__ == "__main__":
     # test_agent()
     # test_rag()
-    test_import()
+    # test_import()
     # test_financebot()
     # test_financebot_ex()
     # test_llm_api()
     # test_chroma_connect()
+    # test_milvus_connect()
     # test_answer_question()
-    # test_milvus()
-    # test_import_with_milvus()
+    clean_test_result()

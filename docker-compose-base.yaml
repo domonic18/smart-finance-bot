@@ -8,12 +8,19 @@ services:
     volumes:
       - ./app:/app          # 将当前目录挂载到容器内的/app
       - ./dataset:/dataset  # 将宿主机的data目录挂载到容器内的/app/dataset
+      - ./chroma_db:/chroma_db      # 将宿主机的model目录挂载到容器内的/app/model
     working_dir: /app       # 设置工作目录
     command: python server.py  # 启动后端服务
     ports:
       - "8082:8082"  
     environment:
       - PYTHONUNBUFFERED=1  # 使输出立即显示
+      - CHROMA_HOST=chroma
+      - CHROMA_PORT=8000
+    depends_on:
+      - chroma
+    networks:
+      - smart_bot_network
 
   frontend:
     build:
@@ -30,4 +37,22 @@ services:
       - "5173:5173"  # 映射端口
     environment:
       - NODE_ENV=development  # 设置环境变量为开发模式
+    networks:
+      - smart_bot_network
 
+  chroma:
+      image: python:3.10  
+      volumes:
+        - ./chroma_db:/chroma_db    # 挂载 Chroma 数据库目录
+        - ./app:/app                # 挂载应用目录
+      working_dir: /app             # 设置工作目录
+      command: >
+        bash -c "
+        pip install langchain_chroma chromadb &&
+        chroma run --path chroma_db --port 8000 --host 0.0.0.0"  # 启动 Chroma
+      ports:
+        - "8000:8000"               # 映射 Chroma 服务端口
+      networks:
+        - smart_bot_network
+networks:
+  smart_bot_network:

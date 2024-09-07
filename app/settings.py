@@ -64,7 +64,7 @@ MODEL_UID_BGE_CHAT = "glm-4-9b-chat"
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 使用Qwen的embedding
-# EMBED = get_qwen_embeddings()
+EMBED = get_qwen_embeddings()
 
 # 使用智普bge-m3的向量化模型
 #  本地部署：免费
@@ -77,7 +77,7 @@ MODEL_UID_BGE = "bge-m3"
 
 SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:49173"
 MODEL_UID_BCE = "bce-embedding-base_v1"
-EMBED = get_bce_embeddings()
+# EMBED = get_bce_embeddings()
 
 # 使用Huggingface的embedding
 # EMBED = get_huggingface_embeddings()

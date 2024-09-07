@@ -1,0 +1,26 @@
+include:
+  - path: ./docker-compose-base.yaml
+  - path: ./docker-compose-es.yaml
+    env_file: ./.env
+    
+services:
+  milvus:
+    image: milvusdb/milvus:latest
+    environment:
+      - MILVUS_DB_PATH=/milvus/db
+      - MILVUS_LOG_PATH=/milvus/logs
+      - MILVUS_ENABLE_AUTO_COMPACTION=true
+      - MILVUS_USE_CUDA=false
+    ports:
+      - "19530:19530"  # Milvus 的服务端口
+      - "19121:19121"  # Milvus 的 HTTP 接口端口
+    volumes:
+      - milvus_db:/milvus/db
+      - milvus_logs:/milvus/logs
+    restart: always
+
+volumes:
+  milvus_db:
+    driver: local
+  milvus_logs:
+    driver: local

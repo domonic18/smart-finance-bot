@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .            # 将上下文设置为当前目录
+      dockerfile: ./docker/backend/Dockerfile
+    volumes:
+      - ./app:/app          # 将当前目录挂载到容器内的/app
+      - ./dataset:/dataset  # 将宿主机的data目录挂载到容器内的/app/dataset
+    working_dir: /app       # 设置工作目录
+    command: python server.py  # 启动后端服务
+    ports:
+      - "8082:8082"  
+    environment:
+      - PYTHONUNBUFFERED=1  # 使输出立即显示
+
+  frontend:
+    build:
+      context: ./chatweb
+      dockerfile: ../docker/frontend/Dockerfile
+    volumes:
+      - ./chatweb:/chatweb  # 将当前目录挂载到容器内的/chatweb
+    working_dir: /chatweb  # 设置工作目录
+    command: >
+      bash -c "
+      npm install && 
+      npm run dev"  # 安装依赖并启动前端服务
+    ports:
+      - "5173:5173"  # 映射端口
+    environment:
+      - NODE_ENV=development  # 设置环境变量为开发模式
+

@@ -46,7 +46,7 @@ services:
       working_dir: /app             # 设置工作目录
       command: >
         bash -c "
-        pip install langchain_chroma chromadb -i https://pypi.tuna.tsinghua.edu.cn/simple/ &&
+        pip install langchain_chroma chromadb &&
         chroma run --path chroma_db --port 8000 --host 0.0.0.0"  # 启动 Chroma
       ports:
         - "8000:8000"               # 映射 Chroma 服务端口

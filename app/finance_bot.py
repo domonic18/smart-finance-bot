@@ -36,6 +36,7 @@ class FinanceBot:
                 "persist_path": settings.CHROMA_PERSIST_DB_PATH,
                 "collection_name": settings.CHROMA_COLLECTION_NAME,
             }
+            print(db_config)
 
             self.rag = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=self.llm, embed=self.embed)
         else:

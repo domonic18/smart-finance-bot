@@ -90,8 +90,8 @@ CHROMA_SERVER_TYPE = "http"
 # 默认本地数据库的持久化目录
 CHROMA_PERSIST_DB_PATH = "chroma_db"
 
-CHROMA_HOST = "localhost"
-CHROMA_PORT = 8000
+CHROMA_HOST = os.getenv("CHROMA_HOST", "localhost")
+CHROMA_PORT = int(os.getenv("CHROMA_PORT", 8000))
 CHROMA_COLLECTION_NAME = "langchain"
 
 CHROMA_SERVER_TYPE_IMPORT = "local"

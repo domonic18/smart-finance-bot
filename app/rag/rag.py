@@ -6,6 +6,7 @@ from langchain_core.output_parsers import StrOutputParser
 from .retrievers import SimpleRetriever
 from .vector_db import ChromaDB, MilvusDB  # 导入 VectorDB 子类
 from utils.logger_config import LoggerManager
+import settings
 
 # 配置日志记录
 logger = LoggerManager().logger
@@ -22,11 +23,11 @@ class RagManager:
         # 如果没有提供 db_config，使用默认配置
         if db_config is None:
             db_config = {
-                "chroma_server_type": "http",
-                "host": "localhost",
-                "port": 8000,
-                "persist_path": "chroma_db",
-                "collection_name": "langchain"
+                "chroma_server_type": settings.CHROMA_SERVER_TYPE,
+                "host": settings.CHROMA_HOST,
+                "port": settings.CHROMA_PORT,
+                "persist_path": settings.CHROMA_PERSIST_DB_PATH,
+                "collection_name": settings.CHROMA_COLLECTION_NAME
             }
         # 创建向量数据库实例
         self.vector_db = vector_db_class(**db_config, embed=self.embed)

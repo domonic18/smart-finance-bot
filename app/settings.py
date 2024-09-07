@@ -27,7 +27,7 @@ from utils.util import get_zhipu_chat_model
 #   模型调用-输出:0.002/text_token（千个）
 
 LLM = get_qwen_models(model="qwen-max")[0]
-# CHAT = get_qwen_models(model="qwen-max")[1]
+CHAT = get_qwen_models(model="qwen-max")[1]
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 百度文心一言系列模型
@@ -60,7 +60,7 @@ LLM = get_qwen_models(model="qwen-max")[0]
 
 SERVER_URL_BGE_CHAT = "http://sy-direct.virtaicloud.com:42796/v1"
 MODEL_UID_BGE_CHAT = "glm-4-9b-chat"
-CHAT = get_zhipu_chat_model()
+# CHAT = get_zhipu_chat_model()
 
 # ---------------------------------------------------------------------------------------------------------------------
 # 使用Qwen的embedding
@@ -110,7 +110,19 @@ MILVUS_COLLECTION_NAME = "langchain"
 本地SQLite数据库相关的配置
 """
 # 连接数据库db文件的地址根据需要需要更换
-SQLDATABASE_URI = os.path.join(os.getcwd(), "app/dataset/dataset/博金杯比赛数据.db")
+# SQLDATABASE_URI = os.path.join(os.getcwd(), "dataset/dataset/博金杯比赛数据.db")
+import os
+
+# 获取当前文件的绝对路径
+current_file_path = os.path.abspath(__file__)
+
+# 向上取两级找到根目录
+root_directory = os.path.dirname(os.path.dirname(current_file_path))
+
+# 拼接最终的数据库路径
+SQLDATABASE_URI = os.path.join(root_directory, "dataset", "dataset", "博金杯比赛数据.db")
+
+print(SQLDATABASE_URI)  # 输出最终的数据库路径
 
 
 # 意图识别问答模型的配置

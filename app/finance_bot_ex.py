@@ -90,6 +90,7 @@ class FinanceBotEx:
 
     def init_sql_tool(self, path):
         # 连接数据库
+        print(f"连接数据库: {path}")
         db = SQLDatabase.from_uri(f"sqlite:///{path}")
         toolkit = SQLDatabaseToolkit(db=db, llm=self.llm)
         sql_tools = toolkit.get_tools()  # 工具

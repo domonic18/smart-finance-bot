@@ -15,6 +15,7 @@ class AgentSql:
         self.embed = embed
 
         """连接本地数据库"""
+        print(f"连接数据库: {sql_path}")
         self.db = SQLDatabase.from_uri(f"sqlite:///{sql_path}")
         self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
         self.tools = self.toolkit.get_tools() # 工具

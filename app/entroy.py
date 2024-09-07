@@ -133,7 +133,7 @@ def rename_tables_and_columns(db_path):
 
 def run_test_answer_question(start, end):
     current_path = os.getcwd()
-    input_file_path = os.path.join(current_path, "app/dataset/question.json")
+    input_file_path = os.path.join(current_path, "dataset/question.json")
 
     test_question = TestQuestion(input_file_path, test_case_start=start, test_case_end=end)
     test_question.run_cases()

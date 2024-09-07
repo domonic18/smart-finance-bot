@@ -62,17 +62,3 @@ class PrettyConsoleFormatter(logging.Formatter):
         if isinstance(record.msg, dict):
             record.msg = pprint.pformat(record.msg)
         return super().format(record)
-
-# # 使用示例
-# logger_manager = LoggerManager(to_file=True)
-# logger = logger_manager.logger
-
-# # 在其他模块中获取日志记录器
-# # from logger_config import LoggerManager
-# # logger = LoggerManager().logger
-
-# # 使用日志
-# logger.info("This is an info message.")
-# logger_manager.set_log_file('new_app.log')
-# logger_manager.set_level(logging.DEBUG)
-# logger.debug("This is a debug message.")

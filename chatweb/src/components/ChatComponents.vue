@@ -50,7 +50,7 @@ const showSetting = ref(false)
 var LLM_APIKEY = ref("sk-cwtdeSy4Ownmy6Uh5e9b6a67Fe4c4454A3Dc524876348eB1")
 
 var setting = reactive({
-    server_url: 'http://localhost:8082/query', // 默认值
+    server_url: 'http://localhost:8082/queryex', // 默认值
     type: 'query',
 })
 

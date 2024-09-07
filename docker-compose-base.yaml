@@ -8,7 +8,7 @@ services:
       - ./dataset:/dataset  # 将宿主机的data目录挂载到容器内的/app/dataset
       - ./chroma_db:/chroma_db      # 将宿主机的model目录挂载到容器内的/app/model
     working_dir: /app       # 设置工作目录
-    command: ["./wait-for-it.sh", "chroma:8000", "--", "python", "app.py"]  # 启动后端服务并等待 Chroma 服务
+    # command: ["wait-for-it", "chroma:8000", "--", "python", "server.py"]  # 启动后端服务并等待 Chroma 服务
     ports:
       - "8082:8082"  
     environment:
@@ -39,15 +39,17 @@ services:
       - smart_bot_network
 
   chroma:
-      image: python:3.10  
+      build:
+        context: .
+        dockerfile: ./docker/chroma/Dockerfile
       volumes:
         - ./chroma_db:/chroma_db    # 挂载 Chroma 数据库目录
         - ./app:/app                # 挂载应用目录
       working_dir: /app             # 设置工作目录
-      command: >
-        bash -c "
-        pip install langchain_chroma chromadb -i https://pypi.tuna.tsinghua.edu.cn/simple/ &&
-        chroma run --path chroma_db --port 8000 --host 0.0.0.0"  # 启动 Chroma
+      # command: >
+      #   bash -c "
+      #   pip install langchain_chroma chromadb &&
+      #   chroma run --path chroma_db --port 8000 --host 0.0.0.0"  # 启动 Chroma
       ports:
         - "8000:8000"               # 映射 Chroma 服务端口
       networks:

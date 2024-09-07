@@ -4,13 +4,9 @@ import settings
 from agent.agent import AgentSql
 from rag.rag import RagManager
 from rag.pdf_processor import PDFProcessor
-from utils.util import get_qwen_models
-from utils.util import get_huggingface_embeddings
 from test.question_answer import TestQuestion
 from finance_bot_ex import FinanceBotEx
 from finance_bot import FinanceBot
-from langchain_openai import ChatOpenAI
-from langchain_community.embeddings import XinferenceEmbeddings
 from utils.logger_config import LoggerManager
 from rag.vector_db import ChromaDB, MilvusDB
 
@@ -237,10 +233,10 @@ if __name__ == "__main__":
     # test_agent()
     # test_rag()
     # test_import()
-    # test_financebot()
-    # test_financebot_ex()
+    test_financebot()
+    test_financebot_ex()
     # test_llm_api()
     # test_chroma_connect()
     # test_milvus_connect()
     # test_answer_question()
-    clean_test_result()
+    # clean_test_result()

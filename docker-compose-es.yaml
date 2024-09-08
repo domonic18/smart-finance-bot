@@ -54,6 +54,8 @@ services:
         until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
         echo "All done!";
       '
+    networks:
+        - smart_bot_network
     healthcheck:
       test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
       interval: 1s
@@ -104,6 +106,8 @@ services:
         fi;
         /usr/local/bin/docker-entrypoint.sh
       '
+    networks:
+        - smart_bot_network
     healthcheck:
       test:
         [
@@ -156,6 +160,8 @@ services:
         fi;
         /usr/local/bin/docker-entrypoint.sh
       '
+    networks:
+        - smart_bot_network
     healthcheck:
       test:
         [
@@ -208,6 +214,8 @@ services:
         fi;
         /usr/local/bin/docker-entrypoint.sh
       '
+    networks:
+        - smart_bot_network
     healthcheck:
       test:
         [
@@ -232,6 +240,8 @@ services:
     volumes:
       - ./docker/elasticsearch/certs:/usr/share/kibana/config/certs
       - ./docker/elasticsearch/kibanadata:/usr/share/kibana/data
+    networks:
+        - smart_bot_network
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -268,7 +278,5 @@ volumes:
     driver: local
 
 networks:
- default:
-   name: elastic
-   external: true
+  smart_bot_network:
 

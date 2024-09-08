@@ -164,7 +164,7 @@ npm run dev
 ##### 2、下载Docker-Compose文件
 命令行下运行
 ```bash
-curl -L https://get.daocloud.io/docker/compose/releases/download/v2.14.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+curl -L https://github.com/docker/compose/releases/tag/v2.28.0/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
 ```
 
 ##### 3、启动服务
@@ -213,3 +213,8 @@ cd smart-finance-bot
 5. 在 `app/settings.py` 中修改全局配置CHAT的赋值，即： `CHAT = get_zhipu_models(model="glm-4-plus")`
 6. 至此，大模型修改完毕，你可以使用 `test_framework.py` 中的 `test_llm_api()` 进行测试。
 
+### 关于启动ElasticSearch(简称ES)服务的方法
+命令行运行：
+```bash
+docker-compose -f docker-compose-es.yaml up -d
+```

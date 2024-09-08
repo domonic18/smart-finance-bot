@@ -11,6 +11,7 @@ from langchain_core.prompts import SystemMessagePromptTemplate
 from langchain_core.prompts import HumanMessagePromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
+from rag.retrievers import ElasticsearchRetriever
 
 logger = LoggerManager().logger
 
@@ -127,9 +128,6 @@ class FinanceBotEx:
             1、如果查询过程中SQL语句有语法错误，减少查询量,总体查询次数应控制在15次以内。 
             2、请注意SQL语句的查询性能，SQL语句中如果有`SUM`、`COUNT(*)`的情况，务必使用`WITH FilteredIndustry`先筛选出符合条件的数据，然后再进行计算。
             3、对于复杂查询，请在生成 SQL 语句后使用 EXPLAIN 来评估查询计划，避免使用全表扫描或其他低效操作。
-
-            # 关于最终答案：
-            1、如果你不知道答案，就说你不知道。请使用不超过三句话的简洁回答。
                                                 
             # 关于你的思考和行动过程，请按照如下格式：
             问题：你必须回答的输入问题
@@ -140,6 +138,9 @@ class FinanceBotEx:
             ... (这个思考/行动/行动输入/观察可以重复N次)
             最终答案：原始输入问题的最终答案
 
+            # 关于最终答案：
+            1、如果你不知道答案，就说你不知道。
+            2、请对最终答案总结，给出不超过三句话的简洁回答。
             
             Begin!
                             

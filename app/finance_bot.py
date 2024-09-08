@@ -66,6 +66,7 @@ class FinanceBot:
                         max_tokens=512
                         )
         logger.info(f'连接意图识别大模型：base_url:{base_url}，model={model}')
+        
         # 测试连接
         try:
             # 发送一个简单的消息

@@ -15,3 +15,7 @@ chromadb
 xinference_client
 pyjwt
 zhipuai
+elasticsearch
+jieba
+nltk
+elasticsearch7

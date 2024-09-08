@@ -5,32 +5,48 @@ from tqdm import tqdm
 from langchain_community.document_loaders import PyMuPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from rag.vector_db import VectorDB
+from rag.elasticsearch_db import TraditionDB
+from utils.logger_config import LoggerManager
 
+logger = LoggerManager().logger
 
 class PDFProcessor:
-    def __init__(self,
-                 directory,  
-                 vector_db: VectorDB,  # 向量数据库实例
-                 file_group_num=20,  
-                 batch_num=6,  
-                 chunksize=500,  
-                 overlap=100,  
-                 embed=None):  
+    def __init__(self, directory, db_type='vector', **kwargs):
+        """
+        初始化 PDF 处理器
+        :param directory: PDF 文件所在目录
+        :param db_type: 数据库类型 ('vector' 或 'es')
+        :param kwargs: 其他参数
+        """
+        self.directory = directory  # PDF 文件所在目录
+        self.db_type = db_type  # 数据库类型
+        self.file_group_num = kwargs.get('file_group_num', 20)  # 每组处理的文件数
+        self.batch_num = kwargs.get('batch_num', 6)  # 每次插入的批次数量
+        self.chunksize = kwargs.get('chunksize', 500)  # 切分文本的大小
+        self.overlap = kwargs.get('overlap', 100)  # 切分文本的重叠大小
+        logger.info(f"""
+                    初始化PDF文件导入器:
+                    配置参数：
+                    - 导入的文件路径：{self.directory}
+                    - 每次处理文件数：{self.file_group_num}
+                    - 每批次处理样本数：{self.batch_num}
+                    - 切分文本的大小：{self.chunksize}
+                    - 切分文本重叠大小：{self.overlap}
+                    """)
 
-        self.directory = directory              # PDF文件所在目录
-        self.file_group_num = file_group_num    # 每组处理的文件数
-        self.batch_num = batch_num              # 每次插入的批次数量
-        self.chunksize = chunksize              # 切分文本的大小
-        self.overlap = overlap                  # 切分文本的重叠大小
-        self.vector_db = vector_db              # 使用多态向量数据库实例
+        # 根据数据库类型初始化相应的客户端
+        if db_type == 'vector':
+            self.vector_db = kwargs.get('vector_db')  # 向量数据库实例
+            self.es_client = None
 
-        # 配置日志
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            datefmt='%Y-%m-%d %H:%M:%S'
-        )
-
+            logger.info(f'导入的目标数据库为：向量数据库')
+        elif db_type == 'es':
+            self.vector_db = None
+            self.es_client = kwargs.get('es_client')  # Elasticsearch 客户端
+            
+            logger.info(f'导入的目标数据库为：ES数据库')
+        else:
+            raise ValueError("db_type must be either 'vector' or 'es'.")
     def load_pdf_files(self):
         """
         加载目录下的所有PDF文件
@@ -68,39 +84,48 @@ class PDFProcessor:
         logging.info("Split text into smaller chunks with RecursiveCharacterTextSplitter.")
         return docs
 
-    def insert_docs_chromadb(self, docs, batch_size=6):
+    def insert_docs(self, docs, insert_function, batch_size=None):
         """
-        将文档插入到VectorDB
+        将文档插入到指定的数据库，并显示进度
+        :param docs: 要插入的文档列表
+        :param insert_function: 插入函数
+        :param batch_size: 批次大小
         """
-        # 分批入库
-        logging.info(f"Inserting {len(docs)} documents into VectorDB.")
+        if batch_size is None:
+            batch_size = self.batch_num
 
-        # 记录开始时间
+        logging.info(f"Inserting {len(docs)} documents.")
         start_time = time.time()
         total_docs_inserted = 0
 
-        # 计算总批次
         total_batches = (len(docs) + batch_size - 1) // batch_size
 
         with tqdm(total=total_batches, desc="Inserting batches", unit="batch") as pbar:
             for i in range(0, len(docs), batch_size):
-                # 获取当前批次的样本
                 batch = docs[i:i + batch_size]
+                insert_function(batch)  # 调用传入的插入函数
 
-                # 将样本入库
-                self.vector_db.add_with_langchain(batch)
-
-                # 更新已插入的文档数量
                 total_docs_inserted += len(batch)
 
                 # 计算并显示当前的TPM
-                elapsed_time = time.time() - start_time  # 计算已用时间（秒）
-                if elapsed_time > 0:  # 防止除以零
-                    tpm = (total_docs_inserted / elapsed_time) * 60  # 转换为每分钟插入的文档数
-                    pbar.set_postfix({"TPM": f"{tpm:.2f}"})  # 更新进度条的后缀信息
+                elapsed_time = time.time() - start_time
+                if elapsed_time > 0:
+                    tpm = (total_docs_inserted / elapsed_time) * 60
+                    pbar.set_postfix({"TPM": f"{tpm:.2f}"})
 
-                # 更新进度条
                 pbar.update(1)
+
+    def insert_to_vector_db(self, docs):
+        """
+        将文档插入到 VectorDB
+        """
+        self.vector_db.add_with_langchain(docs)
+
+    def insert_to_elasticsearch(self, docs):
+        """
+        将文档插入到 Elasticsearch
+        """
+        self.es_client.add_documents(docs)
 
     def process_pdfs_group(self, pdf_files_group):
         # 读取PDF文件内容
@@ -116,8 +141,14 @@ class PDFProcessor:
         # 将文本切分成小段
         docs = self.split_text(pdf_contents)
 
-        # 将文档插入到ChromaDB
-        self.insert_docs_chromadb(docs, self.batch_num)
+        if self.db_type == 'vector':
+            # 将文档插入到 VectorDB
+            self.insert_docs(docs, self.insert_to_vector_db)
+        elif self.db_type == 'es':
+            # 将文档插入到 Elasticsearch
+            self.insert_docs(docs, self.insert_to_elasticsearch)
+        else:
+            raise ValueError("db_type must be either 'vector' or 'es'.")
 
     def process_pdfs(self):
         # 获取目录下所有的PDF文件

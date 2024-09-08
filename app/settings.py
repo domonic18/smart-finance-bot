@@ -122,11 +122,17 @@ root_directory = os.path.dirname(os.path.dirname(current_file_path))
 # 拼接最终的数据库路径
 SQLDATABASE_URI = os.path.join(root_directory, "dataset", "dataset", "博金杯比赛数据.db")
 
-print(SQLDATABASE_URI)  # 输出最终的数据库路径
-
 
 # 意图识别问答模型的配置
 BASE_URL = "http://direct.virtaicloud.com:45181/v1"
 API_KEY = "EMPTY"
 MODEL = "Qwen2_7B-chat-sft2"
 
+"""
+ES数据库相关的配置
+"""
+ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD", "123abc")
+ELASTIC_HOST = os.getenv("ELASTIC_HOST", "localhost")
+ELASTIC_PORT = os.getenv("ELASTIC_PORT", 9200)
+ELASTIC_SCHEMA = "https"
+ELASTIC_INDEX_NAME = "demo_index0"

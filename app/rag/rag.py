@@ -40,6 +40,8 @@ class RagManager:
         self.store = self.vector_db.get_store()
 
         self.retriever_instance = retriever_cls(self.store, self.llm, **retriever_kwargs)
+        logger.info(f'使用的检索器类: {retriever_cls.__name__}')
+
 
     def get_chain(self, retriever):
         """获取RAG查询链"""
@@ -69,8 +71,12 @@ class RagManager:
         retrieved_content = "\n\n".join(doc.page_content for doc in docs)
         logger.info(f"检索到的资料为:\n{retrieved_content}")
 
-        retrieved_files = "\n".join([doc.metadata["source"] for doc in docs])
-        logger.info(f"资料文件分别是:\n{retrieved_files}")
+        # 对于ES查询没有source的情况进行特殊处理
+        try:
+            retrieved_files = "\n".join([doc.metadata["source"] for doc in docs])
+            logger.info(f"资料文件分别是:\n{retrieved_files}")
+        except Exception as e:
+            logger.info(f"处理查询时没有找到source字段: {e}")
         
         logger.info(f"检索到资料文件个数：{len(docs)}")
 
@@ -80,6 +86,7 @@ class RagManager:
         """获取RAG查询结果"""
         retriever = self.retriever_instance.create_retriever()
         rag_chain = self.get_chain(retriever)
+        
         try:
             result = rag_chain.invoke(input=question)
             logger.info(f"RAG查询结果：{result}")

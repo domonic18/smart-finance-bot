@@ -37,9 +37,6 @@ def test_rag():
         "collection_name": "langchaintest",
     }
 
-    # 普通检索器
-    # rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed)
-    
     # 多查询检索器
     rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed,
                              etriever_cls=MultiQueryRetrieverWrapper)
@@ -92,7 +89,6 @@ def test_import_elasticsearch():
     directory = "./dataset/pdf"
 
     # 创建 Elasticsearch 数据库实例
-    # es_db = TraditionDB()
     es_db = ElasticsearchDB()
 
         # 创建 PDFProcessor 实例
@@ -109,8 +105,8 @@ def test_financebot():
     from finance_bot import FinanceBot
     financebot = FinanceBot()
 
-    # example_query = "根据武汉兴图新科电子股份有限公司招股意向书，电子信息行业的上游涉及哪些企业？"
-    example_query = "武汉兴图新科电子股份有限公司"
+    example_query = "根据武汉兴图新科电子股份有限公司招股意向书，电子信息行业的上游涉及哪些企业？"
+    # example_query = "武汉兴图新科电子股份有限公司"
     # example_query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
 
     final_result = financebot.handle_query(example_query)
@@ -154,11 +150,11 @@ def test_llm_api():
     from utils.util import get_qwen_embeddings
     from utils.util import get_erine_embeddings
     from utils.util import get_zhipu_models
-    from utils.util import get_bge_chat_model
+    from utils.util import get_zhipu_chat_model
 
     # llm = get_qwen_models()
     # chat = get_zhipu_models()
-    chat = get_bge_chat_model()
+    chat = get_zhipu_models()
     # embed = get_qwen_embeddings()
     # embed = get_bge_embeddings()
     # embed = get_bce_embeddings()
@@ -321,6 +317,37 @@ def test_es_add():
         es_client.bluk_data(docs)
     es_client.flush()
 
+def test_es_search():
+    from rag.retrievers import ElasticsearchRetriever
+    from rag.retrievers import MultiQueryRetrieverWrapper
+    from rag.rag import RagManager
+    from rag.vector_db import ChromaDB
+    llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
+
+    es_retriever = ElasticsearchRetriever()
+
+    # Chroma的配置
+    db_config = {
+        "chroma_server_type": "http",
+        "host": "localhost",
+        "port": 8000,
+        "persist_path": "chroma_db",
+        "collection_name": "langchaintest",
+    }
+ 
+    # 多查询检索器
+    rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed,
+                             etriever_cls=es_retriever)
+
+
+    example_query = "湖南长远锂科股份有限公司"
+    example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
+    example_query = "昇兴集团股份有限公司本次发行的拟上市证券交易所是？"
+
+    result = rag_manager.get_result(example_query)
+
+    print(result)
+
 
 if __name__ == "__main__":
     # test_chroma_connect()
@@ -328,11 +355,13 @@ if __name__ == "__main__":
     # test_es_add()
     # test_import_vector_db()
     # test_import_elasticsearch()
-    test_agent()
-    test_rag()
-    test_financebot()
+    # test_agent()
+    # test_rag()
+    # test_financebot()
     test_financebot_ex()
-    test_llm_api()
-    test_answer_question()
+    # test_llm_api()
+    # test_answer_question()
     # test_clean_test_result()
+    # test_es_search()
+
 

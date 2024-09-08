@@ -70,6 +70,7 @@ services:
     volumes:
       - ./docker/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./docker/elasticsearch/esdata01:/usr/share/elasticsearch/data
+      - ./docker/elasticsearch/esplugins01:/usr/share/elasticsearch/plugins
     ports:
       - ${ES_PORT}:9200
     environment:
@@ -95,6 +96,14 @@ services:
       memlock:
         soft: -1
         hard: -1
+    command: >
+      bash -c '
+        if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
+          echo "Installing IK Analyzer plugin";
+          bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
+        fi;
+        /usr/local/bin/docker-entrypoint.sh
+      '
     healthcheck:
       test:
         [
@@ -115,6 +124,7 @@ services:
     volumes:
       - ./docker/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./docker/elasticsearch/esdata02:/usr/share/elasticsearch/data
+      - ./docker/elasticsearch/esplugins02:/usr/share/elasticsearch/plugins
     environment:
       - node.name=es02
       - cluster.name=${CLUSTER_NAME}
@@ -138,6 +148,14 @@ services:
       memlock:
         soft: -1
         hard: -1
+    command: >
+      bash -c '
+        if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
+          echo "Installing IK Analyzer plugin";
+          bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
+        fi;
+        /usr/local/bin/docker-entrypoint.sh
+      '
     healthcheck:
       test:
         [
@@ -158,6 +176,7 @@ services:
     volumes:
       - ./docker/elasticsearch/certs:/usr/share/elasticsearch/config/certs
       - ./docker/elasticsearch/esdata03:/usr/share/elasticsearch/data
+      - ./docker/elasticsearch/esplugins03:/usr/share/elasticsearch/plugins
     environment:
       - node.name=es03
       - cluster.name=${CLUSTER_NAME}
@@ -181,6 +200,14 @@ services:
       memlock:
         soft: -1
         hard: -1
+    command: >
+      bash -c '
+        if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
+          echo "Installing IK Analyzer plugin";
+          bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
+        fi;
+        /usr/local/bin/docker-entrypoint.sh
+      '
     healthcheck:
       test:
         [

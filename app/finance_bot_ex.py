@@ -75,6 +75,7 @@ class FinanceBotEx:
 
 
         self.agent_executor = self.init_agent()
+        logger.info(f'初始化程序框架：FinanceEx')
 
     def init_rag_tools(self):
         # 给大模型 RAG 检索器工具
@@ -183,7 +184,9 @@ class FinanceBotEx:
                 result_list.append(event["messages"][-1].content)
             
             final_result = event["messages"][-1].content if result_list else None
-            logger.info(f"查询过程: {result_list}")
+            logger.info(f'查询过程：')
+            for presult in result_list:
+                logger.info(f'【agent】: {presult}')
             logger.info(f"最终结果: {final_result}")
             return final_result
         except Exception as e:

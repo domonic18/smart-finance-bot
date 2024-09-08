@@ -23,11 +23,20 @@ class TestQuestion():
         self.test_plan_name = test_plan_name.replace(" ", "_")
         self.test_case_start = test_case_start
         self.test_case_end = test_case_end
+
         self.__init_dirs()
         self.__load_data()
         self.__init_model()
         # 检查进度文件是否存在
         self.check_progress_file()
+        logger.info(f"""
+                    测试参数：
+                    测试用例读取路径：{self.input_question_path}
+                    测试结果输出路径：{self.output_answer_root_dic}
+                    测试用例Start：{self.test_case_start}
+                    测试用例End：{self.test_case_end}
+        """)
+
     def __init_dirs(self):
         """初始化目录"""
         # 创建测试结果的根目录
@@ -64,6 +73,7 @@ class TestQuestion():
     def __init_model(self):
         # self.model = FinanceBot()
         self.model = FinanceBotEx()
+        logger.info(f'测试所使用的框架：FinanceBotEx')
 
     def check_progress_file(self):
         """检查进度文件是否存在，如果存在则读取进度信息"""

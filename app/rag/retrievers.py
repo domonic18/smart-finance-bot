@@ -1,11 +1,14 @@
 from langchain.retrievers.multi_query import MultiQueryRetriever
+from utils.logger_config import LoggerManager
 
+logger = LoggerManager().logger
 
 class RetrieverBase:
     """检索器基类"""
     def __init__(self, store, llm, **kwargs):
         self.store = store
         self.llm = llm
+        logger.info(f'检索器所使用的Embed模型：{self.llm}')
 
     def create_retriever(self):
         """创建检索器，子类需要实现这个方法"""

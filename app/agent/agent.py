@@ -14,8 +14,12 @@ class AgentSql:
         self.llm = llm
         self.embed = embed
 
+        logger.info(f"""初始化 SQL agent:
+                    Agent所使用LLM模型：{self.llm}
+                    Agent所使用Embed模型：{self.embed}
+                    """)
         """连接本地数据库"""
-        print(f"连接数据库: {sql_path}")
+        logger.info(f'连接的Sqlite数据库地址：{sql_path}')
         self.db = SQLDatabase.from_uri(f"sqlite:///{sql_path}")
         self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
         self.tools = self.toolkit.get_tools() # 工具
@@ -64,7 +68,10 @@ class AgentSql:
                 result_list.append(event["messages"][-1].content)
             
             final_result = event["messages"][-1].content if result_list else None
-            logger.info(f"查询过程: {result_list}")
+            logger.info(f'查询过程：')
+            for presult in result_list:
+                logger.info(f'【agent】: {presult}')
+
             logger.info(f"最终结果: {final_result}")
             return final_result, result_list
         except Exception as e:

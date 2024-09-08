@@ -4,7 +4,8 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
 from .retrievers import SimpleRetriever
-from .vector_db import ChromaDB, MilvusDB  # 导入 VectorDB 子类
+from .vector_db import ChromaDB  # 导入 VectorDB 子类
+from .elasticsearch_db import TraditionDB
 from utils.logger_config import LoggerManager
 import settings
 
@@ -14,11 +15,14 @@ logger = LoggerManager().logger
 class RagManager:
     def __init__(self,
                  vector_db_class=ChromaDB,          # 默认使用 ChromaDB
+                 es_db=TraditionDB,
                  db_config=None,                    # 数据库配置参数
                  llm=None, embed=None,
                  retriever_cls=SimpleRetriever, **retriever_kwargs):
         self.llm = llm
         self.embed = embed
+        logger.info(f'初始化llm大模型：{self.llm}')
+        logger.info(f'初始化embed模型：{self.embed}')
 
         # 如果没有提供 db_config，使用默认配置
         if db_config is None:
@@ -29,6 +33,8 @@ class RagManager:
                 "persist_path": settings.CHROMA_PERSIST_DB_PATH,
                 "collection_name": settings.CHROMA_COLLECTION_NAME
             }
+            logger.info(f'初始化向量数据库配置：{db_config}')
+        
         # 创建向量数据库实例
         self.vector_db = vector_db_class(**db_config, embed=self.embed)
         self.store = self.vector_db.get_store()

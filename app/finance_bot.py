@@ -49,6 +49,7 @@ class FinanceBot:
             }
 
             self.rag = RagManager(vector_db_class=MilvusDB, db_config=db_config, llm=self.llm, embed=self.embed)
+        logger.info(f'初始化程序框架：Finance')
 
     def init_recognition(self, base_url, api_key, model):
         """
@@ -64,6 +65,7 @@ class FinanceBot:
                         temperature=0.01,
                         max_tokens=512
                         )
+        logger.info(f'连接意图识别大模型：base_url:{base_url}，model={model}')
         # 测试连接
         try:
             # 发送一个简单的消息

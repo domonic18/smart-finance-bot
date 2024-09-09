@@ -4,11 +4,11 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 # 设置 Python 脚本的路径
-PYTHON_SCRIPT="$SCRIPT_DIR/../app/entroy.py"
+PYTHON_SCRIPT="$SCRIPT_DIR/../app/entrypoint.py"
 
-# 调用 entroy.py，传入参数
-echo "Running entroy.py to renametables to DB..."
+# 调用 entrypoint.py，传入参数
+echo "Running entrypoint.py to renametables to DB..."
 python "$PYTHON_SCRIPT" --job renametables
 
-echo "Running entroy.py to addindexes to DB..."
+echo "Running entrypoint.py to addindexes to DB..."
 python "$PYTHON_SCRIPT" --job addindexes

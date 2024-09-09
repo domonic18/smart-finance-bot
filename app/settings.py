@@ -134,7 +134,7 @@ SQLDATABASE_URI = os.path.join(root_directory, "dataset", "dataset", "博金杯�
 ES数据库相关的配置
 """
 # 默认不使用ES服务
-ELASTIC_ENABLE_USE = False
+ELASTIC_ENABLE_USE = True
 ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD", "123abc")
 ELASTIC_HOST = os.getenv("ELASTIC_HOST", "175.27.143.233")
 ELASTIC_PORT = os.getenv("ELASTIC_PORT", 9200)

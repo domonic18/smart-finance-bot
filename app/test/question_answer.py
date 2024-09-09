@@ -127,10 +127,12 @@ class TestQuestion():
 
             # 更新进度
             self.update_progress(i + 1)
-        try:
-            with open(file=file_path, mode='a', encoding='utf-8') as f:
-                json_line = json.dumps(data_out, ensure_ascii=False)
-                f.write(json_line + "\n")
+            try:
+                with open(file=file_path, mode='a', encoding='utf-8') as f:
+                    json_line = json.dumps(data_out, ensure_ascii=False)
+                    f.write(json_line + "\n")
 
-        except Exception as e:
-            logger.error(f"Error writing to file: {e}")
+            except Exception as e:
+                logger.error(f"Error writing to file: {e}")
+
+        logger.info(f"测试用例 从起始 {self.test_case_start} 到 {self.test_case_end - 1} 执行完毕.")

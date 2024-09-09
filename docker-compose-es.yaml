@@ -98,16 +98,16 @@ services:
       memlock:
         soft: -1
         hard: -1
-    command: >
-      bash -c '
-        if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
-          echo "Installing IK Analyzer plugin";
-          bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
-        fi;
-        /usr/local/bin/docker-entrypoint.sh
-      '
+    # command: >
+    #   bash -c '
+    #     if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
+    #       echo "Installing IK Analyzer plugin";
+    #       bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
+    #     fi;
+    #     /usr/local/bin/docker-entrypoint.sh
+    #   '
     networks:
-        - smart_bot_network
+        - es_network
     healthcheck:
       test:
         [
@@ -152,16 +152,16 @@ services:
       memlock:
         soft: -1
         hard: -1
-    command: >
-      bash -c '
-        if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
-          echo "Installing IK Analyzer plugin";
-          bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
-        fi;
-        /usr/local/bin/docker-entrypoint.sh
-      '
+    # command: >
+    #   bash -c '
+    #     if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
+    #       echo "Installing IK Analyzer plugin";
+    #       bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
+    #     fi;
+    #     /usr/local/bin/docker-entrypoint.sh
+    #   '
     networks:
-        - smart_bot_network
+        - es_network
     healthcheck:
       test:
         [
@@ -206,16 +206,16 @@ services:
       memlock:
         soft: -1
         hard: -1
-    command: >
-      bash -c '
-        if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
-          echo "Installing IK Analyzer plugin";
-          bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
-        fi;
-        /usr/local/bin/docker-entrypoint.sh
-      '
+    # command: >
+    #   bash -c '
+    #     if ! bin/elasticsearch-plugin list | grep -q "analysis-ik"; then
+    #       echo "Installing IK Analyzer plugin";
+    #       bin/elasticsearch-plugin install --batch https://github.com/infinilabs/analysis-ik/releases/download/v8.11.4/elasticsearch-analysis-ik-8.11.4.zip;
+    #     fi;
+    #     /usr/local/bin/docker-entrypoint.sh
+    #   '
     networks:
-        - smart_bot_network
+        - es_network
     healthcheck:
       test:
         [
@@ -241,7 +241,7 @@ services:
       - ./docker/elasticsearch/certs:/usr/share/kibana/config/certs
       - ./docker/elasticsearch/kibanadata:/usr/share/kibana/data
     networks:
-        - smart_bot_network
+        - es_network
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -278,5 +278,5 @@ volumes:
     driver: local
 
 networks:
-  smart_bot_network:
-
+  es_network:
+    driver: bridge

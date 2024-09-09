@@ -11,13 +11,11 @@ from utils.util import get_zhipu_embeddings
 from utils.util import get_zhipu_chat_model
 
 """
-大模型相关的配置
+连接大模型
+如果想更换模型，在配置中进行相应修改即可
 """
-
-# 连接大模型
-# 如果想更换模型，在配置中进行相应修改即可
 # ---------------------------------------------------------------------------------------------------------------------
-
+"""
 # 阿里千问系列模型
 # 默认使用qwen-max模型
 #   模型调用-输入:0.04/text_token（千个）
@@ -25,11 +23,13 @@ from utils.util import get_zhipu_chat_model
 # qwen-long模型
 #   模型调用-输入:0.0005/text_token（千个）
 #   模型调用-输出:0.002/text_token（千个）
-
+"""
 LLM = get_qwen_models(model="qwen-max")[0]
 CHAT = get_qwen_models(model="qwen-max")[1]
+EMBED = get_qwen_embeddings()
 
 # ---------------------------------------------------------------------------------------------------------------------
+"""
 # 百度文心一言系列模型
 # 默认模型：ERNIE-Bot-turbo
 #  免费
@@ -44,8 +44,9 @@ CHAT = get_qwen_models(model="qwen-max")[1]
 # LLM = get_ernie_models()[0]
 # CHAT = get_ernie_models()[1]
 # EMBED = get_erine_embeddings()
-
+"""
 # ---------------------------------------------------------------------------------------------------------------------
+"""
 # 智普对话模型
 # 活动：注册送500万tokens, 新客专享充值99元 1000万tokens
 # GLM-4-Plus模型
@@ -53,34 +54,44 @@ CHAT = get_qwen_models(model="qwen-max")[1]
 # GLM-4-Air模型
 #   单价：0.001 元 / 千tokens
 #   Batch API 定价：0.0005元 / 千tokens
-
+"""
 # LLM = get_zhipu_models(model="glm-4-plus")
 # CHAT = get_zhipu_models(model="glm-4-flash")
 # EMBED = get_zhipu_embeddings(model="embedding-3")
 
+"""
+# 智普自主搭建的模型
+"""
 SERVER_URL_BGE_CHAT = "http://sy-direct.virtaicloud.com:42796/v1"
 MODEL_UID_BGE_CHAT = "glm-4-9b-chat"
 # CHAT = get_zhipu_chat_model()
 
 # ---------------------------------------------------------------------------------------------------------------------
-# 使用Qwen的embedding
-EMBED = get_qwen_embeddings()
 
+"""
 # 使用智普bge-m3的向量化模型
 #  本地部署：免费
+"""
 SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:49173"
 MODEL_UID_BGE = "bge-m3"
 # EMBED = get_bge_embeddings()
 
+"""
 # 使用网易的bce for rag向量化模型
 #  本地部署：免费
-
+"""
 SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:49173"
 MODEL_UID_BCE = "bce-embedding-base_v1"
 # EMBED = get_bce_embeddings()
 
-# 使用Huggingface的embedding
-# EMBED = get_huggingface_embeddings()
+"""
+# 意图识别问答模型的配置
+"""
+BASE_URL = "http://direct.virtaicloud.com:45181/v1"
+API_KEY = "EMPTY"
+MODEL = "Qwen2_7B-chat-sft2"
+
+# ---------------------------------------------------------------------------------------------------------------------
 
 """
 Chroma向量数据库使用时的相关的配置
@@ -109,10 +120,6 @@ MILVUS_COLLECTION_NAME = "langchain"
 """
 本地SQLite数据库相关的配置
 """
-# 连接数据库db文件的地址根据需要需要更换
-# SQLDATABASE_URI = os.path.join(os.getcwd(), "dataset/dataset/博金杯比赛数据.db")
-import os
-
 # 获取当前文件的绝对路径
 current_file_path = os.path.abspath(__file__)
 
@@ -123,16 +130,11 @@ root_directory = os.path.dirname(os.path.dirname(current_file_path))
 SQLDATABASE_URI = os.path.join(root_directory, "dataset", "dataset", "博金杯比赛数据.db")
 
 
-# 意图识别问答模型的配置
-BASE_URL = "http://direct.virtaicloud.com:45181/v1"
-API_KEY = "EMPTY"
-MODEL = "Qwen2_7B-chat-sft2"
-
 """
 ES数据库相关的配置
 """
 ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD", "123abc")
-ELASTIC_HOST = os.getenv("ELASTIC_HOST", "localhost")
+ELASTIC_HOST = os.getenv("ELASTIC_HOST", "175.27.143.233")
 ELASTIC_PORT = os.getenv("ELASTIC_PORT", 9200)
 ELASTIC_SCHEMA = "https"
-ELASTIC_INDEX_NAME = "demo_index0"
+ELASTIC_INDEX_NAME = "smart_bot_index"

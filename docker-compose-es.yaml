@@ -55,7 +55,7 @@ services:
         echo "All done!";
       '
     networks:
-        - smart_bot_network
+        - es_network
     healthcheck:
       test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
       interval: 1s

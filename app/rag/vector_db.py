@@ -1,11 +1,10 @@
 import chromadb
-from chromadb import Settings
 from langchain_chroma import Chroma
-from pymilvus import MilvusClient
 from langchain_community.vectorstores.milvus import Milvus
 from utils.logger_config import LoggerManager
 
 logger = LoggerManager().logger
+
 
 class VectorDB:
     def add_with_langchain(self, docs):
@@ -19,7 +18,8 @@ class VectorDB:
         获得向量数据库的对象实例
         """
         raise NotImplementedError("Subclasses should implement this method!")
-    
+
+
 class ChromaDB(VectorDB):
     def __init__(self,
                  chroma_server_type="local",
@@ -49,11 +49,9 @@ class ChromaDB(VectorDB):
 
         if self.store is None:
             raise ValueError("Chroma store init failed!")
-        
+
         logger.info(f'Chroma数据库的Collectname：{collection_name}')
         logger.info(f'Chroma数据库所使用的embed模型：{self.embed}')
-
-
 
     def add_with_langchain(self, docs):
         self.store.add_documents(documents=docs)

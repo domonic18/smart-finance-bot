@@ -4,14 +4,18 @@ from langgraph.prebuilt import create_react_agent
 from langchain.tools.retriever import create_retriever_tool
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits import SQLDatabaseToolkit
-from rag.rag import RagManager
-from rag.vector_db import ChromaDB, MilvusDB
-from utils.logger_config import LoggerManager
 from langchain_core.prompts import SystemMessagePromptTemplate
 from langchain_core.prompts import HumanMessagePromptTemplate
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
-from rag.retrievers import ElasticsearchRetriever
+from utils.logger_config import LoggerManager
+from rag.vector_db import ChromaDB
+from rag.vector_db import MilvusDB
+from rag.rag import RagManager
+from typing import TypedDict, Annotated, List, Union
+from langchain_core.agents import AgentAction, AgentFinish
+from langchain_core.messages import BaseMessage
+import operator
 
 logger = LoggerManager().logger
 
@@ -26,24 +30,20 @@ def get_datetime() -> str:
 
     return formatted_date
 
-from typing import TypedDict, Annotated, List, Union
-from langchain_core.agents import AgentAction, AgentFinish
-from langchain_core.messages import BaseMessage
-import operator
-
 
 class AgentState(TypedDict):
-   # The input string
-   input: str
-   # The list of previous messages in the conversation
-   chat_history: list[BaseMessage]
-   # The outcome of a given call to the agent
-   # Needs `None` as a valid type, since this is what this will start as
-   agent_outcome: Union[AgentAction, AgentFinish, None]
-   # List of actions and corresponding observations
-   # Here we annotate this with `operator.add` to indicate that operations to
-   # this state should be ADDED to the existing values (not overwrite it)
-   intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+    # The input string
+    input: str
+    # The list of previous messages in the conversation
+    chat_history: list[BaseMessage]
+    # The outcome of a given call to the agent
+    # Needs `None` as a valid type, since this is what this will start as
+    agent_outcome: Union[AgentAction, AgentFinish, None]
+    # List of actions and corresponding observations
+    # Here we annotate this with `operator.add` to indicate that operations to
+    # this state should be ADDED to the existing values (not overwrite it)
+    intermediate_steps: Annotated[list[tuple[AgentAction, str]], operator.add]
+
 
 class FinanceBotEx:
     def __init__(self, llm=settings.LLM, chat=settings.CHAT, embed=settings.EMBED, vector_db_type='chroma'):
@@ -55,7 +55,7 @@ class FinanceBotEx:
         if vector_db_type.lower() == 'chroma':
             # 使用示例
             db_config = {
-                "chroma_server_type": settings.CHROMA_SERVER_TYPE,  
+                "chroma_server_type": settings.CHROMA_SERVER_TYPE,
                 "host": settings.CHROMA_HOST,
                 "port": settings.CHROMA_PORT,
                 "persist_path": settings.CHROMA_PERSIST_DB_PATH,
@@ -74,7 +74,6 @@ class FinanceBotEx:
 
             self.rag = RagManager(vector_db_class=MilvusDB, db_config=db_config, llm=self.llm, embed=self.embed)
 
-
         self.agent_executor = self.init_agent()
         logger.info(f'初始化程序框架：FinanceEx')
 
@@ -82,7 +81,7 @@ class FinanceBotEx:
         # 给大模型 RAG 检索器工具
         # retriever = self.rag.get_retriever()
         retriever = self.rag.retriever_instance.create_retriever()
-        
+
         retriever_tool = create_retriever_tool(
             retriever=retriever,
             name="rag_search",
@@ -183,7 +182,7 @@ class FinanceBotEx:
                 logger.info(event["messages"][-1].pretty_print())
 
                 result_list.append(event["messages"][-1].content)
-            
+
             final_result = event["messages"][-1].content if result_list else None
             logger.info(f'查询过程：')
             for presult in result_list:
@@ -193,9 +192,7 @@ class FinanceBotEx:
         except Exception as e:
             logger.error(f"处理查询时出错: {e}")
             raise e
-        
 
-    
     def create_agent(self):
         """
         使用langgraph创建Agent，该函数还未启用
@@ -203,7 +200,7 @@ class FinanceBotEx:
         from langchain.agents.format_scratchpad import format_to_openai_functions
         from langchain.prompts import MessagesPlaceholder, ChatPromptTemplate
         from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
-        from langchain.tools.render import format_tool_to_openai_function 
+        from langchain.tools.render import format_tool_to_openai_function
         from langchain_core.output_parsers import StrOutputParser
 
         sys_msg = SystemMessagePromptTemplate.from_template(template=self.create_sys_prompt())
@@ -211,13 +208,13 @@ class FinanceBotEx:
             问题：{input}
         """)
         messages = [sys_msg, user_msg]
-        prompt = ChatPromptTemplate.from_messages(messages=messages) 
+        prompt = ChatPromptTemplate.from_messages(messages=messages)
 
-        retriever_tool = self.init_rag_tools()  
+        retriever_tool = self.init_rag_tools()
         sql_tools = self.init_sql_tool(settings.SQLDATABASE_URI)
 
-        tools = [ retriever_tool] + sql_tools
-        
+        tools = [retriever_tool] + sql_tools
+
         llm_with_tools = self.chat.bind(
             functions=[format_tool_to_openai_function(t) for t in tools]
         )
@@ -227,13 +224,12 @@ class FinanceBotEx:
         #     "agent_scratchpad": lambda x: format_to_openai_functions(x['intermediate_steps']),
         #     # "chat_history": lambda x: x["chat_history"]
         # } | prompt | llm_with_tools | OpenAIFunctionsAgentOutputParser()
-        
 
         # 使用代理
         from langchain.agents import AgentExecutor
         # agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
         # agent_executor.invoke({"input": "关于color有多少个字母?"})
-        
+
         # 创建Agent
         agent_executor = create_react_agent(
             self.chat,

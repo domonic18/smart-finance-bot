@@ -10,6 +10,7 @@ from utils.logger_config import LoggerManager
 
 logger = LoggerManager().logger
 
+
 class PDFProcessor:
     def __init__(self, directory, db_type='vector', **kwargs):
         """
@@ -43,10 +44,11 @@ class PDFProcessor:
         elif db_type == 'es':
             self.vector_db = None
             self.es_client = kwargs.get('es_client')  # Elasticsearch 客户端
-            
+
             logger.info(f'导入的目标数据库为：ES数据库')
         else:
             raise ValueError("db_type must be either 'vector' or 'es'.")
+
     def load_pdf_files(self):
         """
         加载目录下的所有PDF文件

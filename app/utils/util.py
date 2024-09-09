@@ -20,8 +20,6 @@ from langchain_community.chat_models import ChatBaichuan
 from langchain_community.chat_models import ChatZhipuAI
 from langchain_community.embeddings import ZhipuAIEmbeddings
 
-
-
 # 获取当前文件的目录
 current_dir = os.path.dirname(__file__)
 
@@ -59,8 +57,8 @@ def get_qwen_models(model="qwen-max"):
 
     chat = ChatTongyi(model=model, temperature=0.01, top_p=0.2, max_tokens=1024)
 
-
     return llm, chat
+
 
 def get_ernie_models(model="ERNIE-Bot-turbo"):
     """
@@ -68,10 +66,11 @@ def get_ernie_models(model="ERNIE-Bot-turbo"):
     """
 
     llm = QianfanLLMEndpoint(model=model, temperature=0.1, top_p=0.2)
-    
+
     chat = QianfanChatEndpoint(model=model, top_p=0.2, temperature=0.1)
 
     return llm, chat
+
 
 def get_erine_embeddings(model="bge-large-zh"):
     """
@@ -81,6 +80,7 @@ def get_erine_embeddings(model="bge-large-zh"):
 
     return embeddings
 
+
 def get_qwen_embeddings(model="text-embedding-v3"):
     """
     加载千问系列嵌入模型
@@ -88,6 +88,7 @@ def get_qwen_embeddings(model="text-embedding-v3"):
     embeddings = DashScopeEmbeddings(model=model)
 
     return embeddings
+
 
 def get_huggingface_embeddings(model_name="bert-base-chinese"):
     """
@@ -99,23 +100,27 @@ def get_huggingface_embeddings(model_name="bert-base-chinese"):
 
     return embeddings
 
+
 def get_bge_embeddings():
-    server_url=settings.SERVER_URL_BGE
-    model_uid=settings.MODEL_UID_BGE
+    server_url = settings.SERVER_URL_BGE
+    model_uid = settings.MODEL_UID_BGE
 
     embed = XinferenceEmbeddings(server_url=server_url, model_uid=model_uid)
     return embed
+
 
 def get_bce_embeddings():
-    server_url=settings.SERVER_URL_BCE
-    model_uid=settings.MODEL_UID_BCE
+    server_url = settings.SERVER_URL_BCE
+    model_uid = settings.MODEL_UID_BCE
 
     embed = XinferenceEmbeddings(server_url=server_url, model_uid=model_uid)
     return embed
+
 
 def get_zhipu_embeddings(model="embedding-2"):
     embed = ZhipuAIEmbeddings(model=model)
     return embed
+
 
 def get_zhipu_models(model="glm-4-plus"):
     """
@@ -129,6 +134,7 @@ def get_zhipu_models(model="glm-4-plus"):
 
     return zhipuai_chat
 
+
 def get_baichuan_chat(model="Baichuan4"):
     """
     加载百川大模型
@@ -138,14 +144,15 @@ def get_baichuan_chat(model="Baichuan4"):
 
     return chat
 
+
 def get_zhipu_chat_model():
     # 使用OpenAI的Chat模型连接
     from langchain_openai import ChatOpenAI
 
     # 连接大模型
     chat = ChatOpenAI(base_url=settings.SERVER_URL_BGE_CHAT,
-                      model=settings.MODEL_UID_BGE_CHAT, 
+                      model=settings.MODEL_UID_BGE_CHAT,
                       temperature=0.01, max_tokens=512,
-                      api_key="xxxx",)
+                      api_key="xxxx", )
 
     return chat

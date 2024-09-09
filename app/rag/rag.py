@@ -12,11 +12,12 @@ import settings
 # 配置日志记录
 logger = LoggerManager().logger
 
+
 class RagManager:
     def __init__(self,
-                 vector_db_class=ChromaDB,          # 默认使用 ChromaDB
+                 vector_db_class=ChromaDB,  # 默认使用 ChromaDB
                  es_db=TraditionDB,
-                 db_config=None,                    # 数据库配置参数
+                 db_config=None,  # 数据库配置参数
                  llm=None, embed=None,
                  retriever_cls=SimpleRetriever, **retriever_kwargs):
         self.llm = llm
@@ -34,14 +35,13 @@ class RagManager:
                 "collection_name": settings.CHROMA_COLLECTION_NAME
             }
             logger.info(f'初始化向量数据库配置：{db_config}')
-        
+
         # 创建向量数据库实例
         self.vector_db = vector_db_class(**db_config, embed=self.embed)
         self.store = self.vector_db.get_store()
 
         self.retriever_instance = retriever_cls(self.store, self.llm, **retriever_kwargs)
         logger.info(f'使用的检索器类: {retriever_cls.__name__}')
-
 
     def get_chain(self, retriever):
         """获取RAG查询链"""
@@ -77,7 +77,7 @@ class RagManager:
             logger.info(f"资料文件分别是:\n{retrieved_files}")
         except Exception as e:
             logger.info(f"处理查询时没有找到source字段: {e}")
-        
+
         logger.info(f"检索到资料文件个数：{len(docs)}")
 
         return retrieved_content
@@ -86,7 +86,7 @@ class RagManager:
         """获取RAG查询结果"""
         retriever = self.retriever_instance.create_retriever()
         rag_chain = self.get_chain(retriever)
-        
+
         try:
             result = rag_chain.invoke(input=question)
             logger.info(f"RAG查询结果：{result}")

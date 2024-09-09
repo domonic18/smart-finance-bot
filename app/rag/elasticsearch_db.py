@@ -15,11 +15,12 @@ import settings
 from utils.logger_config import LoggerManager
 
 import warnings
+
 warnings.simplefilter("ignore")  # 屏蔽 ES 的一些Warnings
 nltk.download('stopwords')
 
-
 logger = LoggerManager().logger
+
 
 class TraditionDB:
     def add_documents(self, docs):
@@ -34,6 +35,7 @@ class TraditionDB:
         """
         raise NotImplementedError("Subclasses should implement this method!")
 
+
 class ElasticsearchDB(TraditionDB):
     def __init__(self,
                  schema=settings.ELASTIC_SCHEMA,
@@ -41,12 +43,11 @@ class ElasticsearchDB(TraditionDB):
                  port=settings.ELASTIC_PORT,
                  index_name=settings.ELASTIC_INDEX_NAME,
                  k=3
-                #  docs=docs
+                 #  docs=docs
                  ):
-        #定义索引名称
+        # 定义索引名称
         self.index_name = index_name
         self.k = k
-
 
         try:
             url = f"{schema}://elastic:{settings.ELASTIC_PASSWORD}@{host}:{port}"
@@ -69,7 +70,7 @@ class ElasticsearchDB(TraditionDB):
             logger.error(f'异常类型: {type(e).__name__}')  # 记录异常类型
             raise
 
-    def to_keywords(self,input_string):
+    def to_keywords(self, input_string):
         """将句子转成检索关键词序列"""
         # 按搜索引擎模式分词
         word_tokens = jieba.cut_for_search(input_string)
@@ -78,8 +79,8 @@ class ElasticsearchDB(TraditionDB):
         # 去除停用词
         filtered_sentence = [w for w in word_tokens if not w in stop_words]
         return ' '.join(filtered_sentence)
-    
-    def sent_tokenize(self,input_string):
+
+    def sent_tokenize(self, input_string):
         """按标点断句,没有用到"""
         # 按标点切分
         sentences = re.split(r'(?<=[。！？；?!])', input_string)
@@ -90,9 +91,9 @@ class ElasticsearchDB(TraditionDB):
         """如果索引不存在，则创建索引"""
         if not self.es.indices.exists(index=self.index_name):
             # 创建索引
-            self.es.indices.create(index=self.index_name,ignore=400)
+            self.es.indices.create(index=self.index_name, ignore=400)
 
-    def bluk_data(self,paragraphs):
+    def bluk_data(self, paragraphs):
         """批量进行数据灌库"""
         # 灌库指令
         actions = [
@@ -111,10 +112,10 @@ class ElasticsearchDB(TraditionDB):
         # time.sleep(2)
 
     def flush(self):
-        #刷新数据,数据入库完成以后刷新数据
+        # 刷新数据,数据入库完成以后刷新数据
         self.es.indices.flush()
-        
-    def search(self,query_string):
+
+    def search(self, query_string):
         """关键词检索"""
         # ES 的查询语言
         search_query = {
@@ -129,7 +130,7 @@ class ElasticsearchDB(TraditionDB):
         """如果索引存在，则删除索引"""
         if self.es.indices.exists(index=self.index_name):
             # 创建索引
-            self.es.indices.delete(index=self.index_name,ignore=400)
+            self.es.indices.delete(index=self.index_name, ignore=400)
 
     def add_documents(self, docs):
         self.bluk_data(docs)

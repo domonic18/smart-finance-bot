@@ -5,6 +5,7 @@ from utils.logger_config import LoggerManager
 
 logger = LoggerManager().logger
 
+
 # 测试Agent主流程
 def test_agent():
     from agent.agent import AgentSql
@@ -13,13 +14,13 @@ def test_agent():
     sql_path = settings.SQLDATABASE_URI
     agent = AgentSql(sql_path=sql_path, llm=chat, embed=embed)
 
-
     example_query = "请帮我查询出20210415日，建筑材料一级行业涨幅超过5%（不包含）的股票数量"
 
     result, result_list = agent.get_result(example_query)
 
     print(result)
     print(result_list)
+
 
 # 测试RAG主流程
 def test_rag():
@@ -41,26 +42,27 @@ def test_rag():
     rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed,
                              etriever_cls=SimpleRetriever)
 
-
-    example_query = "湖南长远锂科股份有限公司"
+    # example_query = "湖南长远锂科股份有限公司"
     example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
 
     result = rag_manager.get_result(example_query)
 
     print(result)
 
+
 # 测试导入PDF到向量库主流程
 def test_import_vector_db():
     from rag.pdf_processor import PDFProcessor
-    from rag.vector_db import ChromaDB, MilvusDB
-    from rag.vector_db import VectorDB
+    from rag.vector_db import ChromaDB
+    # from rag.vector_db import MilvusDB
+    # from rag.vector_db import VectorDB
     llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
 
     # 导入文件的文件目录
     directory = "./dataset/pdf"
 
     db_config = {
-        "chroma_server_type": "local",  
+        "chroma_server_type": "local",
         "host": settings.CHROMA_HOST,
         "port": settings.CHROMA_PORT,
         "persist_path": "chroma_db",
@@ -78,8 +80,9 @@ def test_import_vector_db():
     # 处理 PDF 文件
     pdf_processor.process_pdfs()
 
+
 def test_import_elasticsearch():
-    from rag.elasticsearch_db import TraditionDB
+    # from rag.elasticsearch_db import TraditionDB
     from rag.elasticsearch_db import ElasticsearchDB
     from rag.pdf_processor import PDFProcessor
 
@@ -91,14 +94,15 @@ def test_import_elasticsearch():
     # 创建 Elasticsearch 数据库实例
     es_db = ElasticsearchDB()
 
-        # 创建 PDFProcessor 实例
+    # 创建 PDFProcessor 实例
     pdf_processor = PDFProcessor(directory=directory,
                                  db_type="es",
                                  es_client=es_db,
                                  embed=embed)
-    
+
     # 处理 PDF 文件
     pdf_processor.process_pdfs()
+
 
 # 测试 FinanceBot主流程
 def test_financebot():
@@ -113,6 +117,7 @@ def test_financebot():
 
     print(final_result)
 
+
 # 测试 FinanceBotEx 主流程
 def test_financebot_ex():
     from finance_bot_ex import FinanceBotEx
@@ -121,7 +126,6 @@ def test_financebot_ex():
 
     # 使用milvus 的向量库
     # financebot = FinanceBotEx(vector_db_type='milvus')
-
 
     # example_query = "现在几点了？"
     # example_query = "湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？"
@@ -132,14 +136,16 @@ def test_financebot_ex():
 
     financebot.handle_query(example_query)
 
+
 def test_answer_question():
     from test.question_answer import TestQuestion
     current_path = os.getcwd()
 
-    input_file_path = os.path.join(current_path, "dataset/question.json")
+    input_file_path = os.path.join(current_path, "dataset/复测用例.json")
 
-    test_question = TestQuestion(input_file_path, test_case_start=45, test_case_end=46)
+    test_question = TestQuestion(input_file_path, test_case_start=0, test_case_end=2)
     test_question.run_cases()
+
 
 def test_llm_api():
     from utils.util import get_qwen_models
@@ -163,17 +169,17 @@ def test_llm_api():
     print(chat.invoke(input="你好"))
     # print(embed.embed_query(text="你好"))
 
+
 def test_chroma_connect():
     import chromadb
-    from chromadb import Settings
     from langchain_chroma import Chroma
 
     client = chromadb.HttpClient(host='localhost', port=8000)
 
     store = Chroma(collection_name='langchain',
                    persist_directory='chroma_db',
-                        embedding_function=settings.EMBED,
-                        client=client)
+                   embedding_function=settings.EMBED,
+                   client=client)
     # 增加时间戳
     logger.info(f"Start searching at {datetime.datetime.now()}")
     query = "安徽黄山胶囊有限公司"
@@ -181,19 +187,19 @@ def test_chroma_connect():
     logger.info(f"End searching at {datetime.datetime.now()}")
     # 打印结果
     for doc in docs:
-        logger.info("="*100)
+        logger.info("=" * 100)
         logger.info(doc.page_content)
 
     logger.info(f'检索文档个数：{len(docs)}')
-# 测试Milvus的基础使用方法
+
+
 def test_milvus_connect():
     from langchain_community.document_loaders import PyMuPDFLoader
     from langchain_text_splitters import RecursiveCharacterTextSplitter
     from rag.vector_db import MilvusDB
 
-
     mdb = MilvusDB(collection_name="LangChainCollectionImportTest", embed=settings.EMBED)
-    
+
     pdf_path = os.path.join(os.getcwd(), "dataset/pdf/0b46f7a2d67b5b59ad67cafffa0e12a9f0837790.pdf")
 
     pdf_loader = PyMuPDFLoader(file_path=pdf_path)
@@ -216,7 +222,7 @@ def test_milvus_connect():
     for i in range(0, len(docs), batch_size):
         batch = docs[i:i + batch_size]  # 获取当前批次的样本
         # mdb.add_with_langchain(docs=batch)  # 入库
-    
+
     # 查询
     # 增加时间戳
     logger.info(f"Start searching at {datetime.datetime.now()}")
@@ -226,16 +232,22 @@ def test_milvus_connect():
     logger.info(f"End searching at {datetime.datetime.now()}")
     # 打印结果
     for doc in docs:
-        logger.info("="*100)
+        logger.info("=" * 100)
         logger.info(doc.page_content)
 
     logger.info(f'检索文档个数：{len(docs)}')
 
+
 def test_clean_test_result():
     import json
     # 读取json文件
-    test_file_path = os.path.join(os.getcwd(), "test_result/测试结果汇总/TestPlan_embed_bge_chat_glmlong_0_405_financebotex_by_dongming/answer_id_0_999.json")
-    test_file_save_path = os.path.join(os.getcwd(), "test_result/测试结果汇总/TestPlan_embed_bge_chat_glmlong_0_405_financebotex_by_dongming/answer_id_0_999_clean.json")
+    test_file_path = os.path.join(os.getcwd(),
+                                  "test_result/测试结果汇总/TestPlan_embed_bge_chat_glmlong_0_405_financebotex_by_dongming"
+                                  "/answer_id_0_999.json")
+    test_file_save_path = os.path.join(os.getcwd(),
+                                       "test_result"
+                                       "/测试结果汇总/TestPlan_embed_bge_chat_glmlong_0_405_financebotex_by_dongming"
+                                       "/answer_id_0_999_clean.json")
 
     data_to_write = []
 
@@ -258,6 +270,7 @@ def test_clean_test_result():
 
     pass
 
+
 def test_es_connect():
     from elasticsearch import Elasticsearch
 
@@ -267,7 +280,7 @@ def test_es_connect():
     port = 9200
     schema = "https"
     # url = f"{schema}://{host}:{port}"
-    url = f"{schema}://elastic:123abc@{host}:{port}"
+    url = f"{schema}://elastic:{ELASTIC_PASSWORD}@{host}:{port}"
 
     # Create the client instance
     client = Elasticsearch(
@@ -279,6 +292,7 @@ def test_es_connect():
 
     # Successful response!
     print(client.info())
+
 
 def test_es_add():
     from langchain_community.document_loaders import PyMuPDFLoader
@@ -302,22 +316,22 @@ def test_es_add():
     )
     docs = text_splitter.split_documents(documents)
 
-    #将所有文本进行切割
+    # 将所有文本进行切割
     def splitFiles(docs):
         paragraphs = []
         for i in range(len(docs)):
             paragraphs.append(text_splitter.create_documents([docs[i].page_content]))
         return paragraphs
-    
 
     paragraphs = splitFiles(docs)
 
     es_client = ElasticsearchDB()
-    
-    #数据入库，完成后刷新
+
+    # 数据入库，完成后刷新
     for docs in paragraphs:
         es_client.bluk_data(docs)
     es_client.flush()
+
 
 def test_es_search():
     from rag.retrievers import ElasticsearchRetriever
@@ -335,11 +349,10 @@ def test_es_search():
         "persist_path": "chroma_db",
         "collection_name": "langchaintest",
     }
- 
+
     # 多查询检索器
     rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed,
                              etriever_cls=es_retriever)
-
 
     example_query = "湖南长远锂科股份有限公司"
     example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
@@ -364,6 +377,3 @@ if __name__ == "__main__":
     test_answer_question()
     # test_clean_test_result()
     # test_es_search()
-
-
-

@@ -8,8 +8,9 @@ from utils.logger_config import LoggerManager
 
 logger = LoggerManager().logger
 
+
 class AgentSql:
-    
+
     def __init__(self, sql_path, llm, embed):
         self.llm = llm
         self.embed = embed
@@ -22,7 +23,7 @@ class AgentSql:
         logger.info(f'连接的Sqlite数据库地址：{sql_path}')
         self.db = SQLDatabase.from_uri(f"sqlite:///{sql_path}")
         self.toolkit = SQLDatabaseToolkit(db=self.db, llm=self.llm)
-        self.tools = self.toolkit.get_tools() # 工具
+        self.tools = self.toolkit.get_tools()  # 工具
         self.SQL_PREFIX = """You are an agent designed to interact with a SQL database.
             Given an input question, create a syntactically correct SQLite query to run, then look at the results of the query and return the answer.
             Unless the user specifies a specific number of examples they wish to obtain, always limit your query to at most 5 results.
@@ -41,7 +42,7 @@ class AgentSql:
             如果所有表中都没有查询到相关的信息，就停止查询，返回没有查询到结果即可。
             如果生成的SQL语句中，字段带有英文括号()，请使用双引号包裹起来，例如：收盘价(元) 双引号包裹为 "收盘价(元)"。
             如果查询过程中SQL语句有语法错误，减少查询量,总体查询次数应控制在15次以内。"""
-        
+
         self.system_message = SystemMessage(content=self.SQL_PREFIX)
         self.agent_executor = create_react_agent(self.llm, self.tools, state_modifier=self.system_message)
 
@@ -51,7 +52,7 @@ class AgentSql:
 
     def get_result(self, input):
         """查询 Agent"""
-        
+
         example_query = input
         logger.info(f"查询输入: {example_query}")
         try:
@@ -59,14 +60,14 @@ class AgentSql:
                 {"messages": [("user", example_query)]},
                 stream_mode="values",
             )
-            
+
             result_list = []
 
             for event in events:
                 logger.info(event["messages"][-1].pretty_print())
 
                 result_list.append(event["messages"][-1].content)
-            
+
             final_result = event["messages"][-1].content if result_list else None
             logger.info(f'查询过程：')
             for presult in result_list:
@@ -77,5 +78,3 @@ class AgentSql:
         except Exception as e:
             logger.error(f"处理事件时发生错误: {e}")
             return f'{example_query} 处理事件时发生错误: {e}', []
-        
-

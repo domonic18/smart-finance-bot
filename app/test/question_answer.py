@@ -5,17 +5,17 @@ from finance_bot_ex import FinanceBotEx
 from utils.logger_config import LoggerManager
 import datetime
 
-
 logger_manager = LoggerManager(name="TestQuestion", log_file="test_question.log")
 logger = logger_manager.logger
 
+
 class TestQuestion():
-    def __init__(self, 
-                 input_question_path,                               # 测试用例文件的读取路径
-                 output_answer_root_dic="test_result",              # 测试结果输出的保存目录
-                 test_plan_name="TestPlan",                         # 测试计划名称
-                 test_case_start=0,                                 # 测试用例的起始ID
-                 test_case_end=5                                    # 测试用例的结束ID
+    def __init__(self,
+                 input_question_path,  # 测试用例文件的读取路径
+                 output_answer_root_dic="test_result",  # 测试结果输出的保存目录
+                 test_plan_name="TestPlan",  # 测试计划名称
+                 test_case_start=0,  # 测试用例的起始ID
+                 test_case_end=5  # 测试用例的结束ID
                  ):
         self.input_question_path = input_question_path
         self.output_answer_root_dic = output_answer_root_dic
@@ -63,6 +63,7 @@ class TestQuestion():
         # 初始化测试结果输出文件路径
         log_path = os.path.join(self.test_result_dic, "test_question.log")
         logger_manager.set_log_file(log_path)
+
     def __load_data(self):
         # 一次性把数据存到内存中
         with open(self.input_question_path, mode='r', encoding='utf-8') as f:
@@ -70,6 +71,7 @@ class TestQuestion():
                 # 解析每一行的 JSON 数据
                 record = json.loads(line)
                 self.test_case_data.append(record)
+
     def __init_model(self):
         # self.model = FinanceBot()
         self.model = FinanceBotEx()
@@ -90,7 +92,6 @@ class TestQuestion():
                     user_input = input("检测到上次未执行的结果，是否继续执行？(y/n): ")
                     if user_input.lower() == 'y':
                         self.test_case_start = current_id
-
 
     def update_progress(self, current):
         """更新进度信息"""

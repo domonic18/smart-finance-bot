@@ -9,12 +9,13 @@ import nltk
 from nltk.corpus import stopwords
 import time
 from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import ConnectionError, AuthenticationException
 from elasticsearch import helpers
 import settings
 from utils.logger_config import LoggerManager
 
-# import warnings
-# warnings.simplefilter("ignore")  # 屏蔽 ES 的一些Warnings
+import warnings
+warnings.simplefilter("ignore")  # 屏蔽 ES 的一些Warnings
 nltk.download('stopwords')
 
 
@@ -45,18 +46,28 @@ class ElasticsearchDB(TraditionDB):
         #定义索引名称
         self.index_name = index_name
         self.k = k
-        url = f"{schema}://{host}:{port}"
 
-        logger.info(f'初始化ES服务连接：{url}')
 
-        self.es = Elasticsearch(
-            url,
-            ca_certs="./docker/elasticsearch/certs/ca/ca.crt",
-            basic_auth=("elastic", settings.ELASTIC_PASSWORD)
-        )
-        if not self.es.ping():
-            logger.error(f'ES连接失败：{url}')
-            raise ValueError(f"ES连接失败：{url}")
+        try:
+            url = f"{schema}://elastic:{settings.ELASTIC_PASSWORD}@{host}:{port}"
+            logger.info(f'初始化ES服务连接：{url}')
+
+            self.es = Elasticsearch(
+                url,
+                verify_certs=False,
+                # ca_certs="./docker/elasticsearch/certs/ca/ca.crt",
+                # basic_auth=("elastic", settings.ELASTIC_PASSWORD)
+            )
+
+            response = self.es.info()  # 尝试获取信息
+            logger.info(f'ES服务响应: {response}')
+        except (ConnectionError, AuthenticationException) as e:
+            logger.error(f'连接 Elasticsearch 失败: {e}')
+            raise
+        except Exception as e:
+            logger.error(f'发生其他错误: {e}')
+            logger.error(f'异常类型: {type(e).__name__}')  # 记录异常类型
+            raise
 
     def to_keywords(self,input_string):
         """将句子转成检索关键词序列"""

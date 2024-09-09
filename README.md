@@ -214,7 +214,19 @@ cd smart-finance-bot
 6. 至此，大模型修改完毕，你可以使用 `test_framework.py` 中的 `test_llm_api()` 进行测试。
 
 ### 关于启动ElasticSearch(简称ES)服务的方法
-命令行运行：
+第一步：vim 编辑 `/etc/sysctl.conf`，增加 `vm.max_map_count` 
+```bash
+vm.max_map_count=262144
+```
+编辑之后，运行以下命令以应用更改:
+```bash
+sudo sysctl -p
+```
+
+第二步：检查 docker/elasticsearch 目录下是否有读写权限。
+
+第三步：运行如下命令启动ES服务
+
 ```bash
 docker-compose -f docker-compose-es.yaml up -d
 ```

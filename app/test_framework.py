@@ -23,9 +23,9 @@ def test_agent():
 
 # 测试RAG主流程
 def test_rag():
-    from rag.retrievers import MultiQueryRetrieverWrapper
     from rag.rag import RagManager
     from rag.vector_db import ChromaDB
+    from rag.retrievers import SimpleRetriever
     llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
 
     # Chroma的配置
@@ -39,7 +39,7 @@ def test_rag():
 
     # 多查询检索器
     rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed,
-                             etriever_cls=MultiQueryRetrieverWrapper)
+                             etriever_cls=SimpleRetriever)
 
 
     example_query = "湖南长远锂科股份有限公司"
@@ -319,7 +319,6 @@ def test_es_add():
 
 def test_es_search():
     from rag.retrievers import ElasticsearchRetriever
-    from rag.retrievers import MultiQueryRetrieverWrapper
     from rag.rag import RagManager
     from rag.vector_db import ChromaDB
     llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
@@ -356,12 +355,12 @@ if __name__ == "__main__":
     # test_import_vector_db()
     # test_import_elasticsearch()
     # test_agent()
-    # test_rag()
+    test_rag()
     # test_financebot()
-    test_financebot_ex()
+    # test_financebot_ex()
     # test_llm_api()
     # test_answer_question()
     # test_clean_test_result()
-    # test_es_search()
+    test_es_search()
 
 

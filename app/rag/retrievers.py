@@ -7,6 +7,7 @@ from rag.elasticsearch_db import ElasticsearchDB
 # ES需要导入的库
 from typing import List
 import logging
+import settings
 
 logger = LoggerManager().logger
 
@@ -32,14 +33,19 @@ class SimpleRetriever(RetrieverBase):
         logging.basicConfig()
         logging.getLogger("langchain.retrievers.multi_query").setLevel(logging.INFO)
 
-        # 创建一个 ES 的 Retriever
-        es_retriever = ElasticsearchRetriever()
+        if settings.ELASTIC_ENABLE_USE == True:
+            # 创建一个 ES 的 Retriever
+            es_retriever = ElasticsearchRetriever()
 
-        # 将集合在一起
-        ensemble_retriever = EnsembleRetriever(
-        retrievers=[es_retriever, mq_retriever], weights=[0.5, 0.5])
+            # 将集合在一起
+            ensemble_retriever = EnsembleRetriever(
+            retrievers=[es_retriever, mq_retriever], weights=[0.5, 0.5])
 
-        return ensemble_retriever
+            logger.info(f'使用的检索器类: {ensemble_retriever.__class__.__name__}')
+            return ensemble_retriever
+        else:
+            logger.info(f'使用的检索器类: {mq_retriever.__class__.__name__}')
+            return mq_retriever
 
 
 class ElasticsearchRetrieverWrapper(RetrieverBase):

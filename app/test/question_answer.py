@@ -112,6 +112,11 @@ class TestQuestion():
         data_to_write = []
 
         for i in range(self.test_case_start, self.test_case_end):
+            # 加异常保护，避免end大于文件中实际个数
+            if i < 0 or i >= len(self.test_case_data):
+                logger.error(f"无效的索引: {i}.")
+                continue  # 跳过无效索引
+
             item = self.test_case_data[i]
             logger.info(f"ID: {item['id']}, Question: {item['question']}")
 

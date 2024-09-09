@@ -26,7 +26,7 @@ from utils.util import get_zhipu_chat_model
 """
 LLM = get_qwen_models(model="qwen-max")[0]
 CHAT = get_qwen_models(model="qwen-max")[1]
-EMBED = get_qwen_embeddings()
+# EMBED = get_qwen_embeddings()
 
 # ---------------------------------------------------------------------------------------------------------------------
 """
@@ -40,7 +40,6 @@ EMBED = get_qwen_embeddings()
 #   模型调用-输入:¥0.004元/千tokens
 #   模型调用-输出:¥0.012元/千tokens
 
-# MODEL = "ERNIE-Bot-turbo"
 # LLM = get_ernie_models()[0]
 # CHAT = get_ernie_models()[1]
 # EMBED = get_erine_embeddings()
@@ -60,7 +59,7 @@ EMBED = get_qwen_embeddings()
 # EMBED = get_zhipu_embeddings(model="embedding-3")
 
 """
-# 智普自主搭建的模型
+# 自主搭建的智普对话模型
 """
 SERVER_URL_BGE_CHAT = "http://sy-direct.virtaicloud.com:42796/v1"
 MODEL_UID_BGE_CHAT = "glm-4-9b-chat"
@@ -69,23 +68,29 @@ MODEL_UID_BGE_CHAT = "glm-4-9b-chat"
 # ---------------------------------------------------------------------------------------------------------------------
 
 """
-# 使用智普bge-m3的向量化模型
-#  本地部署：免费
+# 自主搭建的智普bge-m3的向量化模型
+# 负责人：陈富龙
 """
-SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:49173"
+# 旧地址
+# SERVER_URL_BGE  = "http://sy-direct.virtaicloud.com:49173"
+
+# 新的地址：2张卡，每个模型2个节点
+SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:23215"
 MODEL_UID_BGE = "bge-m3"
-# EMBED = get_bge_embeddings()
+EMBED = get_bge_embeddings()
+
 
 """
-# 使用网易的bce for rag向量化模型
-#  本地部署：免费
+# 自主搭建的网易bce for rag向量化模型
+# 负责人：陈富龙
 """
-SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:49173"
+SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:23215"
 MODEL_UID_BCE = "bce-embedding-base_v1"
 # EMBED = get_bce_embeddings()
 
 """
-# 意图识别问答模型的配置
+# 自主搭建的意图识别问答模型的配置
+# 负责人：刘林
 """
 BASE_URL = "http://direct.virtaicloud.com:45181/v1"
 API_KEY = "EMPTY"
@@ -105,6 +110,7 @@ CHROMA_HOST = os.getenv("CHROMA_HOST", "localhost")
 CHROMA_PORT = int(os.getenv("CHROMA_PORT", 8000))
 CHROMA_COLLECTION_NAME = "langchain"
 
+# 默认导入PDF时使用local方式导入
 CHROMA_SERVER_TYPE_IMPORT = "local"
 
 """
@@ -115,7 +121,6 @@ MILVUS_SERVER_TYPE = "http"
 MILVUS_HOST = "localhost"
 MILVUS_PORT = 19530
 MILVUS_COLLECTION_NAME = "langchain"
-
 
 """
 本地SQLite数据库相关的配置
@@ -133,11 +138,10 @@ SQLDATABASE_URI = os.path.join(root_directory, "dataset", "dataset", "博金杯�
 """
 ES数据库相关的配置
 """
-# 默认不使用ES服务
+# ES服务开关：True表示开启ES服务，False表示关闭ES服务
 ELASTIC_ENABLE_USE = True
 ELASTIC_PASSWORD = os.getenv("ELASTIC_PASSWORD", "123abc")
 ELASTIC_HOST = os.getenv("ELASTIC_HOST", "175.27.143.233")
 ELASTIC_PORT = os.getenv("ELASTIC_PORT", 9200)
 ELASTIC_SCHEMA = "https"
-# ELASTIC_INDEX_NAME = "smart_bot_index"
 ELASTIC_INDEX_NAME = "smart_test_index"

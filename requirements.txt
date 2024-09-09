@@ -1,15 +1,15 @@
 python-dotenv
 sse_starlette
-sentence-transformers~=3.0.1
+sentence-transformers
 uvicorn
 dashscope
 pymupdf
-langserve~=0.2.2
-langchain-community~=0.2.13
-langchain_openai~=0.1.23
-langchain-core~=0.2.35
-langchain_chroma~=0.1.2
-langgraph~=0.2.14
+langserve
+langchain-community
+langchain_openai
+langchain-core
+langchain_chroma
+langgraph
 langchain-milvus
 chromadb
 xinference_client
@@ -18,4 +18,3 @@ zhipuai
 elasticsearch
 jieba
 nltk
-elasticsearch7

@@ -72,7 +72,7 @@ pip install -r requirements.txt
 1. 访问网盘下载链接
 下载地址：https://share.weiyun.com/wa3QocyY
 2. 下载 `chroma_db_bge`
-3. 将`chroma_db_qwen`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`。
+3. 将`chroma_db_bge`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`。
 ```
 smart-finance-bot\
     |-chroma_db     # ←放在这个位置
@@ -95,14 +95,14 @@ scripts\start_chroma.bat
 ```
 
 ### 6、开展工作
-注意：此处后续的工作因为需求不尽相同，所以分别阐述介绍。
+注意：此处后续的工作因为需求不尽相同，所以请根据需求选择对应的内容阅读。
 - 如果你是要执行自动化测试，请查看 `6.1 批量化执行问题提问测试方法` 。
 - 如果你是想启动后端和前端查看Demo效果，请查看 `6.2 启动后端和前端查看Demo效果` 。
 - 如果你是想进行代码调试，请查看 `6.3 代码调试方法` 。
 
 #### 6.1 批量化执行问题提问测试方法
 #####  SQLite数据库批量建立索引方法
-第一步：执行命令给SQLite数据库建立索引
+**第一步**：执行命令给SQLite数据库建立索引
 ```bash 
 # 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot
@@ -113,7 +113,7 @@ cd smart-finance-bot
 > 注意：该项工作仅运行一次即可。
 
 ##### 配置自动化测试的start和end用例序号
-第二步：配置自动化测试的start和end用例序号
+**第二步**：配置自动化测试的start和end用例序号
 
 Linux/Mac用户：
 1. 编辑`scripts/run_test_cases.sh` 文件
@@ -131,7 +131,7 @@ python "%PYTHON_SCRIPT%" --job test_question --start 0 --end 100
 ```
 
 ##### 执行自动化脚本
-第三步：运行测试脚本
+**第三步**：运行测试脚本
 ```bash
 # 切换/保持当前目录为 smart-finance-bot
 cd smart-finance-bot

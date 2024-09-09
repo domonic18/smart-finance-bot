@@ -19,23 +19,21 @@ import warnings
 warnings.simplefilter("ignore")  # 屏蔽 ES 的一些Warnings
 
 # 方式一：自动下载停用词
-# nltk.download('stopwords')
+nltk.download('stopwords')
 
 # 方式二：手动下载并指定 NLTK 数据目录
 # 1. 从https://share.weiyun.com/wa3QocyY 下载stopwords.zip
 # 2. 解压到C:\nltk_data\corpora\stopwords目录下。(mac/linux注意改为对应的目录)
 # 3. 注释掉方式一的代码，启用下面的代码
-'''
-nltk_data_path = "C:\\nltk_data"
-nltk.data.path.append(nltk_data_path)
 
-# 检查是否能够获取停用词
-try:
-    chinese_stopwords = stopwords.words('chinese')
-    print(chinese_stopwords)
-except Exception as e:
-    print(f"Error: {e}")
-'''
+# nltk_data_path = "C:\\nltk_data"
+# nltk.data.path.append(nltk_data_path)
+# try:
+#     chinese_stopwords = stopwords.words('chinese')
+#     print(chinese_stopwords)
+# except Exception as e:
+#     print(f"Error: {e}")
+
 
 logger = LoggerManager().logger
 

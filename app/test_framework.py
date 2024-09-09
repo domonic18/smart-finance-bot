@@ -138,7 +138,7 @@ def test_answer_question():
 
     input_file_path = os.path.join(current_path, "dataset/question.json")
 
-    test_question = TestQuestion(input_file_path, test_case_start=0, test_case_end=10)
+    test_question = TestQuestion(input_file_path, test_case_start=45, test_case_end=46)
     test_question.run_cases()
 
 def test_llm_api():
@@ -352,16 +352,16 @@ def test_es_search():
 
 if __name__ == "__main__":
     # test_chroma_connect()
-    test_es_connect()
+    # test_es_connect()
     # test_es_add()
     # test_import_vector_db()
-    test_import_elasticsearch()
+    # test_import_elasticsearch()
     # test_agent()
     # test_rag()
     # test_financebot()
     # test_financebot_ex()
     # test_llm_api()
-    # test_answer_question()
+    test_answer_question()
     # test_clean_test_result()
     # test_es_search()
 

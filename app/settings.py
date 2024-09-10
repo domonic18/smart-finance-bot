@@ -72,10 +72,9 @@ MODEL_UID_BGE_CHAT = "glm-4-9b-chat"
 # 负责人：陈富龙
 """
 # 旧地址
-# SERVER_URL_BGE  = "http://sy-direct.virtaicloud.com:49173"
 
 # 新的地址：2张卡，每个模型2个节点
-SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:23215"
+SERVER_URL_BGE = "http://sy-direct.virtaicloud.com:49173"
 MODEL_UID_BGE = "bge-m3"
 EMBED = get_bge_embeddings()
 
@@ -84,7 +83,7 @@ EMBED = get_bge_embeddings()
 # 自主搭建的网易bce for rag向量化模型
 # 负责人：陈富龙
 """
-SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:23215"
+SERVER_URL_BCE = "http://sy-direct.virtaicloud.com:49173"
 MODEL_UID_BCE = "bce-embedding-base_v1"
 # EMBED = get_bce_embeddings()
 

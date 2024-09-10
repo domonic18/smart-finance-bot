@@ -8,25 +8,34 @@ from rag.elasticsearch_db import ElasticsearchDB
 from typing import List
 import logging
 import settings
+from langchain_community.document_transformers import (
+    LongContextReorder,
+)
+
 
 logger = LoggerManager().logger
 
 
-class RetrieverBase():
-    """检索器基类"""
+# class RetrieverBase():
+#     """检索器基类"""
+
+#     def __init__(self, store, llm, **kwargs):
+#         self.store = store
+#         self.llm = llm
+#         logger.info(f'检索器所使用的Chat模型：{self.llm}')
+
+#     def create_retriever(self):
+#         """创建检索器，子类需要实现这个方法"""
+#         raise NotImplementedError("子类必须实现 create_retriever 方法")
+
+
+class SimpleRetrieverWrapper():
+    """自定义检索器实现"""
 
     def __init__(self, store, llm, **kwargs):
         self.store = store
         self.llm = llm
         logger.info(f'检索器所使用的Chat模型：{self.llm}')
-
-    def create_retriever(self):
-        """创建检索器，子类需要实现这个方法"""
-        raise NotImplementedError("子类必须实现 create_retriever 方法")
-
-
-class SimpleRetriever(RetrieverBase):
-    """自定义检索器实现"""
 
     def create_retriever(self):
         logger.info(f'初始化SimpleRetriever')
@@ -51,17 +60,19 @@ class SimpleRetriever(RetrieverBase):
             logger.info(f'使用的检索器类: {mq_retriever.__class__.__name__}')
             return mq_retriever
 
-
-class ElasticsearchRetrieverWrapper(RetrieverBase):
-    def create_retriever(self):
-        return ElasticsearchRetriever()
-
-
 class ElasticsearchRetriever(BaseRetriever):
     def _get_relevant_documents(self, query: str, ) -> List[Document]:
         """Return the first k documents from the list of documents"""
         es_connector = ElasticsearchDB()
         query_result = es_connector.search(query)
+        
+        # 增加长上下文重排序
+        reordering = LongContextReorder()
+        reordered_docs = reordering.transform_documents(query_result)
+        logger.info(f"检索到的原始文档：{query_result}")
+        logger.info(f"重新排序后的文档：{reordered_docs}")
+        logger.info(f"检索到资料文件个数：{len(query_result)}")
+
         if query_result:
             return [Document(page_content=doc) for doc in query_result]
         return []
@@ -72,5 +83,4 @@ class ElasticsearchRetriever(BaseRetriever):
         query_result = es_connector.search(query)
         if query_result:
             return [Document(page_content=doc) for doc in query_result]
-            # return [Document(page_content=doc['content'], metadata={"source": doc['source']}) for doc in query_result]
         return []

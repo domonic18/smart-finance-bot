@@ -16,18 +16,6 @@ from langchain_community.document_transformers import (
 logger = LoggerManager().logger
 
 
-# class RetrieverBase():
-#     """检索器基类"""
-
-#     def __init__(self, store, llm, **kwargs):
-#         self.store = store
-#         self.llm = llm
-#         logger.info(f'检索器所使用的Chat模型：{self.llm}')
-
-#     def create_retriever(self):
-#         """创建检索器，子类需要实现这个方法"""
-#         raise NotImplementedError("子类必须实现 create_retriever 方法")
-
 
 class SimpleRetrieverWrapper():
     """自定义检索器实现"""
@@ -69,12 +57,19 @@ class ElasticsearchRetriever(BaseRetriever):
         # 增加长上下文重排序
         reordering = LongContextReorder()
         reordered_docs = reordering.transform_documents(query_result)
-        logger.info(f"检索到的原始文档：{query_result}")
-        logger.info(f"重新排序后的文档：{reordered_docs}")
+        logger.info(f"检索到的原始文档：")
+       
+        for poriginal in query_result:
+            logger.info(f"{poriginal}")
+
+        logger.info(f"重新排序后的文档：")
+        for preordered in reordered_docs:
+            logger.info(f"{preordered}")
+
         logger.info(f"检索到资料文件个数：{len(query_result)}")
 
-        if query_result:
-            return [Document(page_content=doc) for doc in query_result]
+        if reordered_docs:
+            return [Document(page_content=doc) for doc in reordered_docs]
         return []
 
     async def _aget_relevant_documents(self, query: str) -> List[Document]:

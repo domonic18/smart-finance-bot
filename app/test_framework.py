@@ -26,7 +26,7 @@ def test_agent():
 def test_rag():
     from rag.rag import RagManager
     from rag.vector_db import ChromaDB
-    from rag.retrievers import SimpleRetriever
+    from rag.retrievers import SimpleRetrieverWrapper
     llm, chat, embed = settings.LLM, settings.CHAT, settings.EMBED
 
     # Chroma的配置
@@ -40,7 +40,7 @@ def test_rag():
 
     # 多查询检索器
     rag_manager = RagManager(vector_db_class=ChromaDB, db_config=db_config, llm=llm, embed=embed,
-                             etriever_cls=SimpleRetriever)
+                             etriever_cls=SimpleRetrieverWrapper)
 
     # example_query = "湖南长远锂科股份有限公司"
     example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
@@ -131,8 +131,12 @@ def test_financebot_ex():
     # example_query = "湖南长远锂科股份有限公司变更设立时作为发起人的法人有哪些？"
     # example_query = "根据联化科技股份有限公司招股意见书，精细化工产品的通常利润率是多少？"
     # example_query = "20210304日，一级行业为非银金融的股票的成交量合计是多少？取整。"
-    # example_query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
-    example_query = "根据武汉兴图新科电子股份有限公司招股意向书，电子信息行业的上游涉及哪些企业？"
+    example_query = "云南沃森生物技术股份有限公司负责产品研发的是什么部门？"
+    # example_query = "根据武汉兴图新科电子股份有限公司招股意向书，电子信息行业的上游涉及哪些企业？"
+    # example_query = "常熟风范电力设备股份有限公司的机器设备成新率是多少？"
+    # example_query = "我想了解博时研究优选灵活配置混合(LOF)A基金,在2021年四季度的季报第3大重股。该持仓股票当个季度的涨跌幅?请四舍五入保留百分比到小数点两位。"
+    # example_query = "帮我查一下鹏扬景科混合A基金在20201126的资产净值和单位净值是多少?"
+    # example_query = "多晶硅成本约占宁波立立电子股份有限公司2007年度产品原材料成本的多大比例？"
 
     financebot.handle_query(example_query)
 
@@ -141,7 +145,7 @@ def test_answer_question():
     from test.question_answer import TestQuestion
     current_path = os.getcwd()
 
-    input_file_path = os.path.join(current_path, "dataset/复测用例.json")
+    input_file_path = os.path.join(current_path, "dataset/question.json")
 
     test_question = TestQuestion(input_file_path, test_case_start=0, test_case_end=2)
     test_question.run_cases()
@@ -268,8 +272,6 @@ def test_clean_test_result():
         for record in data_to_write:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
-    pass
-
 
 def test_es_connect():
     from elasticsearch import Elasticsearch
@@ -372,8 +374,8 @@ if __name__ == "__main__":
     # test_agent()
     # test_rag()
     # test_financebot()
-    # test_financebot_ex()
+    test_financebot_ex()
     # test_llm_api()
-    test_answer_question()
+    # test_answer_question()
     # test_clean_test_result()
     # test_es_search()

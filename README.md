@@ -71,8 +71,8 @@ pip install -r requirements.txt
 ### 4、准备向量数据库
 1. 访问网盘下载链接
 下载地址：https://share.weiyun.com/wa3QocyY
-2. 下载 `chroma_db_bge`
-3. 将`chroma_db_bge`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`。
+2. 下载 `chroma_db_bge_0911`
+3. 将`chroma_db_bge_0911`移动至`smart-finance-bot`目录下，并重命名为`chroma_db`。
 ```
 smart-finance-bot\
     |-chroma_db     # ←放在这个位置

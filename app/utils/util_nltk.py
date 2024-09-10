@@ -12,7 +12,7 @@ class UtilNltk:
         加载停用词
         """
         # 获取当前路径
-        current_dir = os.path.dirname(__file__)
+        current_dir = os.getcwd()
         nltk_data_path = os.path.join(current_dir, '..', 'nltk_data')
         nltk.data.path.append(nltk_data_path)
         try:

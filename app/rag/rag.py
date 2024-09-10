@@ -3,12 +3,14 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.runnables.base import RunnableLambda
 from langchain_core.output_parsers import StrOutputParser
-from .retrievers import SimpleRetriever
+from .retrievers import SimpleRetrieverWrapper
 from .vector_db import ChromaDB  # 导入 VectorDB 子类
 from .elasticsearch_db import TraditionDB
 from utils.logger_config import LoggerManager
 import settings
-
+from langchain_community.document_transformers import (
+    LongContextReorder,
+)
 # 配置日志记录
 logger = LoggerManager().logger
 
@@ -19,7 +21,7 @@ class RagManager:
                  es_db=TraditionDB,
                  db_config=None,  # 数据库配置参数
                  llm=None, embed=None,
-                 retriever_cls=SimpleRetriever, **retriever_kwargs):
+                 retriever_cls=SimpleRetrieverWrapper, **retriever_kwargs):
         self.llm = llm
         self.embed = embed
         logger.info(f'初始化llm大模型：{self.llm}')
@@ -90,6 +92,7 @@ class RagManager:
         try:
             result = rag_chain.invoke(input=question)
             logger.info(f"RAG查询结果：{result}")
+
             return result
         except Exception as e:
             logger.error(f"查询时发生错误：{e}")

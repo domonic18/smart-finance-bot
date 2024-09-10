@@ -39,13 +39,13 @@ class ChromaDB(VectorDB):
             self.store = Chroma(collection_name=collection_name,
                                 embedding_function=self.embed,
                                 client=client)
-            logger.info(f'Chroma数据库连接成功，连接方式：{chroma_server_type}, host:{self.host}, port:{self.port}')
+            logger.info(f'Chroma数据库连接成功，连接方式：{chroma_server_type}, host:{self.host}, port:{self.port}, embed:{self.embed}')
 
         elif chroma_server_type == "local":
             self.store = Chroma(collection_name=collection_name,
                                 embedding_function=self.embed,
                                 persist_directory=persist_path)
-            logger.info(f'Chroma数据库连接成功，连接方式：{chroma_server_type}, 本地持久化路径：{persist_path}')
+            logger.info(f'Chroma数据库连接成功，连接方式：{chroma_server_type}, 本地持久化路径：{persist_path}, embed:{self.embed}')
 
         if self.store is None:
             raise ValueError("Chroma store init failed!")

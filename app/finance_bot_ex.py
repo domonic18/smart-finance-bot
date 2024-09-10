@@ -79,7 +79,6 @@ class FinanceBotEx:
 
     def init_rag_tools(self):
         # 给大模型 RAG 检索器工具
-        # retriever = self.rag.get_retriever()
         retriever = self.rag.retriever_instance.create_retriever()
 
         retriever_tool = create_retriever_tool(
@@ -186,10 +185,12 @@ class FinanceBotEx:
                 result_list.append(event["messages"][-1].content)
 
             final_result = event["messages"][-1].content if result_list else None
+
             logger.info(f'查询过程：')
             for presult in result_list:
                 logger.info(f'【agent】: {presult}')
             logger.info(f"最终结果: {final_result}")
+            
             return final_result
         except Exception as e:
             logger.error(f"处理查询时出错: {e}")

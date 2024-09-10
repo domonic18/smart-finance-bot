@@ -91,7 +91,7 @@ class FinanceBotEx:
 
     def init_sql_tool(self, path):
         # 连接数据库
-        print(f"连接数据库: {path}")
+        logger.info(f"FinanceBotEx连接数据库: {path}")
         db = SQLDatabase.from_uri(f"sqlite:///{path}")
         toolkit = SQLDatabaseToolkit(db=db, llm=self.llm)
         sql_tools = toolkit.get_tools()  # 工具
@@ -127,6 +127,8 @@ class FinanceBotEx:
             1、如果查询过程中SQL语句有语法错误，减少查询量,总体查询次数应控制在15次以内。 
             2、请注意SQL语句的查询性能，SQL语句中如果有`SUM`、`COUNT(*)`的情况，务必使用`WITH FilteredIndustry`先筛选出符合条件的数据，然后再进行计算。
             3、对于复杂查询，请在生成 SQL 语句后使用 EXPLAIN 来评估查询计划，避免使用全表扫描或其他低效操作。
+            4、如果你在查询数据库时，已经尽力了但是没有找到答案，你可以尝试使用RAG检索工具来查找相关的资料。
+
                                                 
             # 关于你的思考和行动过程，请按照如下格式：
             问题：你必须回答的输入问题

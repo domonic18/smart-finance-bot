@@ -18,7 +18,7 @@ class RetrieverBase():
     def __init__(self, store, llm, **kwargs):
         self.store = store
         self.llm = llm
-        logger.info(f'检索器所使用的Embed模型：{self.llm}')
+        logger.info(f'检索器所使用的Chat模型：{self.llm}')
 
     def create_retriever(self):
         """创建检索器，子类需要实现这个方法"""

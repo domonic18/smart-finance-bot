@@ -37,7 +37,8 @@ class LoggerManager:
             console_handler.setLevel(self.logger.level)
             console_formatter = PrettyConsoleFormatter('%(asctime)s - %(levelname)s - %(message)s')
             console_handler.setFormatter(console_formatter)
-            self.logger.addHandler(console_handler)
+            # 先暂时关闭控制台的日志输出
+            # self.logger.addHandler(console_handler)
     def set_log_file(self, log_file):
         """修改日志文件路径"""
         self.log_file = log_file

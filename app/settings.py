@@ -24,7 +24,7 @@ from utils.util import get_zhipu_chat_model
 #   模型调用-输入:0.0005/text_token（千个）
 #   模型调用-输出:0.002/text_token（千个）
 """
-LLM = get_qwen_models(model="qwen-max")[0]
+# LLM = get_qwen_models(model="qwen-max")[0]
 CHAT = get_qwen_models(model="qwen-max")[1]
 # EMBED = get_qwen_embeddings()
 
@@ -54,7 +54,7 @@ CHAT = get_qwen_models(model="qwen-max")[1]
 #   单价：0.001 元 / 千tokens
 #   Batch API 定价：0.0005元 / 千tokens
 """
-# LLM = get_zhipu_models(model="glm-4-plus")
+LLM = get_zhipu_models(model="glm-4-plus")
 # CHAT = get_zhipu_models(model="glm-4-flash")
 # EMBED = get_zhipu_embeddings(model="embedding-3")
 

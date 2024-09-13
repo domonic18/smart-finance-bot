@@ -61,7 +61,7 @@ class SimpleRetrieverWrapper():
                 # 如果开启了压缩检索器，就将ES检索器的权重调整为0.3
                 es_compressor = LLMChainExtractor.from_llm(llm=self.llm)
                 es_compression_retriever = ContextualCompressionRetrieverWrapper(
-                    base_compressor=compressor, base_retriever=es_retriever
+                    base_compressor=es_compressor, base_retriever=es_retriever
                 )
                 # 开启开关就使用压缩检索器
                 retrievers.append(es_compression_retriever)

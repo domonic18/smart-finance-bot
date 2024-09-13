@@ -156,3 +156,9 @@ def get_zhipu_chat_model():
                       api_key="xxxx", )
 
     return chat
+
+def get_rerank_model():
+    from qianfan.resources import Reranker
+    r = Reranker(model="bce-reranker-base_v1") 
+
+    return r
